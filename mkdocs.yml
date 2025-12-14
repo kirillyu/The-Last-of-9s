@@ -7,25 +7,22 @@ theme:
   name: material
   language: en
   palette:
-    # По умолчанию - следовать системным настройкам
-    - media: "(prefers-color-scheme)"
-      toggle:
-        icon: material/brightness-auto
-        name: Переключить на светлую тему
-    # Светлая тема (при ручном выборе)
-    - scheme: default
+    # Светлая тема (автоматически когда система в light mode)
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
       primary: indigo
       accent: indigo
       toggle:
         icon: material/brightness-7
         name: Переключить на тёмную тему
-    # Тёмная тема (при ручном выборе)
-    - scheme: slate
+    # Тёмная тема (автоматически когда система в dark mode)
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
       primary: indigo
       accent: indigo
       toggle:
         icon: material/brightness-4
-        name: Переключить на автоматическую
+        name: Переключить на светлую тему
   features:
     - navigation.instant
     - navigation.instant.prefetch
@@ -38,7 +35,6 @@ theme:
     - navigation.top
     - navigation.footer
     - toc.follow
-    - toc.integrate
     - search.suggest
     - search.highlight
     - search.share
@@ -68,10 +64,8 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Russian:
-    - ru/index.md
-  - English:
-    - en/index.md
+  - Русские статьи: ru/index.md
+  - English Articles: en/index.md
 
 plugins:
   - search

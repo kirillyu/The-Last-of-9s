@@ -7,7 +7,14 @@ theme:
   name: material
   language: en
   palette:
-    # Светлая тема (автоматически когда система в light mode)
+    # Автоматическая тема по системе (по умолчанию)
+    - media: "(prefers-color-scheme)"
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-auto
+        name: Переключить на светлую тему
+    # Светлая тема (ручной выбор)
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: indigo
@@ -15,14 +22,14 @@ theme:
       toggle:
         icon: material/brightness-7
         name: Переключить на тёмную тему
-    # Тёмная тема (автоматически когда система в dark mode)
+    # Тёмная тема (ручной выбор)
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: indigo
       accent: indigo
       toggle:
         icon: material/brightness-4
-        name: Переключить на светлую тему
+        name: Вернуться к автоматической
   features:
     - navigation.instant
     - navigation.instant.prefetch

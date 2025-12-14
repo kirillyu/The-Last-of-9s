@@ -1,6 +1,19 @@
 # The Last of 9s
 
-Performance engineering blog powered by MkDocs and GitHub Pages.
+Performance engineering blog powered by MkDocs Material and GitHub Pages.
+
+## ✨ Features
+
+- 🎨 **Material Design** - Beautiful, responsive theme
+- 🌓 **Adaptive Theme** - Automatically follows system preferences (light/dark mode) with manual toggle
+- 📱 **Mobile-First** - Optimized for all devices
+- 📑 **Table of Contents** - Automatic navigation through article headings with scroll tracking
+- 🔍 **Search** - Full-text search with suggestions
+- 💻 **Code Highlighting** - Syntax highlighting with copy button
+- 📊 **Tables** - Responsive tables with horizontal scroll on mobile
+- 🚀 **Fast** - Static site generation with instant navigation and prefetch
+- 🌐 **Bilingual** - Support for Russian and English articles
+- 🎯 **Admonitions** - Beautiful callouts for notes, warnings, and tips
 
 ## Structure
 

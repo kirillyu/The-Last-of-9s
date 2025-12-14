@@ -7,32 +7,49 @@ theme:
   name: material
   language: en
   palette:
+    # По умолчанию - следовать системным настройкам
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Переключить на светлую тему
+    # Светлая тема (при ручном выборе)
     - scheme: default
       primary: indigo
       accent: indigo
       toggle:
         icon: material/brightness-7
-        name: Switch to dark mode
+        name: Переключить на тёмную тему
+    # Тёмная тема (при ручном выборе)
     - scheme: slate
       primary: indigo
       accent: indigo
       toggle:
         icon: material/brightness-4
-        name: Switch to light mode
+        name: Переключить на автоматическую
   features:
     - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
     - navigation.tracking
     - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
     - navigation.expand
     - navigation.top
+    - navigation.footer
+    - toc.follow
+    - toc.integrate
     - search.suggest
     - search.highlight
+    - search.share
     - content.code.copy
+    - content.code.annotate
 
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
@@ -44,6 +61,10 @@ markdown_extensions:
   - footnotes
   - attr_list
   - md_in_html
+  - toc:
+      permalink: true
+      permalink_title: Anchor link to this section
+      toc_depth: 3
 
 nav:
   - Home: index.md

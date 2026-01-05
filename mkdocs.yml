@@ -1,39 +1,43 @@
 site_name: The Last of 9s
-site_description: Performance engineering blog
+site_description: Engineering epic on performance, observability, and reliability
 site_author: Kirill Yu
 site_url: https://kirillyu.github.io/The-Last-of-9s/
+use_directory_urls: false
+exclude_docs: |
+  _includes/**
+
 
 theme:
   name: material
+  custom_dir: overrides
   language: en
+  font: false
   palette:
     # Автоматическая тема по системе (по умолчанию)
     - media: "(prefers-color-scheme)"
-      primary: indigo
-      accent: indigo
+      primary: blue grey
+      accent: green
       toggle:
         icon: material/brightness-auto
-        name: Переключить на светлую тему
+        name: Switch to light theme
     # Светлая тема (ручной выбор)
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: indigo
-      accent: indigo
+      primary: blue grey
+      accent: green
       toggle:
         icon: material/brightness-7
-        name: Переключить на тёмную тему
+        name: Switch to dark theme
     # Тёмная тема (ручной выбор)
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: indigo
-      accent: indigo
+      primary: blue grey
+      accent: green
       toggle:
         icon: material/brightness-4
-        name: Вернуться к автоматической
+        name: Switch to auto theme
+  logo: assets/logo-optimized.png
   features:
-    - navigation.instant
-    - navigation.instant.prefetch
-    - navigation.instant.progress
     - navigation.tracking
     - navigation.tabs
     - navigation.tabs.sticky
@@ -70,10 +74,37 @@ markdown_extensions:
       toc_depth: 3
 
 nav:
-  - Home: index.md
-  - Русские статьи: ru/index.md
-  - English Articles: en/index.md
+  - index.md
+  - blog.md
+  - dashboards.md
+  - about.md
+
 
 plugins:
-  - search
+  - search:
+      lang:
+        - en
+        - ru
+  - i18n:
+      docs_structure: folder
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+        - locale: ru
+          name: Русский
+          build: true
 
+
+extra_css:
+  - assets/styles/fonts.css
+  - assets/styles/brand.css
+  - assets/styles/layout.css
+  - assets/styles/components.css
+
+extra_javascript:
+  - assets/scripts/hero-bg.js
+  - assets/scripts/brand-anim.js
+  - assets/scripts/site-nav.js
+  - assets/scripts/lang-setup.js

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+<title>The Last of 9s (RU)</title>
+<link>https://kirillyu.github.io/The-Last-of-9s/ru/index.html</link>
+<description>Engineering epic on performance, observability, and reliability</description>
+<language>ru</language>
+<item>
+<title>Ideal application deployment</title>
+<link>https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-23-ideal-deployment.html</link>
+<guid isPermaLink="true">https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-23-ideal-deployment.html</guid>
+<pubDate>Tue, 23 Dec 2025 00:00:00 +0000</pubDate>
+<description>The First Nine Guide, блок 4: как деплоить без троттлинга и сюрпризов</description>
+</item>
+<item>
+<title>Typical web-application inner architecture</title>
+<link>https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-22-inner-architecture.html</link>
+<guid isPermaLink="true">https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-22-inner-architecture.html</guid>
+<pubDate>Mon, 22 Dec 2025 00:00:00 +0000</pubDate>
+<description>The First Nine Guide, блок 3: слои веб-приложения и внутренняя архитектура</description>
+</item>
+<item>
+<title>Runtime models: как запускать тысячи функций одновременно</title>
+<link>https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-21-runtime-models.html</link>
+<guid isPermaLink="true">https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-21-runtime-models.html</guid>
+<pubDate>Sun, 21 Dec 2025 00:00:00 +0000</pubDate>
+<description>The First Nine Guide, блок 2: модели исполнения и их компромиссы</description>
+</item>
+<item>
+<title>Function: the atomic unit of code</title>
+<link>https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-20-function-atomic-unit.html</link>
+<guid isPermaLink="true">https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-20-function-atomic-unit.html</guid>
+<pubDate>Sat, 20 Dec 2025 00:00:00 +0000</pubDate>
+<description>The First Nine Guide, блок 1: атом кода, сложность и ресурсы</description>
+</item>
+<item>
+<title>Полное руководство по анализу производительности Linux</title>
+<link>https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-performance-guide.html</link>
+<guid isPermaLink="true">https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-performance-guide.html</guid>
+<pubDate>Sun, 14 Dec 2025 00:00:00 +0000</pubDate>
+<description>Подробное руководство по инструментам и методикам анализа производительности систем на базе Linux</description>
+</item>
+</channel>
+</rss>

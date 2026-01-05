@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+<title>The Last of 9s</title>
+<link>https://kirillyu.github.io/The-Last-of-9s/index.html</link>
+<description>Engineering epic on performance, observability, and reliability</description>
+<language>en</language>
+<item>
+<title>Ideal application deployment</title>
+<link>https://kirillyu.github.io/The-Last-of-9s/2025-12-23-ideal-deployment.html</link>
+<guid isPermaLink="true">https://kirillyu.github.io/The-Last-of-9s/2025-12-23-ideal-deployment.html</guid>
+<pubDate>Tue, 23 Dec 2025 00:00:00 +0000</pubDate>
+<description>The First Nine Guide, block 4: deploying without throttling surprises</description>
+</item>
+<item>
+<title>Typical web-application inner architecture</title>
+<link>https://kirillyu.github.io/The-Last-of-9s/2025-12-22-inner-architecture.html</link>
+<guid isPermaLink="true">https://kirillyu.github.io/The-Last-of-9s/2025-12-22-inner-architecture.html</guid>
+<pubDate>Mon, 22 Dec 2025 00:00:00 +0000</pubDate>
+<description>The First Nine Guide, block 3: request layers and internal service anatomy</description>
+</item>
+<item>
+<title>Runtime models: running thousands of functions at once</title>
+<link>https://kirillyu.github.io/The-Last-of-9s/2025-12-21-runtime-models.html</link>
+<guid isPermaLink="true">https://kirillyu.github.io/The-Last-of-9s/2025-12-21-runtime-models.html</guid>
+<pubDate>Sun, 21 Dec 2025 00:00:00 +0000</pubDate>
+<description>The First Nine Guide, block 2: execution models and their tradeoffs</description>
+</item>
+<item>
+<title>Function: the atomic unit of code</title>
+<link>https://kirillyu.github.io/The-Last-of-9s/2025-12-20-function-atomic-unit.html</link>
+<guid isPermaLink="true">https://kirillyu.github.io/The-Last-of-9s/2025-12-20-function-atomic-unit.html</guid>
+<pubDate>Sat, 20 Dec 2025 00:00:00 +0000</pubDate>
+<description>The First Nine Guide, block 1: complexity, resources, and concurrency safety</description>
+</item>
+<item>
+<title>Complete Guide to Linux Performance Analysis</title>
+<link>https://kirillyu.github.io/The-Last-of-9s/2025-12-performance-guide.html</link>
+<guid isPermaLink="true">https://kirillyu.github.io/The-Last-of-9s/2025-12-performance-guide.html</guid>
+<pubDate>Sun, 14 Dec 2025 00:00:00 +0000</pubDate>
+<description>Comprehensive guide to tools and techniques for analyzing system performance on Linux</description>
+</item>
+</channel>
+</rss>

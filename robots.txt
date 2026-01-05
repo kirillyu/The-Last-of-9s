@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://kirillyu.github.io/The-Last-of-9s/sitemap.xml

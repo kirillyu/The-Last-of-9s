@@ -6,19 +6,23 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Performance engineering blog">
+        <meta name="description" content="Engineering epic on performance, observability, and reliability">
       
       
         <meta name="author" content="Kirill Yu">
       
       
-        <link rel="canonical" href="https://kirillyu.github.io/The-Last-of-9s/">
+        <link rel="canonical" href="https://kirillyu.github.io/The-Last-of-9s/index.html">
       
       
       
-        <link rel="next" href="ru/">
+        <link rel="next" href="blog.html">
       
       
+        
+          <link rel="alternate" href="index.html" hreflang="en">
+        
+          <link rel="alternate" href="ru/index.html" hreflang="ru">
         
       
       
@@ -27,7 +31,7 @@
     
     
       
-        <title>The Last of 9s</title>
+        <title>Home - The Last of 9s</title>
       
     
     
@@ -45,13 +49,15 @@
     
     
       
-        
-        
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
-      
     
+    
+      <link rel="stylesheet" href="assets/styles/fonts.css">
+    
+      <link rel="stylesheet" href="assets/styles/brand.css">
+    
+      <link rel="stylesheet" href="assets/styles/layout.css">
+    
+      <link rel="stylesheet" href="assets/styles/components.css">
     
     <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -59,6 +65,55 @@
 
     
     
+  
+  <script>
+    // Ensure language selector links always navigate (base-path safe).
+    // Registered early (in <head>) so it can win against later event handlers.
+    (() => {
+      window.addEventListener(
+        "click",
+        (e) => {
+          const target = e.target;
+          if (!(target instanceof Element)) return;
+          const link = target.closest("a.md-select__link");
+          if (!link) return;
+          const href = link.getAttribute("href");
+          if (!href || href.startsWith("javascript:")) return;
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          window.location.href = link.href;
+        },
+        true
+      );
+    })();
+  </script>
+  
+  
+  
+  
+  
+  
+    
+  
+  
+    <meta property="og:title" content="Home">
+    <meta name="twitter:title" content="Home">
+  
+  
+    <meta property="og:description" content="Engineering epic on performance, observability, and reliability">
+    <meta name="twitter:description" content="Engineering epic on performance, observability, and reliability">
+  
+  
+    <meta property="og:url" content="https://kirillyu.github.io/The-Last-of-9s/index.html">
+  
+  <meta property="og:site_name" content="The Last of 9s">
+  <meta property="og:type" content="website">
+  
+    <meta property="og:image" content="https://kirillyu.github.io/The-Last-of-9s/assets/logo-optimized.png">
+    <meta name="twitter:image" content="https://kirillyu.github.io/The-Last-of-9s/assets/logo-optimized.png">
+  
+  <meta name="twitter:card" content="summary">
+
   </head>
   
   
@@ -69,7 +124,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="green">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -78,7 +133,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#blog" class="md-skip">
+        <a href="#dashboards" class="md-skip">
           Skip to content
         </a>
       
@@ -90,12 +145,13 @@
     
       
 
-<header class="md-header" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="The Last of 9s" class="md-header__button md-logo" aria-label="The Last of 9s" data-md-component="logo">
-      
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="The Last of 9s" class="md-header__button md-logo" aria-label="The Last of 9s" data-md-component="logo">
+      
+  <img src="assets/logo-optimized.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -125,9 +181,19 @@
     
     
     
-    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="green"  aria-label="Switch to light theme"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+      <label class="md-header__button md-icon" title="Switch to light theme" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="green"  aria-label="Switch to dark theme"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark theme" for="__palette_2" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -135,9 +201,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="green"  aria-label="Switch to auto theme"  type="radio" name="__palette" id="__palette_2">
     
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+      <label class="md-header__button md-icon" title="Switch to auto theme" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -148,6 +214,32 @@
     
       <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="index.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="ru/index.html" hreflang="ru" class="md-select__link">
+              Русский
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
     
     
       
@@ -168,6 +260,11 @@
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
       </label>
       <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
         
         <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           
@@ -195,14 +292,8 @@
     
   </nav>
   
-</header>
     
-    <div class="md-container" data-md-component="container">
       
-      
-        
-          
-            
 <nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
   <div class="md-grid">
     <ul class="md-tabs__list">
@@ -215,7 +306,7 @@
   
   
     <li class="md-tabs__item md-tabs__item--active">
-      <a href="." class="md-tabs__link">
+      <a href="index.html" class="md-tabs__link">
         
   
   
@@ -233,18 +324,17 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="ru/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="blog.html" class="md-tabs__link">
+        
   
   
-  Russian
+    
+  
+  Blog
 
-        </a>
-      </li>
-    
+      </a>
+    </li>
   
 
       
@@ -253,31 +343,57 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="en/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="dashboards.html" class="md-tabs__link">
+        
   
   
-  English
+    
+  
+  Dashboards
 
-        </a>
-      </li>
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="about.html" class="md-tabs__link">
+        
+  
+  
     
+  
+  About
+
+      </a>
+    </li>
   
 
       
     </ul>
   </div>
 </nav>
-          
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
         
       
       <main class="md-main" data-md-component="main">
         <div class="md-main__inner md-grid">
           
             
+              
+                
               
               <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
                 <div class="md-sidebar__scrollwrap">
@@ -290,10 +406,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="The Last of 9s" class="md-nav__button md-logo" aria-label="The Last of 9s" data-md-component="logo">
+    <a href="index.html" title="The Last of 9s" class="md-nav__button md-logo" aria-label="The Last of 9s" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+  <img src="assets/logo-optimized.png" alt="logo">
 
     </a>
     The Last of 9s
@@ -314,8 +429,6 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
-        
-      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
@@ -335,7 +448,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <a href="." class="md-nav__link md-nav__link--active">
+      <a href="index.html" class="md-nav__link md-nav__link--active">
         
   
   
@@ -358,8 +471,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -368,10 +479,71 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#latest-posts" class="md-nav__link">
+  <a href="#dashboards" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Latest posts
+        Dashboards
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#latest-longreads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Latest longreads
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading paths
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reading paths">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-first-nine-guide-start-here" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The First Nine Guide (Start Here)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tracks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tracks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#about" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        About
       
     </span>
   </a>
@@ -392,69 +564,15 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Russian
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Russian
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="ru/" class="md-nav__link">
+      <a href="blog.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Русские статьи
+    Blog
   
 
     
@@ -466,84 +584,22 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
     
       
       
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    English
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    English
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
   
   
   
   
     <li class="md-nav__item">
-      <a href="en/" class="md-nav__link">
+      <a href="dashboards.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    English Articles
+    Dashboards
   
 
     
@@ -555,11 +611,30 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
+    
       
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="about.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -572,7 +647,9 @@
             
             
               
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" hidden>
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
@@ -580,8 +657,6 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
-  
-    
   
   
     <label class="md-nav__title" for="__toc">
@@ -591,10 +666,71 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#latest-posts" class="md-nav__link">
+  <a href="#dashboards" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Latest posts
+        Dashboards
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#latest-longreads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Latest longreads
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading paths
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reading paths">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-first-nine-guide-start-here" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The First Nine Guide (Start Here)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tracks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tracks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#about" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        About
       
     </span>
   </a>
@@ -615,44 +751,105 @@
               <article class="md-content__inner md-typeset">
                 
                   
-
-
-
-<h1 id="blog">Blog</h1>
-<h2 id="latest-posts">Latest posts</h2>
-<table>
-<thead>
-<tr>
-<th>Date</th>
-<th>Title</th>
-<th>Description</th>
-<th>Lang</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2025-12-13</td>
-<td><a href="ru/2025-12-welcome/">Пример статьи - Добро пожаловать</a></td>
-<td>Примерная статья для демонстрации структуры блога</td>
-<td>RU</td>
-</tr>
-<tr>
-<td>2025-12-13</td>
-<td><a href="en/2025-12-welcome/">Example Article - Welcome</a></td>
-<td>Example article to demonstrate blog structure</td>
-<td>EN</td>
-</tr>
-</tbody>
-</table>
+  
 
 
 
 
+<div class="tl9-mock">
+  <div class="tl9-featured">
+    <div class="tl9-featured-copy" markdown>
+      <div class="hero-eyebrow">The Last of 9s</div>
+      <h1 class="hero-title">Notes on chasing the last 9s.</h1>
+      <p class="hero-lede">
+        Personal engineering blog on tail latency, profiling, SLO math, incident anatomy, and systems that refuse to slow down.
+      </p>
+
+      <div class="hero-links">
+        <a href="blog.html">Blog</a>
+        <a href="dashboards.html">Dashboards</a>
+        <a href="https://t.me/r9yo11yp9e">Telegram</a>
+        <a href="rss.xml">RSS</a>
+      </div>
+
+      <div class="hero-lang">
+        Russian mirror: <a href="ru/index.html">Read in Russian</a>.
+      </div>
+    </div>
+
+    <figure class="tl9-cover tl9-cover--featured">
+      <img src="assets/first-nine/MhmI7Hww45eHuNJ849daWzYGyTQmjeqNGp8Y4OrCYpI=.webp" alt="Featured cover" width="1248" height="702" loading="eager" decoding="async" fetchpriority="high" />
+      <figcaption class="tl9-caption">The First Nine Guide — featured</figcaption>
+    </figure>
+  </div>
+
+  <div class="section-block"></div>
+
+  <div class="tl9-cover-grid">
+    <a class="tl9-mini-cover tl9-spotlight" href="2025-12-20-function-atomic-unit.html">
+      <img src="assets/first-nine/EwBYEJTCrd8aHhoYbMJ6Ycp7tZEZWvig0oJtJIbX1Yw=.webp" alt="Block 1 cover" width="1248" height="702" loading="lazy" decoding="async" />
+      <span class="tl9-mini-title">Block 1 — Function</span>
+    </a>
+    <a class="tl9-mini-cover tl9-spotlight" href="2025-12-21-runtime-models.html">
+      <img src="assets/first-nine/xofaKKCZrH3F565AvyBwXzS86ezS8i7ivme5KTwImwE=.webp" alt="Block 2 cover" width="1248" height="702" loading="lazy" decoding="async" />
+      <span class="tl9-mini-title">Block 2 — Runtime models</span>
+    </a>
+    <a class="tl9-mini-cover tl9-spotlight" href="2025-12-22-inner-architecture.html">
+      <img src="assets/first-nine/lCHu3kApwnEGAEb22UaoNv6wZ9ANDtHAfYjzw91ahOc=.webp" alt="Block 3 cover" width="1248" height="702" loading="lazy" decoding="async" />
+      <span class="tl9-mini-title">Block 3 — Inner architecture</span>
+    </a>
+    <a class="tl9-mini-cover tl9-spotlight" href="2025-12-23-ideal-deployment.html">
+      <img src="assets/first-nine/MhmI7Hww45eHuNJ849daWzYGyTQmjeqNGp8Y4OrCYpI=.webp" alt="Block 4 cover" width="1248" height="702" loading="lazy" decoding="async" />
+      <span class="tl9-mini-title">Block 4 — Deployment</span>
+    </a>
+  </div>
+</div>
+
+<h2 id="dashboards">Dashboards<a class="headerlink" href="#dashboards" title="Anchor link to this section">&para;</a></h2>
+<div class="sketch-panel">
+<ul>
+<li>Latency Terrain: percentiles, saturation, tail amplification</li>
+<li>Reliability Radar: SLO tracking and error budgets</li>
+<li>Capacity Forge: CPU, memory, IO, queue health</li>
+<li>Incident Lens: traces, logs, and error clusters</li>
+</ul>
+</div>
+<h2 id="latest-longreads">Latest longreads<a class="headerlink" href="#latest-longreads" title="Anchor link to this section">&para;</a></h2>
+<h2 id="reading-paths">Reading paths<a class="headerlink" href="#reading-paths" title="Anchor link to this section">&para;</a></h2>
+<p><a id="reading-paths"></a></p>
+<h3 id="the-first-nine-guide-start-here">The First Nine Guide (Start Here)<a class="headerlink" href="#the-first-nine-guide-start-here" title="Anchor link to this section">&para;</a></h3>
+<p>A narrative engineering series with Excalidraw diagrams, moving from the smallest unit of code to deployment.</p>
+<ul>
+<li>Block 1 — <strong><a href="2025-12-20-function-atomic-unit.html">Function: the atomic unit of code</a></strong></li>
+<li>Block 2 — <strong><a href="2025-12-21-runtime-models.html">Runtime models: running thousands of functions at once</a></strong></li>
+<li>Block 3 — <strong><a href="2025-12-22-inner-architecture.html">Typical web-application inner architecture</a></strong></li>
+<li>Block 4 — <strong><a href="2025-12-23-ideal-deployment.html">Ideal application deployment</a></strong></li>
+</ul>
+<h3 id="tracks">Tracks<a class="headerlink" href="#tracks" title="Anchor link to this section">&para;</a></h3>
+<p><strong>Performance archaeology</strong><br />
+Start with <strong><a href="2025-12-performance-guide.html">Complete Guide to Linux Performance Analysis</a></strong>.</p>
+<p><strong>Reliability engineering</strong><br />
+Covering SLO math, error budgets, and incident anatomy. See <a href="dashboards.html">Dashboards</a> for signal design.</p>
+<h2 id="about">About<a class="headerlink" href="#about" title="Anchor link to this section">&para;</a></h2>
+<p>The Last of 9s is a personal engineering lab. Longreads ship in English first, with a Russian
+mirror. Expect hard tradeoffs, practical runbooks, and hands-on profiling.</p>
+<div class="section-block">
+<p><span class="signal">New here?</span> Start with <a href="#reading-paths">Reading paths</a>.</p>
+</div>
 
 
 
 
 
+
+
+  
+  
+
+
+
+
+  
 
 
 
@@ -673,6 +870,32 @@
       </main>
       
         <footer class="md-footer">
+  
+    
+      
+        
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+        
+          
+          <a href="blog.html" class="md-footer__link md-footer__link--next" aria-label="Next: Blog">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Blog
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -699,10 +922,18 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate"], "search": "assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="assets/scripts/hero-bg.js"></script>
+      
+        <script src="assets/scripts/brand-anim.js"></script>
+      
+        <script src="assets/scripts/site-nav.js"></script>
+      
+        <script src="assets/scripts/lang-setup.js"></script>
       
     
   </body>

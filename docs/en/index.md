@@ -9,9 +9,9 @@ title: Home
   <div class="tl9-featured">
     <div class="tl9-featured-copy" markdown>
       <div class="hero-eyebrow">The Last of 9s</div>
-      <h1 class="hero-title">Notes on chasing the last 9s.</h1>
+      <h1 class="hero-title">The last stronghold of hardcore SRE.</h1>
       <p class="hero-lede">
-        Personal engineering blog on tail latency, profiling, SLO math, incident anatomy, and systems that refuse to slow down.
+        No marketing, just pure engineering. War stories, hacks, and tech guides on observability, performance, reliability, and troubleshooting. Here we fight for the nines after the decimal point.
       </p>
 
       <div class="hero-links">
@@ -20,6 +20,10 @@ title: Home
         <a href="https://t.me/r9yo11yp9e">Telegram</a>
         <a href="rss.xml">RSS</a>
       </div>
+      
+      <p class="hero-sublede">
+        Short notes and discussions - in the Telegram channel <a href="https://t.me/r9yo11yp9e">The Last of 9s</a>.
+      </p>
 
       <div class="hero-lang">
         Russian mirror: <a href="ru/index.html">Read in Russian</a>.
@@ -92,8 +96,7 @@ Covering SLO math, error budgets, and incident anatomy. See [Dashboards](dashboa
 
 ## About
 
-The Last of 9s is a personal engineering lab. Longreads ship in English first, with a Russian
-mirror. Expect hard tradeoffs, practical runbooks, and hands-on profiling.
+The Last of 9s is an engineering blog where I share my experience and approaches on how to build processes from scratch and solve applied tasks around my favorite aspects of systems. More in <a href="about.md">About</a>.
 
 <div class="section-block" markdown>
 <span class="signal">New here?</span> Start with <a href="#reading-paths">Reading paths</a>.

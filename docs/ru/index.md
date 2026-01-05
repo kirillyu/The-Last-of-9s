@@ -9,9 +9,9 @@ title: Главная
   <div class="tl9-featured">
     <div class="tl9-featured-copy" markdown>
       <div class="hero-eyebrow">The Last of 9s</div>
-      <h1 class="hero-title">Заметки про охоту за последними девятками.</h1>
+      <h1 class="hero-title">Последний оплот хардкорного SRE.</h1>
       <p class="hero-lede">
-        Личный инженерный блог про tail latency, профилирование, SLO-математику, анатомию инцидентов и системы, которые не любят тормозить.
+        Никакого маркетинга, только суровая инженерия. Кулстори, хаки и техгайды про наблюдаемость, перформанс, устойчивость и траблшутинг. Здесь мы боремся за девятки после запятой.
       </p>
 
       <div class="hero-links">
@@ -20,6 +20,10 @@ title: Главная
         <a href="https://t.me/r9yo11yp9e">Telegram</a>
         <a href="../rss-ru.xml">RSS</a>
       </div>
+      
+      <p class="hero-sublede">
+        Короткие заметки и обсуждения - в Telegram канале <a href="https://t.me/r9yo11yp9e">The Last of 9s</a>.
+      </p>
 
       <div class="hero-lang">
         English first: <a href="../index.html">Switch to English</a>.
@@ -92,8 +96,7 @@ SLO-математика, бюджеты ошибок и анатомия инц
 
 ## О блоге
 
-The Last of 9s - личная инженерная лаборатория. Лонгриды сначала выходят на английском, затем
-русская версия. Без воды: инженерные истории, runbook и практика.
+The Last of 9s - это инженерный блог, в котором я делюсь опытом и подходами к тому, как построить процессы с нуля и решать прикладные задачи вокруг моих любимых аспектов систем. Подробнее в разделе <a href="about.md">Обо мне</a>.
 
 <div class="section-block" markdown>
 <span class="signal">Новый читатель?</span> Начни с секции <a href="#reading-paths">Маршруты</a>.

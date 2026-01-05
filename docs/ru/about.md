@@ -4,23 +4,25 @@ title: Обо мне
 
 # Обо мне
 
-The Last of 9s — личная инженерная лаборатория про performance, observability и reliability. Стиль
-блога намеренно технический: лонгриды, runbook и эксалидроу диаграммы.
+**The Last of 9s** - это инженерный блог, в котором я делюсь опытом и подходами к тому, как построить процессы с нуля и решать прикладные задачи вокруг моих любимых аспектов систем:
 
-## Автор
+*   **Observability:** Как извлекать максимум ценности из самых привычных сигналов.
+*   **Performance:** Где теряется время.
+*   **Reliability:** Архитектура и процессы, которые не падают (или падают, но красиво).
 
-Кирилл Ю — инженер по производительности и надежности, работает с большими распределенными
-системами. Здесь фиксирую разборы и практические приемы.
+## Коротко обо мне
 
-## О чем пишу
+10+ лет в индустрии (Telecom, Banking, Retail, Startups). Прошел путь от инженера нагрузочного тестирования до техлида и и.о. CIO.
 
-- Профилирование и латентность
-- SRE и reliability engineering
-- Observability и дизайн сигналов
-- Linux internals и eBPF tracing
-- Архитектура систем и capacity planning
+*   **Production Experience:** Вывел SLA крупного e-commerce с одной девятки до трех, лично разобрав 400+ критических инцидентов.
+*   **Processes:** Внедрял с нуля Incident Management, Error Budgets, SLO, Capacity Planning и FinOps.
+*   **Engineering:** Написал собственный фреймворк для нагрузочного тестирования и внедрял Performance Testing as a Service.
+*   **Education:** Спикер конференций, ментор сообществ по перформансу и SRE.
+*   **Current:** Customer Reliability Technical Lead в VictoriaMetrics.
 
 ## Контакты
 
-- Telegram: https://t.me/r9yo11yp9e
-- GitHub: https://github.com/kirillyu
+*   [Telegram Channel](https://t.me/r9yo11yp9e) (Основной контент)
+*   [GitHub](https://github.com/kirillyu)
+*   [LinkedIn](https://www.linkedin.com/in/kirillyu/)
+*   [Telegram PM](https://t.me/login40k)

@@ -4,23 +4,25 @@ title: About
 
 # About
 
-The Last of 9s is a personal lab focused on performance, observability, and reliability engineering.
-The style is intentionally technical: longreads, runbooks, and Excalidraw-style diagrams.
+**The Last of 9s** is an engineering blog where I share my experience and approaches on how to build processes from scratch and solve applied tasks around my favorite aspects of systems:
 
-## Author
+*   **Observability:** How to extract maximum value from the most common signals.
+*   **Performance:** Where time is lost.
+*   **Reliability:** Architecture and processes that don't crash (or crash gracefully).
 
-Kirill Yu is a performance and reliability engineer working on large-scale systems. This blog is a
-place for deep dives, war stories, and practical techniques.
+## Briefly about me
 
-## Topics I write about
+10+ years in the industry (Telecom, Banking, Retail, Startups). Journey from Load Testing Engineer to Tech Lead and Acting CIO.
 
-- Performance profiling and latency forensics
-- SRE and reliability engineering
-- Observability and signal design
-- Linux internals and eBPF tracing
-- System architecture and capacity planning
+*   **Production Experience:** Improved a major e-commerce SLA from one nine to three, personally resolving 400+ critical incidents.
+*   **Processes:** Implemented Incident Management, Error Budgets, SLO, Capacity Planning, and FinOps from scratch.
+*   **Engineering:** Wrote a custom load testing framework and implemented Performance Testing as a Service.
+*   **Education:** Conference speaker, mentor for performance and SRE communities.
+*   **Current:** Customer Reliability Technical Lead at VictoriaMetrics.
 
-## Contact
+## Contacts
 
-- Telegram: https://t.me/r9yo11yp9e
-- GitHub: https://github.com/kirillyu
+*   [Telegram Channel](https://t.me/r9yo11yp9e) (Main content, RU)
+*   [GitHub](https://github.com/kirillyu)
+*   [LinkedIn](https://www.linkedin.com/in/kirillyu/)
+*   [Telegram PM](https://t.me/login40k)

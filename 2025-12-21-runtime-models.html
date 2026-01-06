@@ -663,7 +663,7 @@
 <h1 id="runtime-models-running-thousands-of-functions-at-once">Runtime models - running thousands of functions at once<a class="headerlink" href="#runtime-models-running-thousands-of-functions-at-once" title="Anchor link to this section">&para;</a></h1>
 <p><strong>The First Nine Guide. Block 2</strong></p>
 <hr />
-<p><img alt="Illustration" src="assets/first-nine/en/MhmI7Hww45eHuNJ849daWzYGyTQmjeqNGp8Y4OrCYpI%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/2025-12-21-runtime-models_01.png" /></p>
 <p><strong>Disclaimer:</strong> real systems blend multiple models. Pure versions are rare.</p>
 <hr />
 <p>In the previous part we discussed the atom of code - the function. We saw how complexity and characteristics affect performance.</p>
@@ -683,14 +683,14 @@
 <p><strong>Who owns it:</strong> application code creates heavy threads and forgets them</p>
 <p><strong>Weight:</strong> 1-8 MB per stack; creation ~100 microseconds</p>
 <p><strong>If it blocks:</strong> hardware sits idle</p>
-<p><img alt="Illustration" src="assets/first-nine/en/XCI4dNbGkjIcbn2BH4Gf0eg6kUJqtyIf68KYuD39ATY%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/2025-12-21-runtime-models_02.png" /></p>
 <p><strong>Use it if:</strong> legacy monolith at 3 RPS - otherwise no.</p>
 <hr />
 <h2 id="2-thread-pool">2. Thread pool<a class="headerlink" href="#2-thread-pool" title="Anchor link to this section">&para;</a></h2>
 <p>A logical evolution. We remove creation/destruction overhead, keep a fixed pool of heavy threads and a task queue. This is still common in the wild.</p>
 <p><strong>Who owns it:</strong> the pool assigns tasks to ready threads</p>
 <p><strong>If it blocks:</strong> the thread hangs, the queue grows</p>
-<p><img alt="Illustration" src="assets/first-nine/en/1rBE-6K35kPldtzc3hFIpz3iGZxkk7bqyvWxCOhPVtg%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/2025-12-21-runtime-models_03.png" /></p>
 <p><strong>Use it if:</strong> mixed load (CPU + I/O), you want transparency, and you hate "modern" trends.</p>
 <hr />
 <blockquote>
@@ -704,21 +704,21 @@
 </blockquote>
 <p><strong>Who owns it:</strong> the loop itself; only one heavy thread</p>
 <p><strong>If it blocks:</strong> the whole application freezes</p>
-<p><img alt="Illustration" src="assets/first-nine/en/dflECwFSMruawXKfpruUgFlPHwaJx8TNPhahj5ScfoU%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/2025-12-21-runtime-models_04.png" /></p>
 <p><strong>Use it if:</strong> mostly I/O with minimal CPU.</p>
 <hr />
 <h2 id="4-fibers">4. Fibers<a class="headerlink" href="#4-fibers" title="Anchor link to this section">&para;</a></h2>
 <p>Not a separate model but an approach that upgrades the event loop (and beyond), partially solving callback hell. Logic is written inside lightweight fibers. The loop still orchestrates everything, but instead of callbacks it resumes the right fiber. When a fiber hits I/O it yields, keeping the code linear. Fibers can call each other following business logic rather than runtime logic.</p>
 <p><strong>Who owns it:</strong> more control for the developer, but the runtime still drives</p>
 <p><strong>If it blocks:</strong> it blocks the loop as well</p>
-<p><img alt="Illustration" src="assets/first-nine/en/bzAAgLHOh3m8WDuEydkTA86e3Lq7P4RJvpsjBVkb98g%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/2025-12-21-runtime-models_05.png" /></p>
 <p><strong>Use it if:</strong> you want clean async in an I/O service.</p>
 <hr />
 <h2 id="5-green-threads">5. Green threads<a class="headerlink" href="#5-green-threads" title="Anchor link to this section">&para;</a></h2>
 <p>An older model and the ancestor of many new ones. Many lightweight threads live inside one heavy thread. The runtime switches them on a timer.</p>
 <p><strong>Who owns it:</strong> the runtime; everyone lives on one heavy thread</p>
 <p><strong>If it blocks:</strong> any blocking sys-call in a lightweight thread blocks the heavy thread. Everything stops.</p>
-<p><img alt="Illustration" src="assets/first-nine/en/tD5zYs-pQbuPy1yxL61Ftw4yRw2bt24B4pwJBS-yqM8%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/2025-12-21-runtime-models_06.png" /></p>
 <p><strong>Use it if:</strong> a prototype, small script, lab project.</p>
 <hr />
 <h2 id="6-virtual-threads">6. Virtual threads<a class="headerlink" href="#6-virtual-threads" title="Anchor link to this section">&para;</a></h2>
@@ -726,7 +726,7 @@
 <p><strong>Who owns it:</strong> the runtime creates lightweight threads and schedules them onto a heavy pool</p>
 <p><strong>If it blocks:</strong> when a lightweight thread initiates I/O, the scheduler parks it and runs another. Heavy threads do not idle.</p>
 <p><em>With blocking I/O (e.g., Thread.sleep() or File.read() on a regular socket) pinning may occur and reduce efficiency.</em></p>
-<p><img alt="Illustration" src="assets/first-nine/en/Aaj2cY80Q1JP4cqhrUWrK0ojC8bhifVCZuej0Lpe1bY%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/2025-12-21-runtime-models_07.png" /></p>
 <p><strong>Use it if:</strong> modern high-load systems with many network calls. But still use mutexes, timeouts, and fail-fast to avoid millions of parked threads.</p>
 <hr />
 <h2 id="7-actor-model">7. Actor model<a class="headerlink" href="#7-actor-model" title="Anchor link to this section">&para;</a></h2>
@@ -740,11 +740,11 @@
 </ul>
 <p><strong>Who owns it:</strong> the actor runtime; an actor handles one message at a time</p>
 <p><strong>If it blocks:</strong> it blocks only itself; others keep working</p>
-<p><img alt="Illustration" src="assets/first-nine/en/DmTGjzUg7q7ykpBntG1XrVZuxCisqeKbCGT1beEGUKU%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/2025-12-21-runtime-models_08.png" /></p>
 <p><strong>Use it if:</strong> you need high resilience and a ready-made framework. Works for microservices and internal service architecture.</p>
 <hr />
 <h2 id="summary-table">Summary table<a class="headerlink" href="#summary-table" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="assets/first-nine/en/zMR8lFdC68lWB8b9Tn4CvjDttpKYHOd-oOxLx_wEhbk%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/2025-12-21-runtime-models_09.png" /></p>
 <hr />
 <h2 id="hybrid-models-and-where-they-live">Hybrid models and where they live<a class="headerlink" href="#hybrid-models-and-where-they-live" title="Anchor link to this section">&para;</a></h2>
 <p>Pure models are rare. Modern runtimes combine approaches to patch weaknesses.</p>

@@ -619,7 +619,7 @@
 <h1 id="function-the-atomic-unit-of-code">Function: the atomic unit of code<a class="headerlink" href="#function-the-atomic-unit-of-code" title="Anchor link to this section">&para;</a></h1>
 <p><strong>The First Nine Guide. Блок 1</strong></p>
 <hr />
-<p><img alt="Illustration" src="../assets/first-nine/ru/EwBYEJTCrd8aHhoYbMJ6Ycp7tZEZWvig0oJtJIbX1Yw%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-20-function-atomic-unit_01.png" /></p>
 <p>Функции - важная штука внутри каждого приложения. Когда в сервис приходят запросы, они вызывают под собой функции. Какие-то работают медленно, какие-то быстро. Чтобы лучше понимать в чем их разница и какие они вообще бывают, я классифицирую их по нескольким признакам:</p>
 <ol>
 <li>По сложности алгоритма внутри функции.</li>
@@ -636,10 +636,10 @@
 <li>понимать, что O(n log n) - граница, за ней только вечная боль</li>
 <li>замечать, когда алгоритм внезапно становится O(n!)</li>
 </ul>
-<p><img alt="Illustration" src="../assets/first-nine/ru/TNJSq2FkXqGmSse_0ar9hHcmfZBNNGKWQHzaFVh_b-g%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-20-function-atomic-unit_02.png" /></p>
 <p>Выше желтой линии начинает деградировать производительность при росте объема данных.</p>
 <p>Вот примеры и пороги для n (для O(n!) реальных примеров придумать не смог):</p>
-<p><img alt="Illustration" src="../assets/first-nine/ru/CIKUI20xiwHIVetQoFmF1YC0kRJKwVvo2a2n4vhRZys%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-20-function-atomic-unit_03.png" /></p>
 <hr />
 <h2 id="_2">Типы потребляемых ресурсов<a class="headerlink" href="#_2" title="Anchor link to this section">&para;</a></h2>
 <p>Скорость выполнения - это не все, мы же про перформанс.</p>
@@ -652,7 +652,7 @@
 <li>GPU-bound - понятно, кушает GPU</li>
 </ul>
 <p>Это важно, чтобы понимать, где может быть зарыт ботлнек: в ядре, памяти, сокете или в алгоритме.</p>
-<p><img alt="Illustration" src="../assets/first-nine/ru/e87od8WMisLahcccPYWSeve75dtuikfz6ZVlKpasdeU%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-20-function-atomic-unit_04.png" /></p>
 <hr />
 <h2 id="_3">Потокобезопасность<a class="headerlink" href="#_3" title="Anchor link to this section">&para;</a></h2>
 <p>Если код запускается параллельно - а он почти всегда запускается параллельно - важно ответить на вопросы:</p>
@@ -689,7 +689,7 @@
 <h2 id="call-overhead">Call overhead<a class="headerlink" href="#call-overhead" title="Anchor link to this section">&para;</a></h2>
 <p>Каждый вызывающий вызов, любой функции, создает отдельный участок памяти под себя - он называется stack frame.</p>
 <p>Каждый новый вызов создает новый фрейм наверху стека. Когда функция выполнена, кадр удаляется. Даже int sum(int a, int b) создает 16-64 байта накладных расходов.</p>
-<p><img alt="Illustration" src="../assets/first-nine/ru/N1Aropsi21AXUVM2P24ADjYCiv76AcXBwAc89u89MzQ%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-20-function-atomic-unit_05.png" /></p>
 <p><strong>Зачем это вообще знать?</strong></p>
 <p>Просто:</p>
 <ul>

@@ -619,7 +619,7 @@
 <h1 id="function-the-atomic-unit-of-code">Function: the atomic unit of code<a class="headerlink" href="#function-the-atomic-unit-of-code" title="Anchor link to this section">&para;</a></h1>
 <p><strong>The First Nine Guide. Block 1</strong></p>
 <hr />
-<p><img alt="Illustration" src="assets/first-nine/en/EwBYEJTCrd8aHhoYbMJ6Ycp7tZEZWvig0oJtJIbX1Yw%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/2025-12-20-function-atomic-unit_01.png" /></p>
 <p>Functions are the basic unit of every application. Requests call functions; some are fast, some are slow. To reason about performance, I classify functions by a few traits:</p>
 <ol>
 <li>Algorithmic complexity.</li>
@@ -636,10 +636,10 @@
 <li>understand that O(n log n) is the boundary; beyond it there is only pain</li>
 <li>notice when an algorithm suddenly becomes O(n!)</li>
 </ul>
-<p><img alt="Illustration" src="assets/first-nine/en/TNJSq2FkXqGmSse_0ar9hHcmfZBNNGKWQHzaFVh_b-g%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/2025-12-20-function-atomic-unit_02.png" /></p>
 <p>Above the yellow line performance starts degrading as data volume grows.</p>
 <p>Here are examples and thresholds for n (I do not have real-life examples of O(n!)):</p>
-<p><img alt="Illustration" src="assets/first-nine/en/CIKUI20xiwHIVetQoFmF1YC0kRJKwVvo2a2n4vhRZys%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/2025-12-20-function-atomic-unit_03.png" /></p>
 <hr />
 <h2 id="resource-profiles">Resource profiles<a class="headerlink" href="#resource-profiles" title="Anchor link to this section">&para;</a></h2>
 <p>Speed is not the whole story; we're doing performance engineering.</p>
@@ -652,7 +652,7 @@
 <li>GPU-bound - obviously, uses GPU</li>
 </ul>
 <p>This tells you where the bottleneck hides: CPU, memory, socket, or the algorithm itself.</p>
-<p><img alt="Illustration" src="assets/first-nine/en/e87od8WMisLahcccPYWSeve75dtuikfz6ZVlKpasdeU%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/2025-12-20-function-atomic-unit_04.png" /></p>
 <hr />
 <h2 id="concurrency-safety">Concurrency safety<a class="headerlink" href="#concurrency-safety" title="Anchor link to this section">&para;</a></h2>
 <p>If code runs in parallel - and it almost always does - ask two questions:</p>
@@ -689,7 +689,7 @@
 <h2 id="call-overhead">Call overhead<a class="headerlink" href="#call-overhead" title="Anchor link to this section">&para;</a></h2>
 <p>Every function call allocates its own memory region called a stack frame.</p>
 <p>Each call creates a new frame at the top of the stack; when the function completes, the frame is removed. Even int sum(int a, int b) costs 16-64 bytes of overhead.</p>
-<p><img alt="Illustration" src="assets/first-nine/en/N1Aropsi21AXUVM2P24ADjYCiv76AcXBwAc89u89MzQ%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/2025-12-20-function-atomic-unit_05.png" /></p>
 <p><strong>Why should you care?</strong></p>
 <p>Simple:</p>
 <ul>

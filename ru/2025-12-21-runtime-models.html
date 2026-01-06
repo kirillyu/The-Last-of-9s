@@ -663,7 +663,7 @@
 <h1 id="runtime-models-">Runtime models - как запускать тысячи функций одновременно<a class="headerlink" href="#runtime-models-" title="Anchor link to this section">&para;</a></h1>
 <p><strong>The First Nine Guide. Блок 2</strong></p>
 <hr />
-<p><img alt="Illustration" src="../assets/first-nine/ru/MhmI7Hww45eHuNJ849daWzYGyTQmjeqNGp8Y4OrCYpI%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-21-runtime-models_01.png" /></p>
 <p><strong>Дисклеймер</strong> - в реальном мире системы и бэкенды сочетают несколько моделей, в чистом виде их почти нигде не существует.</p>
 <hr />
 <p>В прошлой части мы разобрали атом кода - функцию. Поняли, как ее сложность и характеристики влияют на производительность.</p>
@@ -683,14 +683,14 @@
 <p><strong>Кто рулит:</strong> сам код создает тяжелые потоки и сразу забывает</p>
 <p><strong>Вес:</strong> 1-8 МБ на стек; создание ~100 мкс</p>
 <p><strong>Если блокируется:</strong> железо тупо простаивает</p>
-<p><img alt="Illustration" src="../assets/first-nine/ru/XCI4dNbGkjIcbn2BH4Gf0eg6kUJqtyIf68KYuD39ATY%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-21-runtime-models_02.png" /></p>
 <p><strong>Брать, если:</strong> унаследованный монолит и 3 RPS - иначе нет.</p>
 <hr />
 <h2 id="2-thread-pool">2. Thread pool<a class="headerlink" href="#2-thread-pool" title="Anchor link to this section">&para;</a></h2>
 <p>Логичная эволюция предыдущей модели. Убираем оверхэд на создание и смерть, держим фиксированный пул тяжелых потоков и очередь задач. Сейчас в мире полно таких приложений, хотя модель олдскульная.</p>
 <p><strong>Кто рулит:</strong> пул раздает задачи готовым потокам</p>
 <p><strong>Если блокируется:</strong> поток висит, очередь пухнет</p>
-<p><img alt="Illustration" src="../assets/first-nine/ru/1rBE-6K35kPldtzc3hFIpz3iGZxkk7bqyvWxCOhPVtg%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-21-runtime-models_03.png" /></p>
 <p><strong>Можно брать, если:</strong> нагрузка смешанная (CPU + I/O), хотите прозрачности, тошнит от модного и молодежного.</p>
 <hr />
 <blockquote>
@@ -704,21 +704,21 @@
 </blockquote>
 <p><strong>Кто рулит:</strong> сам loop; тяжелый поток всего один</p>
 <p><strong>Если блокируется:</strong> замирает все приложение</p>
-<p><img alt="Illustration" src="../assets/first-nine/ru/dflECwFSMruawXKfpruUgFlPHwaJx8TNPhahj5ScfoU%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-21-runtime-models_04.png" /></p>
 <p><strong>Брать, если:</strong> чистый I/O и минимум CPU.</p>
 <hr />
 <h2 id="4-fibers">4. Fibers<a class="headerlink" href="#4-fibers" title="Anchor link to this section">&para;</a></h2>
 <p>Это не отдельная модель, а подход, который прокачивает event loop (и не только), частично решая проблему callback hell. Логика пишется внутри легких потоков (файберов). Event loop по-прежнему управляет всем, но теперь он не вызывает колбэки, а возобновляет (resume) нужный файбер. Сам файбер, дойдя до I/O, добровольно отдает управление (yield), позволяя коду выглядеть линейным. Файберы могут вызывать друг друга по логике, которую диктует не рантайм, а сам разработчик.</p>
 <p><strong>Кто рулит:</strong> больше контроля у разработчика, но руль у рантайма</p>
 <p><strong>Если блокируется:</strong> блокирует loop так же</p>
-<p><img alt="Illustration" src="../assets/first-nine/ru/bzAAgLHOh3m8WDuEydkTA86e3Lq7P4RJvpsjBVkb98g%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-21-runtime-models_05.png" /></p>
 <p><strong>Брать, если:</strong> хочется чистый асинхрон в I/O-сервисе.</p>
 <hr />
 <h2 id="5-green-threads">5. Green threads<a class="headerlink" href="#5-green-threads" title="Anchor link to this section">&para;</a></h2>
 <p>Это старая модель, прототип многих новых. В ней много легких потоков внутри одного тяжелого. Рантайм переключает их по таймеру.</p>
 <p><strong>Кто рулит:</strong> рантайм, все живут в одном тяжелом потоке</p>
 <p><strong>Если блокируется:</strong> если любой из легких потоков делает блокирующий системный вызов, он блокирует тот единственный тяжелый поток. Вся работа останавливается.</p>
-<p><img alt="Illustration" src="../assets/first-nine/ru/tD5zYs-pQbuPy1yxL61Ftw4yRw2bt24B4pwJBS-yqM8%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-21-runtime-models_06.png" /></p>
 <p><strong>Брать, если:</strong> прототип, маленький скрипт, лабораторка.</p>
 <hr />
 <h2 id="6-virtual-threads">6. Virtual threads<a class="headerlink" href="#6-virtual-threads" title="Anchor link to this section">&para;</a></h2>
@@ -726,7 +726,7 @@
 <p><strong>Кто рулит:</strong> рантайм создает легкие потоки, планировщик распределяет их по пулу тяжелых</p>
 <p><strong>Если блокируется:</strong> легкий поток инициирует I/O, планировщик не дает ему заблокировать тяжелый поток. Он "паркует" легкий поток и ставит на его место другой. Тяжелый поток не простаивает.</p>
 <p><em>При blocking I/O (например, Thread.sleep() или File.read() на обычном сокете) возможен pinning, что снижает эффективность.</em></p>
-<p><img alt="Illustration" src="../assets/first-nine/ru/Aaj2cY80Q1JP4cqhrUWrK0ojC8bhifVCZuej0Lpe1bY%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-21-runtime-models_07.png" /></p>
 <p><strong>Брать, если:</strong> современный high-load и море сетевых вызовов. Но не забывайте про mutex, таймауты и fail-fast, чтобы не накапливать миллионы легких потоков в ожидании.</p>
 <hr />
 <h2 id="7-actor-model">7. Actor model<a class="headerlink" href="#7-actor-model" title="Anchor link to this section">&para;</a></h2>
@@ -740,11 +740,11 @@
 </ul>
 <p><strong>Кто рулит:</strong> рантайм акторов; актор обрабатывает по одному сообщению</p>
 <p><strong>Если блокируется:</strong> блокирует только себя, остальные работают</p>
-<p><img alt="Illustration" src="../assets/first-nine/ru/DmTGjzUg7q7ykpBntG1XrVZuxCisqeKbCGT1beEGUKU%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-21-runtime-models_08.png" /></p>
 <p><strong>Брать, если:</strong> нужна высокая отказоустойчивость и готовый фреймворк. Можно применять и к микросервисам, и к внутренней архитектуре сервиса.</p>
 <hr />
 <h2 id="_1">Сводная таблица<a class="headerlink" href="#_1" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="../assets/first-nine/ru/zMR8lFdC68lWB8b9Tn4CvjDttpKYHOd-oOxLx_wEhbk%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-21-runtime-models_09.png" /></p>
 <hr />
 <h2 id="_2">Гибридные модели и где они обитают<a class="headerlink" href="#_2" title="Anchor link to this section">&para;</a></h2>
 <p>В реальности чистые модели встречаются редко. Современные рантаймы комбинируют подходы, устраняя слабости каждого.</p>

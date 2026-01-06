@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
-        <loc>https://kirillyu.github.io/The-Last-of-9s/assets/first-nine/png/index.html</loc>
-        <lastmod>2026-01-06</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/assets/first-nine/png/index.html"/>
-        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/assets/first-nine/png/index.html"/>
-    </url>
-    <url>
         <loc>https://kirillyu.github.io/The-Last-of-9s/index.html</loc>
         <lastmod>2026-01-06</lastmod>
         <changefreq>daily</changefreq>
@@ -69,13 +62,6 @@
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/dashboards.html"/>
         <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/dashboards.html"/>
-    </url>
-    <url>
-        <loc>https://kirillyu.github.io/The-Last-of-9s/ru/assets/first-nine/png/index.html</loc>
-        <lastmod>2026-01-06</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/assets/first-nine/png/index.html"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/assets/first-nine/png/index.html"/>
     </url>
     <url>
         <loc>https://kirillyu.github.io/The-Last-of-9s/ru/index.html</loc>

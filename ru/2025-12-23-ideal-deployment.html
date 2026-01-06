@@ -652,7 +652,7 @@
 <h1 id="ideal-application-deployment">Ideal application deployment<a class="headerlink" href="#ideal-application-deployment" title="Anchor link to this section">&para;</a></h1>
 <p><strong>The First Nine Guide. Блок 4</strong></p>
 <hr />
-<p><img alt="Illustration" src="../assets/first-nine/lCHu3kApwnEGAEb22UaoNv6wZ9ANDtHAfYjzw91ahOc%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/lCHu3kApwnEGAEb22UaoNv6wZ9ANDtHAfYjzw91ahOc%3D.webp" /></p>
 <p>Итак, наконец-то - мы написали идеальное веб-приложение:</p>
 <ol>
 <li>В нем проработана и снижена комплексность каждого метода и функции, как это мы разбирали в блоке 1.</li>
@@ -677,7 +677,7 @@
 <hr />
 <h2 id="java-virtual-machine-11">Java Virtual Machine 11+<a class="headerlink" href="#java-virtual-machine-11" title="Anchor link to this section">&para;</a></h2>
 <p>Ранее я писал пост про то как настраивать JVM и не взорваться в проде. Коротко продублирую, чтобы статья была полной.</p>
-<p><img alt="Illustration" src="../assets/first-nine/bZwAGlvnvxkBInOpYRUGtJmPtRGDn7gtOQFYTTnDsvw%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/bZwAGlvnvxkBInOpYRUGtJmPtRGDn7gtOQFYTTnDsvw%3D.webp" /></p>
 <p><strong>Наивный деплой</strong></p>
 <p>JVM видит лимит в 2 CPU и настраивает параллелизм под него: GC, ForkJoinPool и пулы веб-серверов (Tomcat). Проблема: троттлинг на старте, скачки латенси, off-heap утечки.</p>
 <p><strong>Снимаем троттлинг</strong></p>
@@ -687,7 +687,7 @@
 <hr />
 <h2 id="java-virtual-machine-21-virtual-threads">Java Virtual Machine 21+ (Virtual Threads)<a class="headerlink" href="#java-virtual-machine-21-virtual-threads" title="Anchor link to this section">&para;</a></h2>
 <p>Добавим про JVM с virtual threads.</p>
-<p><img alt="Illustration" src="../assets/first-nine/s4y6mnWkmFxLbPhQ_ozwMspA1ODDD-wdm4HXH_mhfiQ%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/s4y6mnWkmFxLbPhQ_ozwMspA1ODDD-wdm4HXH_mhfiQ%3D.webp" /></p>
 <p><strong>Наивный деплой</strong></p>
 <p>Все как в JVM 11+: реквесты/лимиты, троттлинг. Плюс планировщик virtual threads тоже ориентируется на лимиты.</p>
 <p><strong>Снимаем троттлинг</strong></p>
@@ -701,7 +701,7 @@
 <p>Так мы согласовываем параллелизм рантайма с выделенными ресурсами и получаем предсказуемое поведение.</p>
 <hr />
 <h2 id="golang-110">Golang 1.10+<a class="headerlink" href="#golang-110" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="../assets/first-nine/hPazcVMiVnT3HFDpYHuWNr4TH0v8mwXVgG9_7FQLm9k%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/hPazcVMiVnT3HFDpYHuWNr4TH0v8mwXVgG9_7FQLm9k%3D.webp" /></p>
 <p><strong>Наивный деплой</strong></p>
 <p>Запускаем с реквестами и лимитами. Рантайм Go видит лимиты, runtime.NumCPU() вернет 2. Проблемы: CPU throttling и GC не знает границы контейнера - возможен OOMKill.</p>
 <p><strong>Снимаем троттлинг</strong></p>
@@ -710,7 +710,7 @@
 <p>Явно указываем, сколько ядер использовать: GOMAXPROCS=1 (из requests). GOMEMLIMIT лучше ставить в 70-90% от memory limit, так как Go игнорирует memory.limit. Для автоматизации - automemlimit. Рантайм понимает границы контейнера и предсказуемо масштабируется.</p>
 <hr />
 <h2 id="nodejs-1820">Node.js 18+/20+<a class="headerlink" href="#nodejs-1820" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="../assets/first-nine/oBra56jj2xOPX0YvCPyIX0S1ZTO58kAcR5YFHSpf_6M%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/oBra56jj2xOPX0YvCPyIX0S1ZTO58kAcR5YFHSpf_6M%3D.webp" /></p>
 <p><strong>Наивный деплой</strong></p>
 <p>Реквесты 1, лимиты 2. Основной поток Node.js однопоточный, libuv pool по умолчанию 4. Проблем минимум, кроме CPU throttling при CPU-bound задачах.</p>
 <p><strong>Снимаем троттлинг</strong></p>
@@ -719,7 +719,7 @@
 <p>Правильный деплой для Node.js - масштабирование. Рекомендую держать количество процессов равным requests. Это дает прозрачность и утилизацию.</p>
 <hr />
 <h2 id="python-38-gunicorn-uvicorn">Python 3.8+ (Gunicorn / Uvicorn)<a class="headerlink" href="#python-38-gunicorn-uvicorn" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="../assets/first-nine/eHBGSlLYwL7LW2sXQt-l37gYfo_lGk4XdBTfJJIZ4Hs%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/eHBGSlLYwL7LW2sXQt-l37gYfo_lGk4XdBTfJJIZ4Hs%3D.webp" /></p>
 <p><strong>Наивный деплой</strong></p>
 <p>В сердце Python живет GIL, код выполняется в одном потоке. Можно уходить в псевдопараллелизм на уровне процессов. Наивный деплой обычно ок, но троттлинг возможен.</p>
 <p><strong>Снимаем троттлинг</strong></p>
@@ -732,7 +732,7 @@
 </ul>
 <hr />
 <h2 id="ruby-3">Ruby 3+<a class="headerlink" href="#ruby-3" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="../assets/first-nine/REQ8CymAJGzIwfDLPiPyRIZsc1A_kh4IcsjzoUFjemo%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/REQ8CymAJGzIwfDLPiPyRIZsc1A_kh4IcsjzoUFjemo%3D.webp" /></p>
 <p><strong>Наивный деплой</strong></p>
 <p>Однопоточный рантайм MRI. Проблемы троттлинга те же, но в целом наивный деплой чаще всего терпим.</p>
 <p><strong>Снимаем троттлинг</strong></p>
@@ -746,7 +746,7 @@
 </ul>
 <hr />
 <h2 id="php-fpm-74">PHP-FPM 7.4+<a class="headerlink" href="#php-fpm-74" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="../assets/first-nine/nqjKgT46mOa4R9XoQ7-9HyhA6IAExRHw2vDKq1RrABs%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/nqjKgT46mOa4R9XoQ7-9HyhA6IAExRHw2vDKq1RrABs%3D.webp" /></p>
 <p><strong>Наивный деплой</strong></p>
 <p>PHP-FPM работает в режиме dynamic (по умолчанию), создавая и удаляя процессы по мере необходимости (process-per-request). Прожорливое приложение почти всегда упирается в лимиты и страдает. Динамический режим (pm=dynamic) может давать скачки памяти и непредсказуемость.</p>
 <p><strong>Снимаем троттлинг</strong></p>
@@ -759,7 +759,7 @@
 <p>Такое распределение дает стабильное и предсказуемое поведение. Из-за отсутствия постоянного рантайма PHP-FPM сложнее профилировать, но это решают Roadrunner и FrankenPHP.</p>
 <hr />
 <h2 id="net-6">.NET 6+<a class="headerlink" href="#net-6" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="../assets/first-nine/LdJ6yBj57gcBp2D1mxOk6zu0MPQIvYGnRfUQukama7c%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/LdJ6yBj57gcBp2D1mxOk6zu0MPQIvYGnRfUQukama7c%3D.webp" /></p>
 <p><strong>Наивный деплой</strong></p>
 <p>Рантайм .NET хорошо container-aware: видит лимит в 2 CPU, настраивает ThreadPool и GC. Но троттлинг все равно возможен.</p>
 <p><strong>Снимаем троттлинг</strong></p>

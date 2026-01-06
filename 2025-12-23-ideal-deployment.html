@@ -652,7 +652,7 @@
 <h1 id="ideal-application-deployment">Ideal application deployment<a class="headerlink" href="#ideal-application-deployment" title="Anchor link to this section">&para;</a></h1>
 <p><strong>The First Nine Guide. Block 4</strong></p>
 <hr />
-<p><img alt="Illustration" src="assets/first-nine/lCHu3kApwnEGAEb22UaoNv6wZ9ANDtHAfYjzw91ahOc%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/lCHu3kApwnEGAEb22UaoNv6wZ9ANDtHAfYjzw91ahOc%3D.webp" /></p>
 <p>So, we finally built the ideal web application:</p>
 <ol>
 <li>We reduced method complexity and function cost (block 1).</li>
@@ -676,7 +676,7 @@
 <hr />
 <h2 id="java-virtual-machine-11">Java Virtual Machine 11+<a class="headerlink" href="#java-virtual-machine-11" title="Anchor link to this section">&para;</a></h2>
 <p>I wrote about JVM tuning before; here is the short version.</p>
-<p><img alt="Illustration" src="assets/first-nine/bZwAGlvnvxkBInOpYRUGtJmPtRGDn7gtOQFYTTnDsvw%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/bZwAGlvnvxkBInOpYRUGtJmPtRGDn7gtOQFYTTnDsvw%3D.webp" /></p>
 <p><strong>Naive deployment</strong></p>
 <p>JVM sees a 2 CPU limit and sizes its parallelism accordingly: GC, ForkJoinPool, and web server pools (Tomcat). The problem may look like this: throttling during warm-up, latency spikes, off-heap leaks.</p>
 <p><strong>Remove throttling</strong></p>
@@ -686,7 +686,7 @@
 <hr />
 <h2 id="java-virtual-machine-21-virtual-threads">Java Virtual Machine 21+ (Virtual Threads)<a class="headerlink" href="#java-virtual-machine-21-virtual-threads" title="Anchor link to this section">&para;</a></h2>
 <p>Add a note on JVM with virtual threads.</p>
-<p><img alt="Illustration" src="assets/first-nine/s4y6mnWkmFxLbPhQ_ozwMspA1ODDD-wdm4HXH_mhfiQ%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/s4y6mnWkmFxLbPhQ_ozwMspA1ODDD-wdm4HXH_mhfiQ%3D.webp" /></p>
 <p><strong>Naive deployment</strong></p>
 <p>Same as JVM 11+: requests/limits and throttling. The virtual thread scheduler also sizes itself based on limits.</p>
 <p><strong>Remove throttling</strong></p>
@@ -700,7 +700,7 @@
 <p>This aligns runtime parallelism with guaranteed resources.</p>
 <hr />
 <h2 id="golang-110">Golang 1.10+<a class="headerlink" href="#golang-110" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="assets/first-nine/hPazcVMiVnT3HFDpYHuWNr4TH0v8mwXVgG9_7FQLm9k%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/hPazcVMiVnT3HFDpYHuWNr4TH0v8mwXVgG9_7FQLm9k%3D.webp" /></p>
 <p><strong>Naive deployment</strong></p>
 <p>Run with requests and limits. Go sees limits and runtime.NumCPU() returns 2. Issues: CPU throttling and GC not respecting container boundaries (OOMKill risk).</p>
 <p><strong>Remove throttling</strong></p>
@@ -709,7 +709,7 @@
 <p>Set GOMAXPROCS=1 (from requests). Set GOMEMLIMIT to 70-90% of memory limit because Go ignores memory.limit. For automation, use automemlimit. The runtime respects container boundaries and behaves predictably.</p>
 <hr />
 <h2 id="nodejs-1820">Node.js 18+/20+<a class="headerlink" href="#nodejs-1820" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="assets/first-nine/oBra56jj2xOPX0YvCPyIX0S1ZTO58kAcR5YFHSpf_6M%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/oBra56jj2xOPX0YvCPyIX0S1ZTO58kAcR5YFHSpf_6M%3D.webp" /></p>
 <p><strong>Naive deployment</strong></p>
 <p>Requests 1, limits 2. Node's main thread is single-threaded; libuv pool defaults to 4. Problems are minimal, except CPU throttling on CPU-bound workloads.</p>
 <p><strong>Remove throttling</strong></p>
@@ -718,7 +718,7 @@
 <p>The right answer is scale-out. Keep process count aligned with requests. This yields predictable throughput and clarity.</p>
 <hr />
 <h2 id="python-38-gunicorn-uvicorn">Python 3.8+ (Gunicorn / Uvicorn)<a class="headerlink" href="#python-38-gunicorn-uvicorn" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="assets/first-nine/eHBGSlLYwL7LW2sXQt-l37gYfo_lGk4XdBTfJJIZ4Hs%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/eHBGSlLYwL7LW2sXQt-l37gYfo_lGk4XdBTfJJIZ4Hs%3D.webp" /></p>
 <p><strong>Naive deployment</strong></p>
 <p>Python has the GIL, so execution is single-threaded. You can use multi-process pseudo-parallelism. Naive deployment is usually fine, but throttling can happen.</p>
 <p><strong>Remove throttling</strong></p>
@@ -731,7 +731,7 @@
 </ul>
 <hr />
 <h2 id="ruby-3">Ruby 3+<a class="headerlink" href="#ruby-3" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="assets/first-nine/REQ8CymAJGzIwfDLPiPyRIZsc1A_kh4IcsjzoUFjemo%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/REQ8CymAJGzIwfDLPiPyRIZsc1A_kh4IcsjzoUFjemo%3D.webp" /></p>
 <p><strong>Naive deployment</strong></p>
 <p>Single-threaded MRI. Same throttling risks, but usually acceptable.</p>
 <p><strong>Remove throttling</strong></p>
@@ -745,7 +745,7 @@
 </ul>
 <hr />
 <h2 id="php-fpm-74">PHP-FPM 7.4+<a class="headerlink" href="#php-fpm-74" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="assets/first-nine/nqjKgT46mOa4R9XoQ7-9HyhA6IAExRHw2vDKq1RrABs%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/nqjKgT46mOa4R9XoQ7-9HyhA6IAExRHw2vDKq1RrABs%3D.webp" /></p>
 <p><strong>Naive deployment</strong></p>
 <p>PHP-FPM runs in dynamic mode by default, creating and removing child processes as needed (process-per-request). Heavy apps hit limits and suffer. Dynamic mode (pm=dynamic) also causes memory spikes and unpredictability.</p>
 <p><strong>Remove throttling</strong></p>
@@ -758,7 +758,7 @@
 <p>This yields stable and predictable behavior. PHP-FPM is harder to instrument due to its short-lived runtime, but Roadrunner or FrankenPHP can help.</p>
 <hr />
 <h2 id="net-6">.NET 6+<a class="headerlink" href="#net-6" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="assets/first-nine/LdJ6yBj57gcBp2D1mxOk6zu0MPQIvYGnRfUQukama7c%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/LdJ6yBj57gcBp2D1mxOk6zu0MPQIvYGnRfUQukama7c%3D.webp" /></p>
 <p><strong>Naive deployment</strong></p>
 <p>.NET is container-aware: it sees a 2 CPU limit and sizes ThreadPool and GC accordingly. Throttling can still happen.</p>
 <p><strong>Remove throttling</strong></p>

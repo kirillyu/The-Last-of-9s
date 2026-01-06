@@ -664,7 +664,7 @@
 <h1 id="typical-web-application-inner-architecture">Typical web-application inner architecture<a class="headerlink" href="#typical-web-application-inner-architecture" title="Anchor link to this section">&para;</a></h1>
 <p><strong>The First Nine Guide. Block 3</strong></p>
 <hr />
-<p><img alt="Illustration" src="assets/first-nine/xofaKKCZrH3F565AvyBwXzS86ezS8i7ivme5KTwImwE%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/xofaKKCZrH3F565AvyBwXzS86ezS8i7ivme5KTwImwE%3D.webp" /></p>
 <p><strong>Disclaimer:</strong> real-world application architectures vary, but there are common layers that show up almost everywhere. That's what we'll cover.</p>
 <hr />
 <p>In the previous part we discussed runtime models. A runtime alone is not a web application. Today we will look at what an application must implement inside a runtime to earn that name.</p>
@@ -679,7 +679,7 @@
 <p>Start with the layers a request passes through. We'll separate four internal layers.</p>
 <h3 id="network-layer">NETWORK LAYER<a class="headerlink" href="#network-layer" title="Anchor link to this section">&para;</a></h3>
 <p><strong>Goal:</strong> turn an HTTP request into structured data for business logic.</p>
-<p><img alt="Illustration" src="assets/first-nine/4vbyADNgctILkm-TM6c1vZEEg3wFc02Q6cXayYHo99E%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/4vbyADNgctILkm-TM6c1vZEEg3wFc02Q6cXayYHo99E%3D.webp" /></p>
 <p><strong>What happens here:</strong></p>
 <ul>
 <li>socket listen (ports 8080, 443)</li>
@@ -690,7 +690,7 @@
 <p>Many assume this is IO-only. With large HTTPS bodies it can become CPU-bound.</p>
 <h3 id="request-processing">REQUEST PROCESSING<a class="headerlink" href="#request-processing" title="Anchor link to this section">&para;</a></h3>
 <p><strong>Goal:</strong> turn an HTTP request into a function call and route it to the correct handler.</p>
-<p><img alt="Illustration" src="assets/first-nine/Ha2ZICs4CKztEYL4_y5OWccTcawzcYMRYH7scAw4YMc%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/Ha2ZICs4CKztEYL4_y5OWccTcawzcYMRYH7scAw4YMc%3D.webp" /></p>
 <p><strong>What happens here:</strong></p>
 <ul>
 <li>deserialize (JSON/XML/Proto)</li>
@@ -701,7 +701,7 @@
 <p>Rate limits are usually memory-bound if local. Distributed limits live in Redis and become IO.</p>
 <h3 id="business-logic">BUSINESS LOGIC<a class="headerlink" href="#business-logic" title="Anchor link to this section">&para;</a></h3>
 <p><strong>Goal:</strong> execute the core logic of the service.</p>
-<p><img alt="Illustration" src="assets/first-nine/cQK9_XT-AQX5UXeCKwXC8Wk1kwqAWTgUKkNVg2PKwrY%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/cQK9_XT-AQX5UXeCKwXC8Wk1kwqAWTgUKkNVg2PKwrY%3D.webp" /></p>
 <p><strong>What happens here:</strong></p>
 <ul>
 <li>domain operations - algorithms and business rules</li>
@@ -713,7 +713,7 @@
 <p>This is the SRE favorite for incidents. Slow SQL, locks, external APIs without timeouts, and heavy O(n!) compute all live here.</p>
 <h3 id="response-formation">RESPONSE FORMATION<a class="headerlink" href="#response-formation" title="Anchor link to this section">&para;</a></h3>
 <p><strong>Goal:</strong> package the result into an HTTP response and send it back.</p>
-<p><img alt="Illustration" src="assets/first-nine/dcLjrwYGEMgGVb-MWgMjT_uBWuuG6VrLH6xxGlA9_3s%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/dcLjrwYGEMgGVb-MWgMjT_uBWuuG6VrLH6xxGlA9_3s%3D.webp" /></p>
 <p><strong>What happens here:</strong></p>
 <ul>
 <li>serialization (JSON/XML/Proto)</li>
@@ -723,11 +723,11 @@
 </ul>
 <p>The same problems as the first layer.</p>
 <h3 id="full-picture">Full picture<a class="headerlink" href="#full-picture" title="Anchor link to this section">&para;</a></h3>
-<p><img alt="Illustration" src="assets/first-nine/ptjhF4nT3M_IyrndVyT9chMCfvWt-qHp2ogB86eCwUQ%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/ptjhF4nT3M_IyrndVyT9chMCfvWt-qHp2ogB86eCwUQ%3D.webp" /></p>
 <hr />
 <h2 id="internal-architecture">Internal architecture<a class="headerlink" href="#internal-architecture" title="Anchor link to this section">&para;</a></h2>
 <p>Now that we have layers, let's draw an abstract architecture as if this were a microservice system.</p>
-<p><img alt="Illustration" src="assets/first-nine/oOLVDvMncGqzQQeARSEfDGDFw5Vl_aJ8fBWvdjT1uXA%3D.webp" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/oOLVDvMncGqzQQeARSEfDGDFw5Vl_aJ8fBWvdjT1uXA%3D.webp" /></p>
 <p>Meet the components. The real system may have more or fewer. The idea is what matters: isolate anything that has its own worker pool or executes outside the application.</p>
 <p>List:</p>
 <ul>

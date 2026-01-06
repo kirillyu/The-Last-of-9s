@@ -664,7 +664,7 @@
 <h1 id="typical-web-application-inner-architecture">Typical web-application inner architecture<a class="headerlink" href="#typical-web-application-inner-architecture" title="Anchor link to this section">&para;</a></h1>
 <p><strong>The First Nine Guide. Блок 3</strong></p>
 <hr />
-<p><img alt="Illustration" src="../assets/first-nine/xofaKKCZrH3F565AvyBwXzS86ezS8i7ivme5KTwImwE%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/xofaKKCZrH3F565AvyBwXzS86ezS8i7ivme5KTwImwE%3D.webp" /></p>
 <p><strong>Дисклеймер</strong> - в реальном мире архитектуры приложений крайне разнообразны, но есть универсальные слои, которые встречаются почти везде. О них и поговорим.</p>
 <hr />
 <p>В предыдущей серии мы говорили о том, как устроены рантаймы. Но рантайм сам по себе на хлеб не намажешь. Сегодня попробуем понять, что нужно реализовать в выбранном рантайме, чтобы заслужить звание веб-приложения.</p>
@@ -679,7 +679,7 @@
 <p>Начнем с понимания того, через какие слои проходит HTTP-запрос. Для простоты выделим 4 слоя внутри приложения.</p>
 <h3 id="network-layer">NETWORK LAYER<a class="headerlink" href="#network-layer" title="Anchor link to this section">&para;</a></h3>
 <p><strong>Суть:</strong> превращает HTTP-запрос в структурированные данные для бизнес-логики.</p>
-<p><img alt="Illustration" src="../assets/first-nine/4vbyADNgctILkm-TM6c1vZEEg3wFc02Q6cXayYHo99E%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/4vbyADNgctILkm-TM6c1vZEEg3wFc02Q6cXayYHo99E%3D.webp" /></p>
 <p><strong>Что тут происходит:</strong></p>
 <ul>
 <li>socket listen на порту (8080, 443)</li>
@@ -690,7 +690,7 @@
 <p>Часто тут думают, что это только IO-bound. На больших телах с HTTPS CPU тоже начинает болеть.</p>
 <h3 id="request-processing">REQUEST PROCESSING<a class="headerlink" href="#request-processing" title="Anchor link to this section">&para;</a></h3>
 <p><strong>Суть:</strong> превращает HTTP-запрос в вызов функции и маршрутизирует к нужному обработчику.</p>
-<p><img alt="Illustration" src="../assets/first-nine/Ha2ZICs4CKztEYL4_y5OWccTcawzcYMRYH7scAw4YMc%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/Ha2ZICs4CKztEYL4_y5OWccTcawzcYMRYH7scAw4YMc%3D.webp" /></p>
 <p><strong>Что тут происходит:</strong></p>
 <ul>
 <li>deserialize (JSON/XML/Proto) - разбор тела запроса в объекты</li>
@@ -701,7 +701,7 @@
 <p>Про рейты важно сказать: memory-bound - это чаще локальные лимиты. Распределенные лимиты обычно в Redis и это уже IO.</p>
 <h3 id="business-logic">BUSINESS LOGIC<a class="headerlink" href="#business-logic" title="Anchor link to this section">&para;</a></h3>
 <p><strong>Суть:</strong> выполняет основную логику приложения - то, ради чего существует сервис.</p>
-<p><img alt="Illustration" src="../assets/first-nine/cQK9_XT-AQX5UXeCKwXC8Wk1kwqAWTgUKkNVg2PKwrY%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/cQK9_XT-AQX5UXeCKwXC8Wk1kwqAWTgUKkNVg2PKwrY%3D.webp" /></p>
 <p><strong>Что тут происходит:</strong></p>
 <ul>
 <li>domain operations - основные алгоритмы и бизнес-правила</li>
@@ -713,7 +713,7 @@
 <p>Этот слой получает приз SRE симпатий как самый проблемный. Тут и медленные SQL, и блокировки, и внешние API без таймаутов, и тяжелые вычисления O(n!).</p>
 <h3 id="response-formation">RESPONSE FORMATION<a class="headerlink" href="#response-formation" title="Anchor link to this section">&para;</a></h3>
 <p><strong>Суть:</strong> упаковывает результат обратно в HTTP-ответ и отправляет клиенту.</p>
-<p><img alt="Illustration" src="../assets/first-nine/dcLjrwYGEMgGVb-MWgMjT_uBWuuG6VrLH6xxGlA9_3s%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/dcLjrwYGEMgGVb-MWgMjT_uBWuuG6VrLH6xxGlA9_3s%3D.webp" /></p>
 <p><strong>Что тут происходит:</strong></p>
 <ul>
 <li>сериализация (JSON/XML/Proto)</li>
@@ -723,11 +723,11 @@
 </ul>
 <p>Проблемы те же, что и у первого слоя.</p>
 <h3 id="_1">Полная картина<a class="headerlink" href="#_1" title="Anchor link to this section">&para;</a></h3>
-<p><img alt="Illustration" src="../assets/first-nine/ptjhF4nT3M_IyrndVyT9chMCfvWt-qHp2ogB86eCwUQ%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/ptjhF4nT3M_IyrndVyT9chMCfvWt-qHp2ogB86eCwUQ%3D.webp" /></p>
 <hr />
 <h2 id="_2">Внутренняя архитектура<a class="headerlink" href="#_2" title="Anchor link to this section">&para;</a></h2>
 <p>Теперь, когда у нас есть представление о слоях, попробуем нарисовать это как абстрактную архитектуру, будто у нас микросервисы.</p>
-<p><img alt="Illustration" src="../assets/first-nine/oOLVDvMncGqzQQeARSEfDGDFw5Vl_aJ8fBWvdjT1uXA%3D.webp" /></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/oOLVDvMncGqzQQeARSEfDGDFw5Vl_aJ8fBWvdjT1uXA%3D.webp" /></p>
 <p>Знакомимся с объектами. Их может быть больше или меньше в реальности. Тут главное подход: выносим в отдельную сущность все, что имеет независимый пул воркеров или любую работу за пределами приложения.</p>
 <p>Список:</p>
 <ul>

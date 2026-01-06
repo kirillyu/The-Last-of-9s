@@ -11,7 +11,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 ***
 
-![Illustration](../assets/first-nine/en/MhmI7Hww45eHuNJ849daWzYGyTQmjeqNGp8Y4OrCYpI=.webp)
+![Illustration](../assets/first-nine/en/2025-12-21-runtime-models_01.png)
 
 **Disclaimer:** real systems blend multiple models. Pure versions are rare.
 
@@ -42,7 +42,7 @@ One of the oldest models:
 
 **If it blocks:** hardware sits idle
 
-![Illustration](../assets/first-nine/en/XCI4dNbGkjIcbn2BH4Gf0eg6kUJqtyIf68KYuD39ATY=.webp)
+![Illustration](../assets/first-nine/en/2025-12-21-runtime-models_02.png)
 
 **Use it if:** legacy monolith at 3 RPS - otherwise no.
 
@@ -56,7 +56,7 @@ A logical evolution. We remove creation/destruction overhead, keep a fixed pool 
 
 **If it blocks:** the thread hangs, the queue grows
 
-![Illustration](../assets/first-nine/en/1rBE-6K35kPldtzc3hFIpz3iGZxkk7bqyvWxCOhPVtg=.webp)
+![Illustration](../assets/first-nine/en/2025-12-21-runtime-models_03.png)
 
 **Use it if:** mixed load (CPU + I/O), you want transparency, and you hate "modern" trends.
 
@@ -76,7 +76,7 @@ A radical shift. Instead of an army of workers you have one fast **event loop** 
 
 **If it blocks:** the whole application freezes
 
-![Illustration](../assets/first-nine/en/dflECwFSMruawXKfpruUgFlPHwaJx8TNPhahj5ScfoU=.webp)
+![Illustration](../assets/first-nine/en/2025-12-21-runtime-models_04.png)
 
 **Use it if:** mostly I/O with minimal CPU.
 
@@ -90,7 +90,7 @@ Not a separate model but an approach that upgrades the event loop (and beyond), 
 
 **If it blocks:** it blocks the loop as well
 
-![Illustration](../assets/first-nine/en/bzAAgLHOh3m8WDuEydkTA86e3Lq7P4RJvpsjBVkb98g=.webp)
+![Illustration](../assets/first-nine/en/2025-12-21-runtime-models_05.png)
 
 **Use it if:** you want clean async in an I/O service.
 
@@ -104,7 +104,7 @@ An older model and the ancestor of many new ones. Many lightweight threads live 
 
 **If it blocks:** any blocking sys-call in a lightweight thread blocks the heavy thread. Everything stops.
 
-![Illustration](../assets/first-nine/en/tD5zYs-pQbuPy1yxL61Ftw4yRw2bt24B4pwJBS-yqM8=.webp)
+![Illustration](../assets/first-nine/en/2025-12-21-runtime-models_06.png)
 
 **Use it if:** a prototype, small script, lab project.
 
@@ -120,7 +120,7 @@ A game changer. The evolution of green threads. Millions of lightweight threads 
 
 *With blocking I/O (e.g., Thread.sleep() or File.read() on a regular socket) pinning may occur and reduce efficiency.*
 
-![Illustration](../assets/first-nine/en/Aaj2cY80Q1JP4cqhrUWrK0ojC8bhifVCZuej0Lpe1bY=.webp)
+![Illustration](../assets/first-nine/en/2025-12-21-runtime-models_07.png)
 
 **Use it if:** modern high-load systems with many network calls. But still use mutexes, timeouts, and fail-fast to avoid millions of parked threads.
 
@@ -141,7 +141,7 @@ Principles:
 
 **If it blocks:** it blocks only itself; others keep working
 
-![Illustration](../assets/first-nine/en/DmTGjzUg7q7ykpBntG1XrVZuxCisqeKbCGT1beEGUKU=.webp)
+![Illustration](../assets/first-nine/en/2025-12-21-runtime-models_08.png)
 
 **Use it if:** you need high resilience and a ready-made framework. Works for microservices and internal service architecture.
 
@@ -149,7 +149,7 @@ Principles:
 
 ## Summary table
 
-![Illustration](../assets/first-nine/en/zMR8lFdC68lWB8b9Tn4CvjDttpKYHOd-oOxLx_wEhbk=.webp)
+![Illustration](../assets/first-nine/en/2025-12-21-runtime-models_09.png)
 
 ***
 

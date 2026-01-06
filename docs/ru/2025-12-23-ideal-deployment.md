@@ -11,7 +11,7 @@ tags: [first-nine, series, deployment, containers]
 
 ***
 
-![Illustration](../assets/first-nine/ru/lCHu3kApwnEGAEb22UaoNv6wZ9ANDtHAfYjzw91ahOc=.webp)
+![Illustration](../assets/first-nine/ru/2025-12-23-ideal-deployment_01.png)
 
 Итак, наконец-то - мы написали идеальное веб-приложение:
 
@@ -50,7 +50,7 @@ tags: [first-nine, series, deployment, containers]
 
 Ранее я писал пост про то как настраивать JVM и не взорваться в проде. Коротко продублирую, чтобы статья была полной.
 
-![Illustration](../assets/first-nine/ru/bZwAGlvnvxkBInOpYRUGtJmPtRGDn7gtOQFYTTnDsvw=.webp)
+![Illustration](../assets/first-nine/ru/2025-12-23-ideal-deployment_02.png)
 
 **Наивный деплой**
 
@@ -70,7 +70,7 @@ JVM видит лимит в 2 CPU и настраивает параллели�
 
 Добавим про JVM с virtual threads.
 
-![Illustration](../assets/first-nine/ru/s4y6mnWkmFxLbPhQ_ozwMspA1ODDD-wdm4HXH_mhfiQ=.webp)
+![Illustration](../assets/first-nine/ru/2025-12-23-ideal-deployment_03.png)
 
 **Наивный деплой**
 
@@ -93,7 +93,7 @@ JVM видит лимит в 2 CPU и настраивает параллели�
 
 ## Golang 1.10+
 
-![Illustration](../assets/first-nine/ru/hPazcVMiVnT3HFDpYHuWNr4TH0v8mwXVgG9_7FQLm9k=.webp)
+![Illustration](../assets/first-nine/ru/2025-12-23-ideal-deployment_04.png)
 
 **Наивный деплой**
 
@@ -111,7 +111,7 @@ JVM видит лимит в 2 CPU и настраивает параллели�
 
 ## Node.js 18+/20+
 
-![Illustration](../assets/first-nine/ru/oBra56jj2xOPX0YvCPyIX0S1ZTO58kAcR5YFHSpf_6M=.webp)
+![Illustration](../assets/first-nine/ru/2025-12-23-ideal-deployment_05.png)
 
 **Наивный деплой**
 
@@ -129,7 +129,7 @@ JVM видит лимит в 2 CPU и настраивает параллели�
 
 ## Python 3.8+ (Gunicorn / Uvicorn)
 
-![Illustration](../assets/first-nine/ru/eHBGSlLYwL7LW2sXQt-l37gYfo_lGk4XdBTfJJIZ4Hs=.webp)
+![Illustration](../assets/first-nine/ru/2025-12-23-ideal-deployment_06.png)
 
 **Наивный деплой**
 
@@ -149,7 +149,7 @@ JVM видит лимит в 2 CPU и настраивает параллели�
 
 ## Ruby 3+
 
-![Illustration](../assets/first-nine/ru/REQ8CymAJGzIwfDLPiPyRIZsc1A_kh4IcsjzoUFjemo=.webp)
+![Illustration](../assets/first-nine/ru/2025-12-23-ideal-deployment_07.png)
 
 **Наивный деплой**
 
@@ -171,7 +171,7 @@ JVM видит лимит в 2 CPU и настраивает параллели�
 
 ## PHP-FPM 7.4+
 
-![Illustration](../assets/first-nine/ru/nqjKgT46mOa4R9XoQ7-9HyhA6IAExRHw2vDKq1RrABs=.webp)
+![Illustration](../assets/first-nine/ru/2025-12-23-ideal-deployment_08.png)
 
 **Наивный деплой**
 
@@ -192,7 +192,7 @@ PHP-FPM работает в режиме dynamic (по умолчанию), со
 
 ## .NET 6+
 
-![Illustration](../assets/first-nine/ru/LdJ6yBj57gcBp2D1mxOk6zu0MPQIvYGnRfUQukama7c=.webp)
+![Illustration](../assets/first-nine/ru/2025-12-23-ideal-deployment_09.png)
 
 **Наивный деплой**
 

@@ -11,7 +11,7 @@ tags: [first-nine, series, performance, functions]
 
 ***
 
-![Illustration](../assets/first-nine/EwBYEJTCrd8aHhoYbMJ6Ycp7tZEZWvig0oJtJIbX1Yw=.webp)
+![Illustration](../assets/first-nine/ru/EwBYEJTCrd8aHhoYbMJ6Ycp7tZEZWvig0oJtJIbX1Yw=.webp)
 
 Функции - важная штука внутри каждого приложения. Когда в сервис приходят запросы, они вызывают под собой функции. Какие-то работают медленно, какие-то быстро. Чтобы лучше понимать в чем их разница и какие они вообще бывают, я классифицирую их по нескольким признакам:
 
@@ -33,13 +33,13 @@ tags: [first-nine, series, performance, functions]
 - понимать, что O(n log n) - граница, за ней только вечная боль
 - замечать, когда алгоритм внезапно становится O(n!)
 
-![Illustration](../assets/first-nine/TNJSq2FkXqGmSse_0ar9hHcmfZBNNGKWQHzaFVh_b-g=.webp)
+![Illustration](../assets/first-nine/ru/TNJSq2FkXqGmSse_0ar9hHcmfZBNNGKWQHzaFVh_b-g=.webp)
 
 Выше желтой линии начинает деградировать производительность при росте объема данных.
 
 Вот примеры и пороги для n (для O(n!) реальных примеров придумать не смог):
 
-![Illustration](../assets/first-nine/CIKUI20xiwHIVetQoFmF1YC0kRJKwVvo2a2n4vhRZys=.webp)
+![Illustration](../assets/first-nine/ru/CIKUI20xiwHIVetQoFmF1YC0kRJKwVvo2a2n4vhRZys=.webp)
 
 ***
 
@@ -58,7 +58,7 @@ tags: [first-nine, series, performance, functions]
 
 Это важно, чтобы понимать, где может быть зарыт ботлнек: в ядре, памяти, сокете или в алгоритме.
 
-![Illustration](../assets/first-nine/e87od8WMisLahcccPYWSeve75dtuikfz6ZVlKpasdeU=.webp)
+![Illustration](../assets/first-nine/ru/e87od8WMisLahcccPYWSeve75dtuikfz6ZVlKpasdeU=.webp)
 
 ***
 
@@ -102,7 +102,7 @@ tags: [first-nine, series, performance, functions]
 
 Каждый новый вызов создает новый фрейм наверху стека. Когда функция выполнена, кадр удаляется. Даже int sum(int a, int b) создает 16-64 байта накладных расходов.
 
-![Illustration](../assets/first-nine/N1Aropsi21AXUVM2P24ADjYCiv76AcXBwAc89u89MzQ=.webp)
+![Illustration](../assets/first-nine/ru/N1Aropsi21AXUVM2P24ADjYCiv76AcXBwAc89u89MzQ=.webp)
 
 **Зачем это вообще знать?**
 

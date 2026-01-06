@@ -31,7 +31,7 @@ title: Home
     </div>
 
     <figure class="tl9-cover tl9-cover--featured">
-      <img src="assets/first-nine/MhmI7Hww45eHuNJ849daWzYGyTQmjeqNGp8Y4OrCYpI=.webp" alt="Featured cover" width="1248" height="702" loading="eager" decoding="async" fetchpriority="high" />
+      <img src="assets/first-nine/en/MhmI7Hww45eHuNJ849daWzYGyTQmjeqNGp8Y4OrCYpI=.webp" alt="Featured cover" width="1248" height="702" loading="eager" decoding="async" fetchpriority="high" />
       <figcaption class="tl9-caption">The First Nine Guide — featured</figcaption>
     </figure>
   </div>
@@ -40,19 +40,19 @@ title: Home
 
   <div class="tl9-cover-grid">
     <a class="tl9-mini-cover tl9-spotlight" href="2025-12-20-function-atomic-unit.html">
-      <img src="assets/first-nine/EwBYEJTCrd8aHhoYbMJ6Ycp7tZEZWvig0oJtJIbX1Yw=.webp" alt="Block 1 cover" width="1248" height="702" loading="lazy" decoding="async" />
+      <img src="assets/first-nine/en/EwBYEJTCrd8aHhoYbMJ6Ycp7tZEZWvig0oJtJIbX1Yw=.webp" alt="Block 1 cover" width="1248" height="702" loading="lazy" decoding="async" />
       <span class="tl9-mini-title">Block 1 — Function</span>
     </a>
     <a class="tl9-mini-cover tl9-spotlight" href="2025-12-21-runtime-models.html">
-      <img src="assets/first-nine/xofaKKCZrH3F565AvyBwXzS86ezS8i7ivme5KTwImwE=.webp" alt="Block 2 cover" width="1248" height="702" loading="lazy" decoding="async" />
+      <img src="assets/first-nine/en/xofaKKCZrH3F565AvyBwXzS86ezS8i7ivme5KTwImwE=.webp" alt="Block 2 cover" width="1248" height="702" loading="lazy" decoding="async" />
       <span class="tl9-mini-title">Block 2 — Runtime models</span>
     </a>
     <a class="tl9-mini-cover tl9-spotlight" href="2025-12-22-inner-architecture.html">
-      <img src="assets/first-nine/lCHu3kApwnEGAEb22UaoNv6wZ9ANDtHAfYjzw91ahOc=.webp" alt="Block 3 cover" width="1248" height="702" loading="lazy" decoding="async" />
+      <img src="assets/first-nine/en/lCHu3kApwnEGAEb22UaoNv6wZ9ANDtHAfYjzw91ahOc=.webp" alt="Block 3 cover" width="1248" height="702" loading="lazy" decoding="async" />
       <span class="tl9-mini-title">Block 3 — Inner architecture</span>
     </a>
     <a class="tl9-mini-cover tl9-spotlight" href="2025-12-23-ideal-deployment.html">
-      <img src="assets/first-nine/MhmI7Hww45eHuNJ849daWzYGyTQmjeqNGp8Y4OrCYpI=.webp" alt="Block 4 cover" width="1248" height="702" loading="lazy" decoding="async" />
+      <img src="assets/first-nine/en/MhmI7Hww45eHuNJ849daWzYGyTQmjeqNGp8Y4OrCYpI=.webp" alt="Block 4 cover" width="1248" height="702" loading="lazy" decoding="async" />
       <span class="tl9-mini-title">Block 4 — Deployment</span>
     </a>
   </div>

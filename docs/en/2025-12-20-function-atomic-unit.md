@@ -11,7 +11,7 @@ tags: [first-nine, series, performance, functions]
 
 ***
 
-![Illustration](../assets/first-nine/EwBYEJTCrd8aHhoYbMJ6Ycp7tZEZWvig0oJtJIbX1Yw=.webp)
+![Illustration](../assets/first-nine/en/EwBYEJTCrd8aHhoYbMJ6Ycp7tZEZWvig0oJtJIbX1Yw=.webp)
 
 Functions are the basic unit of every application. Requests call functions; some are fast, some are slow. To reason about performance, I classify functions by a few traits:
 
@@ -33,13 +33,13 @@ Before you roll your eyes: no heavy math here. To analyze slow code you only nee
 - understand that O(n log n) is the boundary; beyond it there is only pain
 - notice when an algorithm suddenly becomes O(n!)
 
-![Illustration](../assets/first-nine/TNJSq2FkXqGmSse_0ar9hHcmfZBNNGKWQHzaFVh_b-g=.webp)
+![Illustration](../assets/first-nine/en/TNJSq2FkXqGmSse_0ar9hHcmfZBNNGKWQHzaFVh_b-g=.webp)
 
 Above the yellow line performance starts degrading as data volume grows.
 
 Here are examples and thresholds for n (I do not have real-life examples of O(n!)):
 
-![Illustration](../assets/first-nine/CIKUI20xiwHIVetQoFmF1YC0kRJKwVvo2a2n4vhRZys=.webp)
+![Illustration](../assets/first-nine/en/CIKUI20xiwHIVetQoFmF1YC0kRJKwVvo2a2n4vhRZys=.webp)
 
 ***
 
@@ -58,7 +58,7 @@ Classify functions early (ideally while writing them):
 
 This tells you where the bottleneck hides: CPU, memory, socket, or the algorithm itself.
 
-![Illustration](../assets/first-nine/e87od8WMisLahcccPYWSeve75dtuikfz6ZVlKpasdeU=.webp)
+![Illustration](../assets/first-nine/en/e87od8WMisLahcccPYWSeve75dtuikfz6ZVlKpasdeU=.webp)
 
 ***
 
@@ -102,7 +102,7 @@ Every function call allocates its own memory region called a stack frame.
 
 Each call creates a new frame at the top of the stack; when the function completes, the frame is removed. Even int sum(int a, int b) costs 16-64 bytes of overhead.
 
-![Illustration](../assets/first-nine/N1Aropsi21AXUVM2P24ADjYCiv76AcXBwAc89u89MzQ=.webp)
+![Illustration](../assets/first-nine/en/N1Aropsi21AXUVM2P24ADjYCiv76AcXBwAc89u89MzQ=.webp)
 
 **Why should you care?**
 

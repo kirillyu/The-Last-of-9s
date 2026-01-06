@@ -11,7 +11,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 ***
 
-![Illustration](../assets/first-nine/MhmI7Hww45eHuNJ849daWzYGyTQmjeqNGp8Y4OrCYpI=.webp)
+![Illustration](../assets/first-nine/ru/MhmI7Hww45eHuNJ849daWzYGyTQmjeqNGp8Y4OrCYpI=.webp)
 
 **Дисклеймер** - в реальном мире системы и бэкенды сочетают несколько моделей, в чистом виде их почти нигде не существует.
 
@@ -42,7 +42,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 **Если блокируется:** железо тупо простаивает
 
-![Illustration](../assets/first-nine/XCI4dNbGkjIcbn2BH4Gf0eg6kUJqtyIf68KYuD39ATY=.webp)
+![Illustration](../assets/first-nine/ru/XCI4dNbGkjIcbn2BH4Gf0eg6kUJqtyIf68KYuD39ATY=.webp)
 
 **Брать, если:** унаследованный монолит и 3 RPS - иначе нет.
 
@@ -56,7 +56,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 **Если блокируется:** поток висит, очередь пухнет
 
-![Illustration](../assets/first-nine/1rBE-6K35kPldtzc3hFIpz3iGZxkk7bqyvWxCOhPVtg=.webp)
+![Illustration](../assets/first-nine/ru/1rBE-6K35kPldtzc3hFIpz3iGZxkk7bqyvWxCOhPVtg=.webp)
 
 **Можно брать, если:** нагрузка смешанная (CPU + I/O), хотите прозрачности, тошнит от модного и молодежного.
 
@@ -76,7 +76,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 **Если блокируется:** замирает все приложение
 
-![Illustration](../assets/first-nine/dflECwFSMruawXKfpruUgFlPHwaJx8TNPhahj5ScfoU=.webp)
+![Illustration](../assets/first-nine/ru/dflECwFSMruawXKfpruUgFlPHwaJx8TNPhahj5ScfoU=.webp)
 
 **Брать, если:** чистый I/O и минимум CPU.
 
@@ -90,7 +90,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 **Если блокируется:** блокирует loop так же
 
-![Illustration](../assets/first-nine/bzAAgLHOh3m8WDuEydkTA86e3Lq7P4RJvpsjBVkb98g=.webp)
+![Illustration](../assets/first-nine/ru/bzAAgLHOh3m8WDuEydkTA86e3Lq7P4RJvpsjBVkb98g=.webp)
 
 **Брать, если:** хочется чистый асинхрон в I/O-сервисе.
 
@@ -104,7 +104,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 **Если блокируется:** если любой из легких потоков делает блокирующий системный вызов, он блокирует тот единственный тяжелый поток. Вся работа останавливается.
 
-![Illustration](../assets/first-nine/tD5zYs-pQbuPy1yxL61Ftw4yRw2bt24B4pwJBS-yqM8=.webp)
+![Illustration](../assets/first-nine/ru/tD5zYs-pQbuPy1yxL61Ftw4yRw2bt24B4pwJBS-yqM8=.webp)
 
 **Брать, если:** прототип, маленький скрипт, лабораторка.
 
@@ -120,7 +120,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 *При blocking I/O (например, Thread.sleep() или File.read() на обычном сокете) возможен pinning, что снижает эффективность.*
 
-![Illustration](../assets/first-nine/Aaj2cY80Q1JP4cqhrUWrK0ojC8bhifVCZuej0Lpe1bY=.webp)
+![Illustration](../assets/first-nine/ru/Aaj2cY80Q1JP4cqhrUWrK0ojC8bhifVCZuej0Lpe1bY=.webp)
 
 **Брать, если:** современный high-load и море сетевых вызовов. Но не забывайте про mutex, таймауты и fail-fast, чтобы не накапливать миллионы легких потоков в ожидании.
 
@@ -141,7 +141,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 **Если блокируется:** блокирует только себя, остальные работают
 
-![Illustration](../assets/first-nine/DmTGjzUg7q7ykpBntG1XrVZuxCisqeKbCGT1beEGUKU=.webp)
+![Illustration](../assets/first-nine/ru/DmTGjzUg7q7ykpBntG1XrVZuxCisqeKbCGT1beEGUKU=.webp)
 
 **Брать, если:** нужна высокая отказоустойчивость и готовый фреймворк. Можно применять и к микросервисам, и к внутренней архитектуре сервиса.
 
@@ -149,7 +149,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 ## Сводная таблица
 
-![Illustration](../assets/first-nine/zMR8lFdC68lWB8b9Tn4CvjDttpKYHOd-oOxLx_wEhbk=.webp)
+![Illustration](../assets/first-nine/ru/zMR8lFdC68lWB8b9Tn4CvjDttpKYHOd-oOxLx_wEhbk=.webp)
 
 ***
 

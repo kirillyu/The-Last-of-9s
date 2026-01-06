@@ -11,7 +11,7 @@ tags: [first-nine, series, architecture, http]
 
 ***
 
-![Illustration](../assets/first-nine/xofaKKCZrH3F565AvyBwXzS86ezS8i7ivme5KTwImwE=.webp)
+![Illustration](../assets/first-nine/ru/xofaKKCZrH3F565AvyBwXzS86ezS8i7ivme5KTwImwE=.webp)
 
 **Дисклеймер** - в реальном мире архитектуры приложений крайне разнообразны, но есть универсальные слои, которые встречаются почти везде. О них и поговорим.
 
@@ -36,7 +36,7 @@ tags: [first-nine, series, architecture, http]
 
 **Суть:** превращает HTTP-запрос в структурированные данные для бизнес-логики.
 
-![Illustration](../assets/first-nine/4vbyADNgctILkm-TM6c1vZEEg3wFc02Q6cXayYHo99E=.webp)
+![Illustration](../assets/first-nine/ru/4vbyADNgctILkm-TM6c1vZEEg3wFc02Q6cXayYHo99E=.webp)
 
 **Что тут происходит:**
 
@@ -51,7 +51,7 @@ tags: [first-nine, series, architecture, http]
 
 **Суть:** превращает HTTP-запрос в вызов функции и маршрутизирует к нужному обработчику.
 
-![Illustration](../assets/first-nine/Ha2ZICs4CKztEYL4_y5OWccTcawzcYMRYH7scAw4YMc=.webp)
+![Illustration](../assets/first-nine/ru/Ha2ZICs4CKztEYL4_y5OWccTcawzcYMRYH7scAw4YMc=.webp)
 
 **Что тут происходит:**
 
@@ -66,7 +66,7 @@ tags: [first-nine, series, architecture, http]
 
 **Суть:** выполняет основную логику приложения - то, ради чего существует сервис.
 
-![Illustration](../assets/first-nine/cQK9_XT-AQX5UXeCKwXC8Wk1kwqAWTgUKkNVg2PKwrY=.webp)
+![Illustration](../assets/first-nine/ru/cQK9_XT-AQX5UXeCKwXC8Wk1kwqAWTgUKkNVg2PKwrY=.webp)
 
 **Что тут происходит:**
 
@@ -82,7 +82,7 @@ tags: [first-nine, series, architecture, http]
 
 **Суть:** упаковывает результат обратно в HTTP-ответ и отправляет клиенту.
 
-![Illustration](../assets/first-nine/dcLjrwYGEMgGVb-MWgMjT_uBWuuG6VrLH6xxGlA9_3s=.webp)
+![Illustration](../assets/first-nine/ru/dcLjrwYGEMgGVb-MWgMjT_uBWuuG6VrLH6xxGlA9_3s=.webp)
 
 **Что тут происходит:**
 
@@ -95,7 +95,7 @@ tags: [first-nine, series, architecture, http]
 
 ### Полная картина
 
-![Illustration](../assets/first-nine/ptjhF4nT3M_IyrndVyT9chMCfvWt-qHp2ogB86eCwUQ=.webp)
+![Illustration](../assets/first-nine/ru/ptjhF4nT3M_IyrndVyT9chMCfvWt-qHp2ogB86eCwUQ=.webp)
 
 ***
 
@@ -103,7 +103,7 @@ tags: [first-nine, series, architecture, http]
 
 Теперь, когда у нас есть представление о слоях, попробуем нарисовать это как абстрактную архитектуру, будто у нас микросервисы.
 
-![Illustration](../assets/first-nine/oOLVDvMncGqzQQeARSEfDGDFw5Vl_aJ8fBWvdjT1uXA=.webp)
+![Illustration](../assets/first-nine/ru/oOLVDvMncGqzQQeARSEfDGDFw5Vl_aJ8fBWvdjT1uXA=.webp)
 
 Знакомимся с объектами. Их может быть больше или меньше в реальности. Тут главное подход: выносим в отдельную сущность все, что имеет независимый пул воркеров или любую работу за пределами приложения.
 

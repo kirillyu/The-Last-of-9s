@@ -11,7 +11,7 @@ tags: [first-nine, series, deployment, containers]
 
 ***
 
-![Illustration](../assets/first-nine/lCHu3kApwnEGAEb22UaoNv6wZ9ANDtHAfYjzw91ahOc=.webp)
+![Illustration](../assets/first-nine/en/lCHu3kApwnEGAEb22UaoNv6wZ9ANDtHAfYjzw91ahOc=.webp)
 
 So, we finally built the ideal web application:
 
@@ -48,7 +48,7 @@ When CPU usage is uncontrolled and can eat the whole node. Limits are justified 
 
 I wrote about JVM tuning before; here is the short version.
 
-![Illustration](../assets/first-nine/bZwAGlvnvxkBInOpYRUGtJmPtRGDn7gtOQFYTTnDsvw=.webp)
+![Illustration](../assets/first-nine/en/bZwAGlvnvxkBInOpYRUGtJmPtRGDn7gtOQFYTTnDsvw=.webp)
 
 **Naive deployment**
 
@@ -68,7 +68,7 @@ Remove limits, but tell JVM the real budget. Set -XX:ActiveProcessorCount=1 (equ
 
 Add a note on JVM with virtual threads.
 
-![Illustration](../assets/first-nine/s4y6mnWkmFxLbPhQ_ozwMspA1ODDD-wdm4HXH_mhfiQ=.webp)
+![Illustration](../assets/first-nine/en/s4y6mnWkmFxLbPhQ_ozwMspA1ODDD-wdm4HXH_mhfiQ=.webp)
 
 **Naive deployment**
 
@@ -91,7 +91,7 @@ This aligns runtime parallelism with guaranteed resources.
 
 ## Golang 1.10+
 
-![Illustration](../assets/first-nine/hPazcVMiVnT3HFDpYHuWNr4TH0v8mwXVgG9_7FQLm9k=.webp)
+![Illustration](../assets/first-nine/en/hPazcVMiVnT3HFDpYHuWNr4TH0v8mwXVgG9_7FQLm9k=.webp)
 
 **Naive deployment**
 
@@ -109,7 +109,7 @@ Set GOMAXPROCS=1 (from requests). Set GOMEMLIMIT to 70-90% of memory limit becau
 
 ## Node.js 18+/20+
 
-![Illustration](../assets/first-nine/oBra56jj2xOPX0YvCPyIX0S1ZTO58kAcR5YFHSpf_6M=.webp)
+![Illustration](../assets/first-nine/en/oBra56jj2xOPX0YvCPyIX0S1ZTO58kAcR5YFHSpf_6M=.webp)
 
 **Naive deployment**
 
@@ -127,7 +127,7 @@ The right answer is scale-out. Keep process count aligned with requests. This yi
 
 ## Python 3.8+ (Gunicorn / Uvicorn)
 
-![Illustration](../assets/first-nine/eHBGSlLYwL7LW2sXQt-l37gYfo_lGk4XdBTfJJIZ4Hs=.webp)
+![Illustration](../assets/first-nine/en/eHBGSlLYwL7LW2sXQt-l37gYfo_lGk4XdBTfJJIZ4Hs=.webp)
 
 **Naive deployment**
 
@@ -147,7 +147,7 @@ Remove limits. Trap: C libraries (NumPy, Pandas, OpenCV) may see 128 cores and p
 
 ## Ruby 3+
 
-![Illustration](../assets/first-nine/REQ8CymAJGzIwfDLPiPyRIZsc1A_kh4IcsjzoUFjemo=.webp)
+![Illustration](../assets/first-nine/en/REQ8CymAJGzIwfDLPiPyRIZsc1A_kh4IcsjzoUFjemo=.webp)
 
 **Naive deployment**
 
@@ -169,7 +169,7 @@ Set it explicitly:
 
 ## PHP-FPM 7.4+
 
-![Illustration](../assets/first-nine/nqjKgT46mOa4R9XoQ7-9HyhA6IAExRHw2vDKq1RrABs=.webp)
+![Illustration](../assets/first-nine/en/nqjKgT46mOa4R9XoQ7-9HyhA6IAExRHw2vDKq1RrABs=.webp)
 
 **Naive deployment**
 
@@ -190,7 +190,7 @@ This yields stable and predictable behavior. PHP-FPM is harder to instrument due
 
 ## .NET 6+
 
-![Illustration](../assets/first-nine/LdJ6yBj57gcBp2D1mxOk6zu0MPQIvYGnRfUQukama7c=.webp)
+![Illustration](../assets/first-nine/en/LdJ6yBj57gcBp2D1mxOk6zu0MPQIvYGnRfUQukama7c=.webp)
 
 **Naive deployment**
 

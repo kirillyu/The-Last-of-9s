@@ -15,10 +15,6 @@
         <link rel="canonical" href="https://kirillyu.github.io/The-Last-of-9s/ru/dashboards.html">
       
       
-        <link rel="prev" href="blog.html">
-      
-      
-        <link rel="next" href="about.html">
       
       
         
@@ -87,6 +83,64 @@
         },
         true
       );
+    })();
+  </script>
+  <script>
+    // TL9: add static social icons to header (GitHub / LinkedIn / Telegram).
+    // URLs are taken from the About page "Contacts" section.
+    (() => {
+      const SOCIAL = [
+        { name: "GitHub", href: "https://github.com/kirillyu", svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>' },
+        { name: "LinkedIn", href: "https://www.linkedin.com/in/kirillyu/", svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 3A2 2 0 0 1 21 5v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14Zm-11.75 7H5.5v9h1.75v-9ZM6.38 7.25A1.13 1.13 0 0 0 7.5 6.12 1.12 1.12 0 0 0 6.38 5 1.12 1.12 0 0 0 5.25 6.12c0 .62.5 1.13 1.13 1.13ZM19 13.75c0-2.02-1.08-3.25-2.82-3.25-1.25 0-1.97.69-2.32 1.18V10H12.1v9h1.75v-4.72c0-1.24.63-1.99 1.7-1.99 1.05 0 1.45.74 1.45 1.99V19H19v-5.25Z"/></svg>' },
+        { name: "Telegram", href: "https://t.me/r9yo11yp9e", svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.04 15.55 8.9 19.2c.55 0 .8-.24 1.1-.53l2.64-2.52 5.47 4c1 .55 1.72.26 1.98-.93l3.6-16.9c.35-1.64-.6-2.28-1.64-1.9L1.9 9.3c-1.58.62-1.56 1.5-.28 1.9l5.46 1.7 12.67-7.98c.6-.36 1.15-.16.7.2L9.04 15.55Z"/></svg>' },
+      ];
+
+      const ensure = () => {
+        const header = document.querySelector(".md-header__inner");
+        if (!header) return false;
+        if (header.querySelector(".tl9-header-social")) return true;
+
+        const wrap = document.createElement("div");
+        wrap.className = "md-header__option tl9-header-social";
+        wrap.setAttribute("aria-label", "Social links");
+
+        for (const item of SOCIAL) {
+          const a = document.createElement("a");
+          a.className = "md-header__button tl9-social-btn";
+          a.href = item.href;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.setAttribute("aria-label", item.name);
+          a.title = item.name;
+          a.innerHTML = item.svg;
+          wrap.appendChild(a);
+        }
+
+        // Insert before search icon if possible.
+        const searchLabel = header.querySelector('label[for="__search"]');
+        if (searchLabel && searchLabel.parentElement) {
+          searchLabel.parentElement.insertBefore(wrap, searchLabel);
+        } else {
+          header.appendChild(wrap);
+        }
+        return true;
+      };
+
+      const run = () => {
+        if (ensure()) return;
+        // Retry a few times: Material builds header async on some pages.
+        let tries = 0;
+        const t = setInterval(() => {
+          tries += 1;
+          if (ensure() || tries > 20) clearInterval(t);
+        }, 100);
+      };
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", run, { once: true });
+      } else {
+        run();
+      }
     })();
   </script>
   
@@ -342,27 +396,6 @@
   
   
   
-    
-  
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="dashboards.html" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Дашборды
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
   
     <li class="md-tabs__item">
       <a href="about.html" class="md-tabs__link">
@@ -474,91 +507,6 @@
       
   
   
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Дашборды
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="dashboards.html" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Дашборды
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Содержание">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Содержание
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Примечания
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
   
   
     <li class="md-nav__item">
@@ -602,25 +550,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Содержание
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Примечания
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -637,37 +566,8 @@
 
 
 <h1 id="_1">Дашборды<a class="headerlink" href="#_1" title="Anchor link to this section">&para;</a></h1>
-<p>Grafana дашборды сгруппированы по сигналам и слоям системы. Здесь будут live панели, статические
-снимки и короткие runbook.</p>
-<div class="dash-grid">
-  <div class="dash-card">
-    <h3>Latency Terrain</h3>
-    <p>Перцентили, насыщение, рост хвоста и распространение латентности.</p>
-    <p class="post-meta">Статус: в сборке</p>
-  </div>
-  <div class="dash-card">
-    <h3>Reliability Radar</h3>
-    <p>SLO heatmap, error budget, влияние релизов.</p>
-    <p class="post-meta">Статус: в сборке</p>
-  </div>
-  <div class="dash-card">
-    <h3>Capacity Forge</h3>
-    <p>CPU, память, IO, очереди, запасы для масштабирования.</p>
-    <p class="post-meta">Статус: в сборке</p>
-  </div>
-  <div class="dash-card">
-    <h3>Incident Lens</h3>
-    <p>Связь трасс, логов и ошибок вокруг инцидентов.</p>
-    <p class="post-meta">Статус: в сборке</p>
-  </div>
-</div>
-
-<h2 id="_2">Примечания<a class="headerlink" href="#_2" title="Anchor link to this section">&para;</a></h2>
-<ul>
-<li>Часть дашбордов будет доступна в live виде.</li>
-<li>Для закрытых дашбордов будет статичный снапшот с аннотациями.</li>
-<li>К каждому дашборду будет короткий runbook.</li>
-</ul>
+<p>Скоро здесь будут: дашборды, снапшоты и короткие runbook.</p>
+<p>Пока страница намеренно пустая.</p>
 
 
 
@@ -701,44 +601,6 @@
       
         <footer class="md-footer">
   
-    
-      
-      <nav class="md-footer__inner md-grid" aria-label="Нижний колонтитул" >
-        
-          
-          <a href="blog.html" class="md-footer__link md-footer__link--prev" aria-label="Назад: Блог">
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-            </div>
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Назад
-              </span>
-              <div class="md-ellipsis">
-                Блог
-              </div>
-            </div>
-          </a>
-        
-        
-          
-          <a href="about.html" class="md-footer__link md-footer__link--next" aria-label="Вперед: Обо мне">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Вперед
-              </span>
-              <div class="md-ellipsis">
-                Обо мне
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
     
   
   <div class="md-footer-meta md-typeset">
@@ -774,8 +636,6 @@
         <script src="../assets/scripts/hero-bg.js"></script>
       
         <script src="../assets/scripts/brand-anim.js"></script>
-      
-        <script src="../assets/scripts/site-nav.js"></script>
       
         <script src="../assets/scripts/lang-setup.js"></script>
       

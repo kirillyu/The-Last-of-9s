@@ -470,3 +470,35 @@
   box-shadow: 0 14px 32px rgba(20, 25, 32, 0.12);
   background: rgba(255, 255, 255, 0.7);
 }
+
+/* Language toggle (RU/EN) in the header */
+.tl9-lang-toggle {
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  padding: 0 0.65rem;
+  border-radius: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  background: rgba(0, 0, 0, 0.18);
+  color: rgba(227, 232, 239, 0.92);
+}
+
+[data-md-color-scheme="default"] .tl9-lang-toggle {
+  border-color: rgba(25, 35, 45, 0.18);
+  background: rgba(255, 255, 255, 0.65);
+  color: rgba(25, 35, 45, 0.92);
+}
+
+/* Header social icons */
+.tl9-header-social {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.tl9-social-btn svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  display: block;
+}

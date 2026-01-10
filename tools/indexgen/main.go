@@ -394,11 +394,7 @@ func main() {
 			panic(err)
 		}
 
-		rss := renderRSS(siteCfg, lang, articles)
-		rssPath := filepath.Join(base, rssFileName(lang))
-		err = os.WriteFile(rssPath, []byte(strings.Join(rss, "\n")), 0644)
-		if err != nil {
-			panic(err)
-		}
+		// RSS disabled (the project doesn't publish feeds for now).
+		_ = siteCfg
 	}
 }

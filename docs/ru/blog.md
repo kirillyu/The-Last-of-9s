@@ -38,11 +38,4 @@ hide:
     <div class="post-tags"><span class="tag">first-nine</span><span class="tag">series</span><span class="tag">performance</span><span class="tag">functions</span></div>
     <a class="post-link" href="2025-12-20-function-atomic-unit.html">Читать -></a>
   </article>
-  <article class="post-card">
-    <div class="post-meta">2025-12-14 · 6 мин чтения</div>
-    <h3><a href="2025-12-performance-guide.html">Полное руководство по анализу производительности Linux</a></h3>
-    <p class="post-desc">Подробное руководство по инструментам и методикам анализа производительности систем на базе Linux</p>
-    <div class="post-tags"><span class="tag">linux</span><span class="tag">performance</span><span class="tag">profiling</span><span class="tag">monitoring</span></div>
-    <a class="post-link" href="2025-12-performance-guide.html">Читать -></a>
-  </article>
 </div>

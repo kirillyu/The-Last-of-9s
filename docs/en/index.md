@@ -16,9 +16,7 @@ title: Home
 
       <div class="hero-links">
         <a href="blog.html">Blog</a>
-        <a href="dashboards.html">Dashboards</a>
         <a href="https://t.me/r9yo11yp9e">Telegram</a>
-        <a href="rss.xml">RSS</a>
       </div>
       
       <p class="hero-sublede">
@@ -60,44 +58,6 @@ title: Home
 
 
 
-## Dashboards
-
-<div class="sketch-panel" markdown>
-- Latency Terrain: percentiles, saturation, tail amplification
-- Reliability Radar: SLO tracking and error budgets
-- Capacity Forge: CPU, memory, IO, queue health
-- Incident Lens: traces, logs, and error clusters
-</div>
-
-## Latest longreads
-
---8<-- "../_includes/latest-en.md"
-
-## Reading paths
-
-<a id="reading-paths"></a>
-
-### The First Nine Guide (Start Here)
-
-A narrative engineering series with Excalidraw diagrams, moving from the smallest unit of code to deployment.
-
-- Block 1 — **[Function: the atomic unit of code](2025-12-20-function-atomic-unit.md)**
-- Block 2 — **[Runtime models: running thousands of functions at once](2025-12-21-runtime-models.md)**
-- Block 3 — **[Typical web-application inner architecture](2025-12-22-inner-architecture.md)**
-- Block 4 — **[Ideal application deployment](2025-12-23-ideal-deployment.md)**
-
-### Tracks
-
-**Performance archaeology**  
-Start with **[Complete Guide to Linux Performance Analysis](2025-12-performance-guide.md)**.
-
-**Reliability engineering**  
-Covering SLO math, error budgets, and incident anatomy. See [Dashboards](dashboards.md) for signal design.
-
 ## About
 
 The Last of 9s is an engineering blog where I share my experience and approaches on how to build processes from scratch and solve applied tasks around my favorite aspects of systems. More in <a href="about.md">About</a>.
-
-<div class="section-block" markdown>
-<span class="signal">New here?</span> Start with <a href="#reading-paths">Reading paths</a>.
-</div>

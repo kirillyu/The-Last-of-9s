@@ -76,7 +76,6 @@ markdown_extensions:
 nav:
   - index.md
   - blog.md
-  - dashboards.md
   - about.md
 
 
@@ -106,5 +105,4 @@ extra_css:
 extra_javascript:
   - assets/scripts/hero-bg.js
   - assets/scripts/brand-anim.js
-  - assets/scripts/site-nav.js
   - assets/scripts/lang-setup.js

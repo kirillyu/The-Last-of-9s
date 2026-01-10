@@ -38,11 +38,4 @@ Longreads in English on performance, observability, and reliability engineering.
     <div class="post-tags"><span class="tag">first-nine</span><span class="tag">series</span><span class="tag">performance</span><span class="tag">functions</span></div>
     <a class="post-link" href="2025-12-20-function-atomic-unit.html">Read -></a>
   </article>
-  <article class="post-card">
-    <div class="post-meta">2025-12-14 · 6 min read</div>
-    <h3><a href="2025-12-performance-guide.html">Complete Guide to Linux Performance Analysis</a></h3>
-    <p class="post-desc">Comprehensive guide to tools and techniques for analyzing system performance on Linux</p>
-    <div class="post-tags"><span class="tag">linux</span><span class="tag">performance</span><span class="tag">profiling</span><span class="tag">monitoring</span></div>
-    <a class="post-link" href="2025-12-performance-guide.html">Read -></a>
-  </article>
 </div>

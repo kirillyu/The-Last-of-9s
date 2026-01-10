@@ -1,6 +1,7 @@
 # MkDocs
 site/
 dev/
+Gemini_Generated_Image_*.png
 
 # Python
 __pycache__/

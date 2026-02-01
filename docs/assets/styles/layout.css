@@ -71,12 +71,7 @@
 
 
 @media screen and (min-width: 60em) {
-  .md-sidebar--primary {
-    display: none;
-  }
-
   .md-main__inner {
-    /* Keep Material's centered grid behavior when the primary sidebar is hidden. */
     margin-left: auto;
     margin-right: auto;
   }

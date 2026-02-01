@@ -29,6 +29,15 @@ type Article struct {
 	ReadMinutes int
 }
 
+type ExternalCard struct {
+	Title       string
+	Description string
+	URL         string
+	Meta        string
+	Tags        []string
+	Cta         string
+}
+
 type SiteConfig struct {
 	SiteName        string `yaml:"site_name"`
 	SiteDescription string `yaml:"site_description"`
@@ -122,6 +131,51 @@ func renderTags(tags []string) string {
 		parts = append(parts, fmt.Sprintf("<span class=\"tag\">%s</span>", html.EscapeString(tag)))
 	}
 	return fmt.Sprintf("<div class=\"post-tags\">%s</div>", strings.Join(parts, ""))
+}
+
+func isFirstNine(a Article) bool {
+	if a.Front.Block > 0 {
+		return true
+	}
+	for _, tag := range a.Front.Tags {
+		if strings.EqualFold(tag, "first-nine") {
+			return true
+		}
+	}
+	return false
+}
+
+func renderExternalCard(lang string, card ExternalCard) []string {
+	meta := html.EscapeString(card.Meta)
+	if meta == "" {
+		meta = readLabel(lang, 1)
+	}
+	title := html.EscapeString(card.Title)
+	description := html.EscapeString(card.Description)
+	tags := renderTags(card.Tags)
+	cta := card.Cta
+	if cta == "" {
+		cta = ctaLabel(lang)
+	}
+
+	out := []string{
+		"  <article class=\"post-card\">",
+		fmt.Sprintf("    <div class=\"post-meta\">%s</div>", meta),
+		fmt.Sprintf("    <h3><a href=\"%s\">%s</a></h3>", card.URL, title),
+	}
+
+	if description != "" {
+		out = append(out, fmt.Sprintf("    <p class=\"post-desc\">%s</p>", description))
+	}
+
+	if tags != "" {
+		out = append(out, fmt.Sprintf("    %s", tags))
+	}
+
+	out = append(out, fmt.Sprintf("    <a class=\"post-link\" href=\"%s\">%s</a>", card.URL, cta))
+	out = append(out, "  </article>")
+
+	return out
 }
 
 func renderCard(a Article, prefix string) []string {
@@ -220,21 +274,230 @@ func renderIndex(lang string, articles []Article) []string {
 		)
 	}
 
+	firstNine := make([]Article, 0, len(articles))
+	others := make([]Article, 0, len(articles))
+	for _, article := range articles {
+		if isFirstNine(article) {
+			firstNine = append(firstNine, article)
+		} else {
+			others = append(others, article)
+		}
+	}
+
+	if lang == "ru" {
+		out = append(out,
+			"## The First Nine Guide",
+			"",
+		)
+	} else {
+		out = append(out,
+			"## Branch: The First Nine Guide",
+			"",
+		)
+	}
+
 	out = append(out, "<div class=\"post-grid\">")
 
-	if len(articles) == 0 {
+	if len(firstNine) == 0 {
 		if lang == "ru" {
 			out = append(out, "  <p class=\"post-desc\">Статьи скоро появятся.</p>")
 		} else {
 			out = append(out, "  <p class=\"post-desc\">Articles coming soon.</p>")
 		}
 	} else {
-		for _, article := range articles {
+		for _, article := range firstNine {
 			out = append(out, renderCard(article, "")...)
 		}
 	}
 
 	out = append(out, "</div>")
+
+	if len(others) > 0 {
+		if lang == "ru" {
+			out = append(out,
+				"",
+				"## Внутренние статьи (вне серии)",
+				"",
+				"<div class=\"post-grid\">",
+			)
+		} else {
+			out = append(out,
+				"",
+				"## Internal articles (outside the series)",
+				"",
+				"<div class=\"post-grid\">",
+			)
+		}
+
+		for _, article := range others {
+			out = append(out, renderCard(article, "")...)
+		}
+		out = append(out, "</div>")
+	}
+
+	if lang == "ru" {
+		out = append(out,
+			"",
+			"## Performance Engineering",
+			"",
+			"Материалы вне основной серии, но в той же инженерной линии.",
+			"",
+			"<div class=\"post-grid\">",
+		)
+
+		articlesRU := []ExternalCard{
+			{
+				Title:       "Как мы боролись с овербукингом Kubernetes-кластеров",
+				Description: "Соавторская статья о том, как мы подходили к овербукингу в Kubernetes и какие практические выводы сделали.",
+				URL:         "https://habr.com/ru/companies/ecom_tech/articles/735638/",
+				Meta:        "Habr · внешняя статья",
+				Tags:        []string{"performance-engineering", "kubernetes"},
+			},
+			{
+				Title:       "Load2SRE: от нагрузки к доступности, без потери производительности",
+				Description: "Текстовая версия доклада: путь от нагрузочного тестирования к SRE через практики performance engineering.",
+				URL:         "https://habr.com/ru/companies/ecom_tech/articles/734414/",
+				Meta:        "Habr · внешняя статья",
+				Tags:        []string{"performance-engineering", "sre"},
+			},
+			{
+				Title:       "Нагрузочное тестирование PostgreSQL, используя JMeter, Yandex.Tank и Overload",
+				Description: "Самая ранняя статья (2017) — практика НТ PostgreSQL и инструменты для нагрузочных экспериментов.",
+				URL:         "https://habr.com/ru/articles/339014/",
+				Meta:        "Habr · 2017",
+				Tags:        []string{"performance-testing", "postgresql"},
+			},
+		}
+
+		for _, card := range articlesRU {
+			out = append(out, renderExternalCard(lang, card)...)
+		}
+		out = append(out, "</div>")
+
+		out = append(out,
+			"",
+			"## Публичные выступления (Performance Engineering)",
+			"",
+			"<div class=\"post-grid\">",
+		)
+
+		talks := []ExternalCard{
+			{
+				Title:       "Load2SRE — Heisenbug 2022",
+				Description: "Доклад о Load2SRE: как связывать нагрузочное тестирование и доступность.",
+				URL:         "https://www.youtube.com/watch?v=BN5ZOPMolBU",
+				Meta:        "Видео · 2022",
+				Tags:        []string{"talk", "performance-engineering"},
+				Cta:         "Смотреть ->",
+			},
+			{
+				Title:       "PerfOps — HighLoad 2022",
+				Description: "Операционный подход к производительности: PerfOps как системная практика.",
+				URL:         "https://www.youtube.com/watch?v=iDFBWczQVcg",
+				Meta:        "Видео · 2022",
+				Tags:        []string{"talk", "perfops"},
+				Cta:         "Смотреть ->",
+			},
+			{
+				Title:       "Автоматическая генерация отчётов — PerfConf #7",
+				Description: "Как автоматизировать отчёты по нагрузке и превратить это в стабильный процесс.",
+				URL:         "https://www.youtube.com/watch?v=PzsZnIxNuxA&t=517s",
+				Meta:        "Видео · PerfConf",
+				Tags:        []string{"talk", "automation"},
+				Cta:         "Смотреть ->",
+			},
+			{
+				Title:       "НТ с нуля — Heisenbug 2021",
+				Description: "Как строить нагрузочное тестирование с нуля в продуктовой команде.",
+				URL:         "https://www.youtube.com/watch?v=7H3ImV4LaSY",
+				Meta:        "Видео · 2021",
+				Tags:        []string{"talk", "performance-testing"},
+				Cta:         "Смотреть ->",
+			},
+			{
+				Title:       "Автоматизация НТ — Raiffeisen Meetup 2020",
+				Description: "Сообщество QA Load: автоматизация нагрузочного тестирования в продукте.",
+				URL:         "https://www.youtube.com/watch?v=sEcudxQB62M",
+				Meta:        "Видео · 2020",
+				Tags:        []string{"talk", "performance-testing"},
+				Cta:         "Смотреть ->",
+			},
+		}
+
+		for _, card := range talks {
+			out = append(out, renderExternalCard(lang, card)...)
+		}
+		out = append(out, "</div>")
+	} else {
+		out = append(out,
+			"",
+			"## External articles",
+			"",
+			"<div class=\"post-grid\">",
+		)
+
+		enCards := []ExternalCard{
+			{
+				Title:       "PerfOps: Faster and Cheaper Through a Service Oriented Approach in Performance Testing",
+				Description: "PerfOps on Medium: how a service‑oriented approach makes performance testing faster and cheaper.",
+				URL:         "https://medium.com/@login40000/perfops-faster-and-cheaper-through-a-service-oriented-approach-in-performance-testing-5689b3747014",
+				Meta:        "Medium · external",
+				Tags:        []string{"perfops", "performance-engineering"},
+			},
+		}
+
+		for _, card := range enCards {
+			out = append(out, renderExternalCard(lang, card)...)
+		}
+		out = append(out, "</div>")
+
+		out = append(out,
+			"",
+			"## Branch: VictoriaMetrics",
+			"",
+			"Guides, talks, and tools about VictoriaMetrics and its ecosystem.",
+			"",
+			"<div class=\"post-grid\">",
+		)
+
+		vmCards := []ExternalCard{
+			{
+				Title:       "VictoriaMetrics architectures and topology patterns",
+				Description: "Guide on VM architectures and topology patterns (vm-architectures).",
+				URL:         "https://docs.victoriametrics.com/guides/vm-architectures/",
+				Meta:        "VictoriaMetrics Docs",
+				Tags:        []string{"victoriametrics", "architecture"},
+			},
+		}
+
+		for _, card := range vmCards {
+			out = append(out, renderExternalCard(lang, card)...)
+		}
+		out = append(out, "</div>")
+
+		out = append(out,
+			"",
+			"## Tools",
+			"",
+			"<div class=\"post-grid\">",
+		)
+
+		tools := []ExternalCard{
+			{
+				Title:       "vmgather",
+				Description: "Tooling for VictoriaMetrics ecosystem.",
+				URL:         "https://github.com/VictoriaMetrics/vmgather",
+				Meta:        "GitHub · tool",
+				Tags:        []string{"victoriametrics", "tooling"},
+			},
+		}
+
+		for _, card := range tools {
+			out = append(out, renderExternalCard(lang, card)...)
+		}
+		out = append(out, "</div>")
+	}
+
 	return out
 }
 
@@ -272,7 +535,8 @@ func renderLatest(lang string, articles []Article) []string {
 		if len(articles) < limit {
 			limit = len(articles)
 		}
-		for _, article := range articles[:limit] {
+		for i := limit - 1; i >= 0; i-- {
+			article := articles[i]
 			out = append(out, renderCard(article, latestPrefix(lang))...)
 		}
 	}
@@ -403,7 +667,7 @@ func main() {
 				return nil
 			}
 			// Skip generated and navigation pages (non-articles).
-			if info.Name() == "index.md" || info.Name() == "blog.md" || info.Name() == "home.md" {
+			if info.Name() == "index.md" || info.Name() == "blog.md" || info.Name() == "home.md" || info.Name() == "about.md" || info.Name() == "dashboards.md" {
 				return nil
 			}
 

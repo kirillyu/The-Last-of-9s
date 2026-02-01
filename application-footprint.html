@@ -1,0 +1,1296 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="System Footprint: how to separate OS and app issues by metrics">
+      
+      
+        <meta name="author" content="Kirill Yu">
+      
+      
+        <link rel="canonical" href="https://kirillyu.github.io/The-Last-of-9s/application-footprint.html">
+      
+      
+      
+      
+        
+          <link rel="alternate" href="application-footprint.html" hreflang="en">
+        
+          <link rel="alternate" href="ru/application-footprint.html" hreflang="ru">
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Application footprint in operating system - The Last of 9s</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/styles/fonts.css">
+    
+      <link rel="stylesheet" href="assets/styles/brand.css">
+    
+      <link rel="stylesheet" href="assets/styles/layout.css">
+    
+      <link rel="stylesheet" href="assets/styles/components.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  
+  <script>
+    // Ensure language selector links always navigate (base-path safe).
+    // Registered early (in <head>) so it can win against later event handlers.
+    (() => {
+      window.addEventListener(
+        "click",
+        (e) => {
+          const target = e.target;
+          if (!(target instanceof Element)) return;
+          const link = target.closest("a.md-select__link");
+          if (!link) return;
+          const href = link.getAttribute("href");
+          if (!href || href.startsWith("javascript:")) return;
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          window.location.href = link.href;
+        },
+        true
+      );
+    })();
+  </script>
+  <script>
+    // TL9: add static social icons to header (GitHub / LinkedIn / Telegram).
+    // URLs are taken from the About page "Contacts" section.
+    (() => {
+      const SOCIAL = [
+        { name: "GitHub", href: "https://github.com/kirillyu", svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>' },
+        { name: "LinkedIn", href: "https://www.linkedin.com/in/kirillyu/", svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 3A2 2 0 0 1 21 5v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14Zm-11.75 7H5.5v9h1.75v-9ZM6.38 7.25A1.13 1.13 0 0 0 7.5 6.12 1.12 1.12 0 0 0 6.38 5 1.12 1.12 0 0 0 5.25 6.12c0 .62.5 1.13 1.13 1.13ZM19 13.75c0-2.02-1.08-3.25-2.82-3.25-1.25 0-1.97.69-2.32 1.18V10H12.1v9h1.75v-4.72c0-1.24.63-1.99 1.7-1.99 1.05 0 1.45.74 1.45 1.99V19H19v-5.25Z"/></svg>' },
+        { name: "Telegram", href: "https://t.me/r9yo11yp9e", svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.04 15.55 8.9 19.2c.55 0 .8-.24 1.1-.53l2.64-2.52 5.47 4c1 .55 1.72.26 1.98-.93l3.6-16.9c.35-1.64-.6-2.28-1.64-1.9L1.9 9.3c-1.58.62-1.56 1.5-.28 1.9l5.46 1.7 12.67-7.98c.6-.36 1.15-.16.7.2L9.04 15.55Z"/></svg>' },
+      ];
+
+      const buildWrap = () => {
+        const wrap = document.createElement("div");
+        wrap.className = "md-header__option tl9-header-social";
+        wrap.setAttribute("aria-label", "Social links");
+
+        for (const item of SOCIAL) {
+          const a = document.createElement("a");
+          a.className = "md-header__button tl9-social-btn";
+          a.href = item.href;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.setAttribute("aria-label", item.name);
+          a.title = item.name;
+          a.innerHTML = item.svg;
+          wrap.appendChild(a);
+        }
+        return wrap;
+      };
+
+      const findAnchor = (header) => {
+        if (!header) return null;
+        return (
+          header.querySelector('label[for="__search"]') ||
+          header.querySelector('[data-md-component="header-search"]') ||
+          header.querySelector('.md-search') ||
+          header.querySelector('.md-header__option')
+        );
+      };
+
+      const ensure = () => {
+        const header = document.querySelector(".md-header__inner");
+        if (!header) return false;
+        if (header.querySelector(".tl9-header-social")) return true;
+
+        const wrap = buildWrap();
+        const anchor = findAnchor(header);
+        if (anchor && anchor.parentElement) {
+          anchor.parentElement.insertBefore(wrap, anchor);
+        } else {
+          header.appendChild(wrap);
+        }
+        return true;
+      };
+
+      const run = () => {
+        if (ensure()) return;
+        // Retry a few times: Material builds header async on some pages.
+        let tries = 0;
+        const t = setInterval(() => {
+          tries += 1;
+          if (ensure() || tries > 20) clearInterval(t);
+        }, 100);
+      };
+
+      const watch = () => {
+        const root = document.body;
+        if (!root) return;
+        const observer = new MutationObserver(() => {
+          if (!document.querySelector(".tl9-header-social")) {
+            run();
+          }
+        });
+        observer.observe(root, { childList: true, subtree: true });
+      };
+
+      document.addEventListener("DOMContentLoaded", () => {
+        run();
+        watch();
+      }, { once: true });
+      document.addEventListener("navigation.instant", run);
+      window.addEventListener("pageshow", run);
+      if (document.readyState !== "loading") {
+        run();
+        watch();
+      }
+    })();
+  </script>
+  
+  
+  
+  
+  
+  
+    
+  
+  
+    <meta property="og:title" content="Application footprint in operating system">
+    <meta name="twitter:title" content="Application footprint in operating system">
+  
+  
+    <meta property="og:description" content="System Footprint: how to separate OS and app issues by metrics">
+    <meta name="twitter:description" content="System Footprint: how to separate OS and app issues by metrics">
+  
+  
+    <meta property="og:url" content="https://kirillyu.github.io/The-Last-of-9s/application-footprint.html">
+  
+  <meta property="og:site_name" content="The Last of 9s">
+  <meta property="og:type" content="website">
+  
+    <meta property="og:image" content="https://kirillyu.github.io/The-Last-of-9s/assets/logo-optimized.png">
+    <meta name="twitter:image" content="https://kirillyu.github.io/The-Last-of-9s/assets/logo-optimized.png">
+  
+  <meta name="twitter:card" content="summary">
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#application-footprint-in-operating-system" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="The Last of 9s" class="md-header__button md-logo" aria-label="The Last of 9s" data-md-component="logo">
+      
+  <img src="assets/logo-optimized.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The Last of 9s
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Application footprint in operating system
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="green"  aria-label="Switch to light theme"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light theme" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="green"  aria-label="Switch to dark theme"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark theme" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="green"  aria-label="Switch to auto theme"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to auto theme" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="application-footprint.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="ru/application-footprint.html" hreflang="ru" class="md-select__link">
+              Русский
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+
+    <div class="md-header__option tl9-header-social" aria-label="Social links">
+      <a class="md-header__button tl9-social-btn" href="https://github.com/kirillyu" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <a class="md-header__button tl9-social-btn" href="https://www.linkedin.com/in/kirillyu/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 3A2 2 0 0 1 21 5v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14Zm-11.75 7H5.5v9h1.75v-9ZM6.38 7.25A1.13 1.13 0 0 0 7.5 6.12 1.12 1.12 0 0 0 6.38 5 1.12 1.12 0 0 0 5.25 6.12c0 .62.5 1.13 1.13 1.13ZM19 13.75c0-2.02-1.08-3.25-2.82-3.25-1.25 0-1.97.69-2.32 1.18V10H12.1v9h1.75v-4.72c0-1.24.63-1.99 1.7-1.99 1.05 0 1.45.74 1.45 1.99V19H19v-5.25Z"/></svg>
+      </a>
+      <a class="md-header__button tl9-social-btn" href="https://t.me/r9yo11yp9e" target="_blank" rel="noopener noreferrer" aria-label="Telegram" title="Telegram">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.04 15.55 8.9 19.2c.55 0 .8-.24 1.1-.53l2.64-2.52 5.47 4c1 .55 1.72.26 1.98-.93l3.6-16.9c.35-1.64-.6-2.28-1.64-1.9L1.9 9.3c-1.58.62-1.56 1.5-.28 1.9l5.46 1.7 12.67-7.98c.6-.36 1.15-.16.7.2L9.04 15.55Z"/></svg>
+      </a>
+    </div>
+
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="blog.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Blog
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="about.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  About
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="The Last of 9s" class="md-nav__button md-logo" aria-label="The Last of 9s" data-md-component="logo">
+      
+  <img src="assets/logo-optimized.png" alt="logo">
+
+    </a>
+    The Last of 9s
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="blog.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="about.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#anatomy-of-work-on-cpu-and-off-cpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anatomy of work: On-CPU and Off-CPU
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Anatomy of work: On-CPU and Off-CPU">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-on-cpu-thread-runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. On-CPU (Thread runs)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-off-cpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Off-CPU
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operation-cost-scale-transition-to-the-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operation cost scale (transition to the method)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-footprint-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Footprint Method
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="System Footprint Method">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#0-process-states-running-vs-blocked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. Process States: Running vs Blocked
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-psi-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. PSI Overview
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-check-system-footprint-top-down" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to check System Footprint top-down
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How to check System Footprint top-down">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2-cpu-pressure-spend-balance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. CPU: pressure, spend, balance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-disk-latency-and-queues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Disk: latency and queues
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-network-losses-and-queues-my-favorite-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Network: losses and queues (my favorite block)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-memory-pressure-and-faults" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Memory: pressure and faults
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-if-there-are-no-footprints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. If there are no footprints
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-to-do-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What to do next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="application-footprint-in-operating-system">Application footprint in operating system<a class="headerlink" href="#application-footprint-in-operating-system" title="Anchor link to this section">&para;</a></h1>
+<p><strong>The First Nine Guide. Block 5</strong></p>
+<hr />
+<p><img alt="Illustration" src="assets/first-nine/en/application-footprint_01.png" /></p>
+<p>You come to an incident. They say the product became slow. You need to understand if the problem is in the system layer or in the software itself, who is responsible and who to call. For years I looked for the most universal way, and I think I found it. This way has many "buts", so it is universal only in theory for now.</p>
+<p>This is the last article where we look at the app through OS footprints. Next we dive into the OS itself.</p>
+<p>In previous articles we talked about threads. I called them "light" and "heavy" threads. "Heavy" are created by the operating system, and "light" live only inside the app and do not pay all OS thread costs. But the key point is: to consume any resource, CPU or disk, our app (its process) needs OS threads, so "heavy" ones.</p>
+<p>This is the bridge between the app/runtime world and the OS world.</p>
+<p>Most people know that any code works in some thread/worker (often the same word). In the last article about ideal deployment I marked how runtime thread models map to OS threads. This mapping became my research area. When we ask "app vs OS", it is really a choice between user space and kernel space.</p>
+<p><img alt="Illustration" src="assets/first-nine/en/application-footprint_02.png" /></p>
+<p>Any code slowdown is first of all a slowdown of "work". Work is very different. But almost always, when our app needs something from the OS, it makes a syscall (system call). There are many of them: reading disk is <code>read()</code>, opening a file is <code>open()</code>. A syscall is done only by an OS thread. As an analogy, the OS is like a web server with a thread pool, and syscalls are API calls. But to be honest, the OS has another "interface" too: virtual memory. It is harder. We write to memory directly, without syscalls. But if we touch a virtual address that has no physical RAM page yet (or it was swapped out), a CPU block called <a href="https://docs.kernel.org/admin-guide/mm/concepts.html">MMU</a> triggers a hardware interrupt (<a href="https://docs.oracle.com/cd/E19504-01/802-5880/tif-21/index.html">Page Fault</a>). Control goes to the kernel, it brings the page, and returns control to the program. For code it is transparent, but for latency it is a real stop of the thread.</p>
+<p>So, to understand what can slow our "work", we need to understand what this work can be. The OS is well covered by metrics, so by them we can guess what work was done quite well.</p>
+<h2 id="anatomy-of-work-on-cpu-and-off-cpu">Anatomy of work: On-CPU and Off-CPU<a class="headerlink" href="#anatomy-of-work-on-cpu-and-off-cpu" title="Anchor link to this section">&para;</a></h2>
+<p>Work can run on CPU, or without CPU (waiting is also work, because a thread waits too, so it is busy). Work can wait inside the app or inside the system. For system waits there is <strong>Wait Channel (WCHAN)</strong>, which sleeps a thread with a specific reason.</p>
+<p>WCHAN appears only if the kernel puts the thread to sleep. Work can be slow because a resource is missing, and then we often see <strong>PSI</strong> metrics (described <a href="https://docs.kernel.org/accounting/psi.html">here</a>). PSI shows the share of time tasks were forced to wait for a resource. WCHAN is weakly covered by profilers. It is useful to know, but in practice it is rarely in metrics. Another plane of thread state is their <a href="https://www.baeldung.com/linux/process-states">state</a>: R, D, S, etc. We will use it.</p>
+<p>Back to work. In performance analysis (per <a href="https://www.brendangregg.com/offcpuanalysis.html">Brendan Gregg</a>) work is split into two big groups: <strong>On-CPU</strong> (on CPU) and <strong>Off-CPU</strong> (off CPU).</p>
+<h3 id="1-on-cpu-thread-runs">1. On-CPU (Thread runs)<a class="headerlink" href="#1-on-cpu-thread-runs" title="Anchor link to this section">&para;</a></h3>
+<p>This is when a thread uses CPU right now. Thread state is R (Running).</p>
+<p>There are three scenarios:</p>
+<h4 id="11-system-mode-work-in-kernel">1.1. System Mode (Work in kernel)<a class="headerlink" href="#11-system-mode-work-in-kernel" title="Anchor link to this section">&para;</a></h4>
+<p>The thread runs kernel code by its request (via syscall).</p>
+<ul>
+<li><strong>Examples:</strong> <code>getpid()</code>, <code>fstat()</code>, <code>open()</code>, <code>read()</code>.</li>
+<li><strong>Meaning:</strong> It goes to kernel space. Some syscalls like <code>getpid()</code> are instant, but many (<code>open()</code>, <code>read()</code>, <code>connect()</code>) can block on a resource and move the thread to wait.</li>
+<li><strong>Metrics:</strong> <code>system time</code> grows. When blocked, WCHAN and PSI IO appear.</li>
+</ul>
+<h4 id="12-pure-user-space-useful-work">1.2. Pure User-space (Useful work)<a class="headerlink" href="#12-pure-user-space-useful-work" title="Anchor link to this section">&para;</a></h4>
+<p>Classic app code execution. It runs without kernel, doing CPU work.</p>
+<ul>
+<li><strong>Examples:</strong> math, parsing, GC work.</li>
+<li><strong>Meaning:</strong> Fully in user space.</li>
+<li><strong>Metrics:</strong> <code>user time</code> grows. No kernel, no syscall, no WCHAN, no PSI.</li>
+</ul>
+<h4 id="13-user-space-busy-wait-fake-work">1.3. User-space Busy Wait (Fake work)<a class="headerlink" href="#13-user-space-busy-wait-fake-work" title="Anchor link to this section">&para;</a></h4>
+<p>The code is logically waiting or in an endless loop, but it burns CPU.</p>
+<ul>
+<li><strong>Examples:</strong> spin lock or <code>while(!flag) {}</code>.</li>
+<li><strong>Meaning:</strong> The thread spins. For OS it <strong>works</strong> (On-CPU). For code logic it is stuck.</li>
+<li><strong>Metrics:</strong> Looks like <code>user time</code> and often misleads.</li>
+</ul>
+<p>We separate: what a thread does (R/S/D state), what type of CPU consumption, and is there any resource wait (PSI). These are three different layers. We must not mix them. We glue them into a set of signals to understand the delay nature.</p>
+<p>On-CPU time has 8 common modes. Here is a table with mapping to thread state and PSI:</p>
+<table>
+<thead>
+<tr>
+<th><strong>CPU type</strong></th>
+<th><strong>Thread State</strong></th>
+<th><strong>probable PSI</strong></th>
+<th><strong>Meaning</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user</td>
+<td>R (Runnable)</td>
+<td><code>psi.cpu.some</code>*</td>
+<td>App code (useful or Busy Wait)</td>
+</tr>
+<tr>
+<td>system</td>
+<td>R (Runnable)</td>
+<td>-</td>
+<td>Kernel work (syscalls)</td>
+</tr>
+<tr>
+<td>iowait</td>
+<td>D (Uninterruptible)</td>
+<td><code>psi.io.some</code> / <code>full</code></td>
+<td>CPU idle, thread waits I/O</td>
+</tr>
+<tr>
+<td>irq / softirq</td>
+<td>-</td>
+<td>-</td>
+<td>Interrupts (network, timer)</td>
+</tr>
+<tr>
+<td>idle</td>
+<td>S (Interruptible)</td>
+<td>-</td>
+<td>CPU idle, thread sleeps</td>
+</tr>
+<tr>
+<td>steal</td>
+<td>R / -</td>
+<td><code>psi.cpu.some</code> / <code>full</code></td>
+<td>Hypervisor took CPU from VM</td>
+</tr>
+<tr>
+<td>nice</td>
+<td>S / R</td>
+<td><code>psi.cpu.full</code></td>
+<td>Low priority processes</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><em>A running thread does not create PSI for itself, but it creates a queue for others.</em></p>
+</blockquote>
+<p>A small Linux dictionary (more in links above):</p>
+<ul>
+<li><strong>R (running)</strong> - the thread is on CPU or waits for CPU in a queue.</li>
+<li><strong>S (sleep)</strong> - the thread sleeps (network, timer), can be woken up.</li>
+<li><strong>D (uninterruptible sleep)</strong> - the thread sleeps in kernel, waits for hardware (mostly disk).</li>
+<li><strong>%iowait</strong> - CPU is idle, waiting I/O, while threads are in D.</li>
+<li><strong>PSI.XYZ.some</strong> - at least one thread suffered, waiting a resource (CPU/IO/Mem). Direct signal of contention.</li>
+<li><strong>PSI.XYZ.full</strong> - all threads were waiting a resource (CPU/IO/Mem).</li>
+</ul>
+<hr />
+<p>Below I want to show how this work is covered by metrics and at what level. Here are classic <code>node_exporter</code> metrics, i.e. host monitoring:</p>
+<table>
+<thead>
+<tr>
+<th>CPU type</th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user</td>
+<td><code>node_cpu_seconds_total{mode="user"}</code></td>
+<td><code>node_pressure_cpu_waiting_seconds_total</code></td>
+<td><code>node_procs_running</code></td>
+</tr>
+<tr>
+<td>system</td>
+<td><code>node_cpu_seconds_total{mode="system"}</code></td>
+<td>-</td>
+<td><code>node_procs_running</code></td>
+</tr>
+<tr>
+<td>iowait</td>
+<td><code>node_cpu_seconds_total{mode="iowait"}</code></td>
+<td><code>node_pressure_io_waiting_seconds_total</code></td>
+<td><code>node_procs_blocked</code></td>
+</tr>
+<tr>
+<td>irq</td>
+<td><code>node_cpu_seconds_total{mode="irq"}</code></td>
+<td>-</td>
+<td><code>node_intr_total</code></td>
+</tr>
+<tr>
+<td>softirq</td>
+<td><code>node_cpu_seconds_total{mode="softirq"}</code></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>idle</td>
+<td><code>node_cpu_seconds_total{mode="idle"}</code></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>steal</td>
+<td><code>node_cpu_seconds_total{mode="steal"}</code></td>
+<td><code>node_pressure_cpu_waiting_seconds_total</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td>nice</td>
+<td><code>node_cpu_seconds_total{mode="nice"}</code></td>
+<td><code>node_pressure_cpu_waiting_seconds_total</code></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<p><code>cpu_seconds</code> shows <strong>consumption</strong> (who owns the resource now), and PSI shows <strong>shortage</strong> (who waits in the queue).</p>
+<ul>
+<li><strong>User/Nice:</strong> They do not create PSI for the same thread, but their active work creates <code>cpu_waiting</code> for <em>other</em> processes.</li>
+<li><strong>IO:</strong> <code>waiting</code> (Some) - disk slows a process, but others can run. <code>stalled</code> (Full) - disk fully blocks the system (critical!).</li>
+</ul>
+<p>Here are container metrics from <code>cAdvisor</code>:</p>
+<table>
+<thead>
+<tr>
+<th>CPU type</th>
+<th>container metrics</th>
+<th>container_tasks_state</th>
+<th>PSI metrics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user</td>
+<td><code>container_cpu_user_seconds_total</code></td>
+<td><code>running</code></td>
+<td><code>container_pressure_cpu_waiting_seconds_total</code></td>
+</tr>
+<tr>
+<td>system</td>
+<td><code>container_cpu_system_seconds_total</code></td>
+<td><code>running</code></td>
+<td><code>container_pressure_cpu_waiting_seconds_total</code></td>
+</tr>
+<tr>
+<td>iowait</td>
+<td>-</td>
+<td><code>iowait</code></td>
+<td><code>container_pressure_io_waiting_seconds_total</code></td>
+</tr>
+<tr>
+<td>throttled</td>
+<td><code>container_cpu_cfs_throttled_seconds_total</code></td>
+<td><code>running</code>*</td>
+<td><code>container_pressure_cpu_stalled_seconds_total</code></td>
+</tr>
+<tr>
+<td>steal</td>
+<td>-</td>
+<td>-</td>
+<td><code>container_pressure_cpu_waiting_seconds_total</code></td>
+</tr>
+<tr>
+<td>irq / soft</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>idle</td>
+<td>-</td>
+<td><code>sleeping</code></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Throttled processes are formally <code>running</code> (ready to run), but the kernel does not give them CPU because the quota is spent (CFS bandwidth control). This is unique because they wait for cgroup permission while in R state. It is correct to count them as Off-CPU.</p>
+</blockquote>
+<p>Metrics are few (for me, always). PSI metrics are great. CPU work types are often underrated, but useful. Very few people look at process states (<code>running</code>/<code>blocked</code>); they are not super useful, but can help to separate problems when there are many processes.</p>
+<hr />
+<h3 id="2-off-cpu">2. Off-CPU<a class="headerlink" href="#2-off-cpu" title="Anchor link to this section">&para;</a></h3>
+<p>Here the thread is not running, CPU is idle.</p>
+<p>I made a classification for Off-CPU waits based on their properties and how they look in the system.</p>
+<h4 id="21-syscall-based-explicit-wait">2.1. Syscall-based (Explicit wait)<a class="headerlink" href="#21-syscall-based-explicit-wait" title="Anchor link to this section">&para;</a></h4>
+<p>We ask the kernel to wait (network, timer, lock).</p>
+<ul>
+<li><strong>Examples:</strong> <code>futex()</code>, <code>epoll_wait()</code>.</li>
+<li><strong>Meaning:</strong> The kernel puts the thread to sleep (S or D), into a wait queue.</li>
+<li><strong>Metrics:</strong> PSI appears if we wait for an overloaded resource. WCHAN is always there (kernel sleeps the thread at a specific point), but in common metrics (node_exporter/cAdvisor) it is missing — you can see the reason only on the node itself.</li>
+</ul>
+<h4 id="22-page-faults-implicit-wait">2.2. Page Faults (Implicit wait)<a class="headerlink" href="#22-page-faults-implicit-wait" title="Anchor link to this section">&para;</a></h4>
+<p>We just touched memory.</p>
+<ul>
+<li><strong>Examples:</strong> page faults are inevitable when we work with memory; it happens when we access addresses with no RAM pages.</li>
+<li><strong>Meaning:</strong> MMU triggers an interrupt, kernel stops us and goes to disk/swap.</li>
+<li><strong>Metrics:</strong> WCHAN (<code>do_page_fault</code>) and maybe PSI Memory.</li>
+</ul>
+<p>The table below shows how many waits, even system ones, we do not see in metrics, not to mention waits inside the app.</p>
+<table>
+<thead>
+<tr>
+<th><strong>Wait type</strong></th>
+<th><strong>How to detect (WCHAN)</strong></th>
+<th><strong>Node Exporter (PSI)</strong></th>
+<th><strong>CAdvisor (PSI)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Timer / sleep</td>
+<td><code>nanosleep</code>, <code>hrtimer_sleep</code>, <code>pause</code></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Locks (app)</td>
+<td><code>futex_wait_queue_me</code>, <code>pthread_cond_wait</code></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Events / network</td>
+<td><code>ep_poll</code>, <code>poll_schedule_timeout</code></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>I/O wait</td>
+<td><code>io_schedule</code></td>
+<td><code>io_waiting</code> / <code>io_stalled</code></td>
+<td><code>io_waiting</code> / <code>io_stalled</code></td>
+</tr>
+<tr>
+<td>Page Fault</td>
+<td><code>do_page_fault</code>, <code>swap_readpage</code></td>
+<td><code>memory_stalled</code></td>
+<td><code>memory_stalled</code></td>
+</tr>
+</tbody>
+</table>
+<p>So, there is no universal metric or simple way to quickly show what causes delays in the app. Below I try to squeeze maximum from the metrics we usually have.</p>
+<p>First, the approach. I call it <strong>System Footprint</strong>. It is based on the assumption that in 90% cases we have either <code>node_exporter</code> metrics, or container <code>cAdvisor</code> metrics (or both). Metrics give us transparency of OS work. The app itself is usually covered in a very specific and non-universal way, so it often stays a black box (or gray).</p>
+<p>A metaphor: we know the state of the Black Box because it is inside a Glass Box and we see how the app interacts with the system. We can draw many conclusions (even useful) about the app.</p>
+<h3 id="operation-cost-scale-transition-to-the-method">Operation cost scale (transition to the method)<a class="headerlink" href="#operation-cost-scale-transition-to-the-method" title="Anchor link to this section">&para;</a></h3>
+<p>Let us take a more practical scale:</p>
+<ul>
+<li><strong>Cheap</strong> - nanoseconds: registers/L1/L2 cache.</li>
+<li><strong>Moderate</strong> - microseconds: syscalls, context switch, RAM access, NVMe I/O (~30-40 µs). With millions per second it becomes visible.</li>
+<li><strong>Expensive</strong> - milliseconds: network inside DC, short disk queues, HDD sequential.</li>
+<li><strong>Very expensive</strong> - tens of milliseconds and more: HDD random, swap/major faults, RTO/many retransmits, long disk queues.</li>
+</ul>
+<p>Ranges depend on hardware and workload. It is a guide, not hard thresholds.</p>
+<h2 id="system-footprint-method">System Footprint Method<a class="headerlink" href="#system-footprint-method" title="Anchor link to this section">&para;</a></h2>
+<p><strong>System Footprint Method</strong> is a performance analysis method based on <a href="https://www.brendangregg.com/usemethod.html">USE method</a> by Brendan Gregg and extended with a view through "footprints" of load in key system metrics. It is a forensic idea: find where CPU and app time goes by looking at signs (footprints) of load or waiting at each system level. We check process states, CPU time split, PSI, and main subsystems (CPU, disk, network, memory) to find the bottleneck. If a subsystem has abnormal metrics, there are "footprints", so we dig there. If graphs show <strong>no</strong> signs (no footprints), we assume the system is idle or waits for external resources (locks, network calls), i.e. the reason is outside CPU/disk/memory.</p>
+<p>For this method I prepared a <a href="dashboards/system-footprint.json">Grafana dashboard</a> that shows all metrics below. But the method is universal and works with any monitoring tool.</p>
+<p>Below is the analysis sequence and how to read metrics.</p>
+<h3 id="0-process-states-running-vs-blocked">0. Process States: Running vs Blocked<a class="headerlink" href="#0-process-states-running-vs-blocked" title="Anchor link to this section">&para;</a></h3>
+<p>First, inspired by the picture above (app on top, threads go down to kernel), it is useful to check threads: metrics exist for two states - Running (R) and Blocked (D). Understand the scale: these are workers that do your app work. Metrics can show two states:</p>
+<ul>
+<li><strong>Running (R)</strong> - if the number of OS threads in state <em>R</em> is much higher than CPU cores, a CPU queue forms (threads wait for a core). This is a CPU overload sign: more compute tasks than capacity. Even if the runtime hides waits inside (e.g., JVM web pool), R-state shows heavy threads do not get their time slice. In node metrics it is usually <code>node_procs_running</code> (count of OS threads, including kernel threads).</li>
+<li><strong>Blocked (D)</strong> - if there are OS threads in <em>D</em> state (especially spikes), threads are stuck waiting for I/O. Each blocked D-thread means the system waits for disk, and useful work is idle. D spikes come with higher request latency and performance drop. In general many D means waiting for hardware, mostly disk. D threads do not use CPU and are not visible in CPU load. In node metrics this is usually <code>node_procs_blocked</code> (also includes kernel threads).</li>
+</ul>
+<p>Important: metrics usually give only R and D (node_exporter, cAdvisor). S/Z and their variants are not visible or only partially in aggregated counters. The picture is incomplete, and that is ok.</p>
+<p>I recommend to compare these thread counts with what your app should do and how many threads it should create (of course if your node does not run 100 apps). If threads are much more than you expected, your runtime probably hides something or you have a config issue.</p>
+<p>Then step by step: first PSI (is there pressure?), then blocks by resource - CPU, Disk, Network, Memory.</p>
+<h3 id="1-psi-overview">1. PSI Overview<a class="headerlink" href="#1-psi-overview" title="Anchor link to this section">&para;</a></h3>
+<p>The simplest and most useful thing to look at (if this metric exists) is PSI. It is available on <a href="https://github.com/prometheus/node_exporter/pull/1325">host</a>, in containers <a href="https://kubernetes.io/docs/reference/instrumentation/understand-psi-metrics">inside k8s</a>, and <a href="https://github.com/google/cadvisor/pull/3649">outside k8s</a>.</p>
+<p><strong>Pressure Stall Information</strong> shows the share of time when tasks were forced to wait because of lack of CPU, IO, or memory. It is not load, but the percent of "lost" time. <code>some</code> means at least one thread was delayed; <code>full</code> means all runnable tasks were delayed (on host cpu.full is almost always 0, in cgroup it appears when CFS quotas are hit). We care about size and duration, not only "&gt; 0". Load Average is useful as a trend, but it mixes runnable and D-state and is not normalized by cores; PSI is more precise for wait time.</p>
+<p>How to read:</p>
+<ul>
+<li><strong>PSI CPU.some</strong> - signal of CPU contention. Then check: is <code>user/system</code> high, is there single-thread or busy-wait (PSI low, <code>user</code> high).</li>
+<li><strong>PSI IO.some</strong> - disk delays. Check util/latency/queue and D-state count. Reaction depends on disk type and I/O pattern.</li>
+<li><strong>PSI Memory.some</strong> - share of time tasks could not get memory and waited while kernel freed RAM, evicted pages (from cache or to swap) and/or read them back from disk.</li>
+<li><strong>All PSI near zero, but service is slow</strong> - delay can be in network or inside the app (external API, locks). Then use app metrics or profilers.</li>
+</ul>
+<p>Wherever you collect metrics, the logic is one: if PSI exists - choose a subsystem to investigate; if PSI is zero - look outside the kernel.</p>
+<h2 id="how-to-check-system-footprint-top-down">How to check System Footprint top-down<a class="headerlink" href="#how-to-check-system-footprint-top-down" title="Anchor link to this section">&para;</a></h2>
+<p>The view is simple: first pressure (PSI), then by resources - CPU, disk, network, memory. In each group we answer one question and decide to go deeper or move on.</p>
+<h3 id="2-cpu-pressure-spend-balance">2. CPU: pressure, spend, balance<a class="headerlink" href="#2-cpu-pressure-spend-balance" title="Anchor link to this section">&para;</a></h3>
+<p>This is about On-CPU part (user/system/softirq/steal), together with PSI CPU and R-state from the start.</p>
+<ul>
+<li><strong>Where does CPU go?</strong> - look at user/system/softirq/steal split. High <code>system</code> means time in kernel (syscalls, drivers). High <code>softirq</code> means kernel is busy with network/disk in software interrupts. <code>steal</code> means hypervisor takes time from VM. Reaction: spread IRQ, limit heavy threads, profile code/GC.</li>
+<li><strong>Is there CPU contention?</strong> - read PSI CPU with context switches. Node Exporter gives total context switches (<code>node_context_switches_total</code>), without voluntary/involuntary split; cAdvisor usually has none. A high counter alone (or growth) without normalization by cores is not a signal, but with performance drop it can hint too many threads or lock contention. High PSI with low switches can mean cgroup quotas or single-thread.</li>
+<li><strong>Is there imbalance per core?</strong> - per-core load shows hot cores. One CPU is busy, others idle: hot thread or IRQ pinned to one core. On VMs and without RSS/irqbalance this is common: all network/disk traffic can stick to one CPU. Fix with IRQ/RPS and correct worker count (separate topic).</li>
+</ul>
+<p>About load average: it is an average of runnable + D-state over 1/5/15 min, not normalized by cores, and includes blocking (D) tasks. On multi-core systems LA can be high with even load, or low with one hot core. Research (e.g., man proc(5), LWN articles) says LA is a symptom, not truth. Use it as a trend and always confirm with PSI, R-state, and per-CPU load.</p>
+<p>If there is no CPU pressure or it is explained, move to other resources.</p>
+<h3 id="3-disk-latency-and-queues">3. Disk: latency and queues<a class="headerlink" href="#3-disk-latency-and-queues" title="Anchor link to this section">&para;</a></h3>
+<p>These are Off-CPU waits from our model: growth of PSI IO and D-state shows threads wait for disk.</p>
+<ul>
+<li><strong>Is I/O latency growing?</strong> - most universal signal: average time per operation (await): it is queue + device service time. In node_exporter: <code>rate(node_disk_read_time_seconds_total) / rate(node_disk_reads_completed_total)</code> (and same for write).</li>
+<li><strong>If latency grows - why?</strong> - two helper signals:</li>
+<li><strong>Queue depth</strong> - <code>rate(node_disk_io_time_weighted_seconds_total)</code>. If queue grows, requests pile up faster than disk serves them (Little's law: Queue ≈ IOPS × Latency).</li>
+<li><strong>Utilization</strong> - <code>rate(node_disk_io_time_seconds_total)</code>. High util means "disk always busy", but alone it does not prove a bottleneck (especially on SSD/NVMe). Confirm with latency/queue.</li>
+<li><strong>Where is iowait?</strong> - iowait in CPU row means CPU is idle while waiting disk. It can match util/latency/PSI IO. User/system and iowait are mutually exclusive on a core, but app impact adds up - we wait disk and do no useful work.</li>
+<li><strong>iowait trap</strong> (<a href="https://lwn.net/Articles/551284/">details</a>) - iowait is CPU state (idle), not thread state. A thread calls <code>read()</code> → goes to D-state off-CPU → CPU becomes free. When CPU is idle and there is pending I/O, it is counted as iowait. If new work arrives, CPU switches to it, iowait drops, but the thread still waits disk in D. Nuance: iowait shows "CPU idle with I/O", not "how long we wait disk". Waiting is tracked in <code>procs_blocked</code> and PSI IO. So with 100% disk util and busy CPU, iowait can be 0%, but threads still wait in D. Trap: you see low iowait and think disk is not a problem, but threads are waiting and work stops. Look at disk util, D-state and PSI IO together, not only iowait.</li>
+<li><strong>Swap stall</strong> - any swap I/O (page-in/page-out) almost always means memory pressure: system does disk I/O to free RAM, and this hurts disk latency even if the disk as a device is ok.</li>
+<li><strong>Errors/retries</strong> - if you have error/retry metrics on disk/RAID/NVMe (or at least dmesg/SMART), check them. Retries and device degradation almost always show higher latency. Node_exporter has no clear disk error counters; then rely on SMART/dmesg/vendor metrics.</li>
+</ul>
+<p>Reaction depends: faster disk (NVMe, more IOPS), change I/O pattern (batching, less fsync), remove swap by adding memory. If PSI IO is flat and util is low, disk is likely not the main cause.</p>
+<h3 id="4-network-losses-and-queues-my-favorite-block">4. Network: losses and queues (my favorite block)<a class="headerlink" href="#4-network-losses-and-queues-my-favorite-block" title="Anchor link to this section">&para;</a></h3>
+<p>Network waits are Off-CPU: when a thread waits on socket/epoll, it is in S-state (WCHAN: <code>ep_poll</code> / <code>tcp_recvmsg</code>) and does not show in PSI.</p>
+<ul>
+<li><strong>Do we receive traffic fast enough?</strong> - drops and queues on our node answer this:</li>
+<li><strong>Drops / backlog</strong> - first locate the <strong>layer</strong> where packets are lost:<ul>
+<li><strong>Interface level (NIC/driver/RX/TX queues)</strong> - <code>node_network_receive_drop_total</code> / <code>node_network_transmit_drop_total</code> (per interface). Check physical <code>eth*</code> and virtual (<code>veth*</code>/<code>cni*</code>/<code>tap*</code>): sometimes the physical NIC is clean, but the container interface has drops.</li>
+<li><strong>Softnet backlog level (CPU cannot digest input)</strong> - <code>node_softnet_dropped_total</code> with <code>node_softnet_processed_total</code>.</li>
+<li><strong>TCP/socket receive path (packet reached TCP stack, but queues/buffers overflow)</strong> - localize where it overflows <strong>inside TCP receive path</strong> using TcpExt counters: <code>node_netstat_TcpExt_ListenOverflows</code>/<code>node_netstat_TcpExt_ListenDrops</code> (listen/accept overflow), <code>node_netstat_TcpExt_TCPRcvQDrop</code> (drop in rcv queue due to rcvbuf limits), <code>node_netstat_TcpExt_TCPOFOQueue</code> (out-of-order queue growth).</li>
+<li><strong>Receive errors</strong> - <code>node_netstat_Tcp_InErrs</code>: how many incoming TCP segments were accepted with error. Any growth is a signal of problems on receive path (bad segments, checksum/offload/driver/port).
+Drops on receive cause losses; then sender retransmits and client latency grows. This lets us connect cause and effect with only network metrics.</li>
+</ul>
+</li>
+<li><strong>Is the remote side (or the network between) too slow to receive?</strong> - retransmissions answer this:</li>
+<li><strong>Retransmissions</strong> - re-sending lost packets. Metrics: on <strong>node</strong> <code>node_netstat_Tcp_RetransSegs</code> (node_exporter), in <strong>container</strong> similar TCP metrics exist in cAdvisor with advanced TCP stats, in <strong>k8s</strong> (limited cAdvisor) there are no TCP metrics. Also check SYN retries: <code>node_netstat_TcpExt_TCPSynRetrans</code> (SYN retrans on handshake; affects connect latency and errors, especially for short connections).
+    Retransmits are <strong>fast</strong> (fast retransmit: 3 dupACK → resend without timeout) and <strong>timeout</strong> (RTO/backoff: 200 → 400 → 800 → 1600 → 3200 ms … up to tens of seconds).
+    In node_exporter we have a size issue: <code>node_netstat_Tcp_RetransSegs</code> counts segments, and <code>node_netstat_TcpExt_TCPTimeouts</code> counts timeout events (RTO). So we cannot precisely split fast vs RTO without extra TcpExt fields, but we can make an optimistic lower bound for heavy losses.
+    Retransmits are normal: they can happen even in good times (also because of out-of-order packets, see <a href="https://datatracker.ietf.org/doc/html/rfc4653">RFC 4653</a>). For diagnosis, look at <strong>share of traffic</strong> and <strong>trend</strong>.
+    Causes are two groups: (1) loss/errors in network (link/port/overload), (2) remote side is too slow to receive/process (queues, slow server/DB and drops).
+    For scale: a Linux test with CUBIC (default <a href="https://www.rfc-editor.org/rfc/rfc5681">congestion control</a>) on 10G bulk traffic with controlled loss: loss 1% → throughput ~2.36 Gbit/s, loss 5% → ~0.512 Gbit/s, loss 10% → ~0.028 Gbit/s, loss 15% → ~0.002 Gbit/s. For rough loss impact there is <a href="https://en.wikipedia.org/wiki/TCP_congestion_control#Rate_equation">Mathis formula</a> and it is even worse. Real numbers depend on congestion control and network conditions - use it as a guide. Test method: <a href="https://alebsys.github.io/posts/cwnd-retransmit/">TCP Congestion Control in Action</a>.
+    To interpret retransmits, check percent in total traffic:<ul>
+<li>retrans share in TCP traffic: <code>rate(node_netstat_Tcp_RetransSegs) / rate(node_netstat_Tcp_OutSegs)</code></li>
+<li>RTO lower bound: <code>rate(node_netstat_TcpExt_TCPTimeouts) / rate(node_netstat_Tcp_OutSegs)</code>. 1 RTO timeout means at least 1 retransmitted segment.</li>
+<li>fast retrans lower bound: <code>(rate(node_netstat_Tcp_RetransSegs) - rate(node_netstat_TcpExt_TCPTimeouts)) / rate(node_netstat_Tcp_OutSegs)</code>
+Then you can estimate useful traffic share: <code>(rate(node_netstat_Tcp_OutSegs) - rate(node_netstat_Tcp_RetransSegs)) / rate(node_netstat_Tcp_OutSegs)</code> - retransmits push out useful data.
+The bigger the share of RTO retransmits, the worse. Even 1% is already a lot. If there are no RTO, then fast retrans needs ~10-20% to really hurt. Thresholds from tests and prod can vary.</li>
+</ul>
+</li>
+<li><strong>Do we hit system network limits?</strong> - another class of issues, partly same as disk, but grouped here:</li>
+<li><strong>Conntrack / TIME_WAIT</strong> - <strong>Conntrack</strong> (<code>nf_conntrack</code>) is a kernel table that tracks active TCP/UDP connections for NAT, firewall (iptables/nftables) and stateful filtering. Each new connection adds a record. Near the limit (<code>node_nf_conntrack_entries</code> → <code>node_nf_conntrack_entries_limit</code>) new connects are dropped - it looks like "pings work, but new DB connections hang". <strong>TIME_WAIT</strong> is a TCP state after close (lives ~60 seconds by default). It stays on the side that closed first (often server in HTTP/1.1; in HTTP/2/gRPC this is softer due to persistent channels). Many TIME_WAIT on clients can hit ephemeral port limits and block outgoing connections; in practice it depends on <code>net.ipv4.ip_local_port_range</code> + number of TIME_WAIT sockets.</li>
+<li><strong>Backlog / somaxconn / SYN backlog</strong> - limits of incoming queues. When they hit, it looks like "new connects are slow/fail", while traffic/pings are fine. In metrics it shows as <code>node_netstat_TcpExt_ListenOverflows</code>/<code>node_netstat_TcpExt_ListenDrops</code> (listen/accept queues), and for SYN phase - growth of <code>node_netstat_TcpExt_TCPSynRetrans</code> on clients. Limits live at several levels: app backlog (<code>listen()</code>), <code>net.core.somaxconn</code>, <code>net.ipv4.tcp_max_syn_backlog</code>.</li>
+<li><strong>File descriptors (FD)</strong> - each TCP connection/socket uses an FD. When you hit FD, new accept/connect fails (often in logs as "too many open files"). At node level check <code>node_filefd_allocated</code> and <code>node_filefd_maximum</code>; also process limits (ulimit/systemd LimitNOFILE) and system limits (<code>fs.file-max</code>/<code>fs.nr_open</code>).</li>
+<li><strong>Inodes</strong> - inodes limit number of files/dirs. When inodes are exhausted, creating files/dirs (and Unix sockets with FS paths) fails even if disk space is free. At node level check <code>node_filesystem_files_free</code> / <code>node_filesystem_files</code>.</li>
+</ul>
+<p>With retrans/drops first check network/stack (losses, queue overflow), then app. With normal drops/retrans and PSI near zero, look at external dependencies (API/DB) that are slow. Drops/retrans are signals of loss/overflow (often earlier than "throughput limit"). For "slow without clear loss" add TCP timeouts/queues: <code>node_netstat_TcpExt_TCPTimeouts</code> (RTO) and queue overflow counters (rcv/OFO/listen). <strong>RTT does not live in these counters</strong> - it is per-socket state; use <code>ss -ti</code> (tcp_info: <code>rtt</code>, <code>rto</code>, <code>retrans</code>) or app/proxy metrics.</p>
+<h3 id="5-memory-pressure-and-faults">5. Memory: pressure and faults<a class="headerlink" href="#5-memory-pressure-and-faults" title="Anchor link to this section">&para;</a></h3>
+<p>Start with sharp problems.
+* <strong>Is there OOM?</strong> - on node check <code>node_vmstat_oom_kill</code>. At container level OOM events are in cAdvisor <code>container_oom_events_total</code>. If OOM exists, it is no longer "footprint diagnosis", but a limits/requests and app behavior review.
+* <strong>Do we hit container memory limit?</strong> - in cgroup v1 cAdvisor exports <code>container_memory_failcnt</code> (from <code>memory.failcnt</code>): number of failed allocations due to limit. Growing failcnt without OOM means working at the limit with constant reclaim. For limit context check <code>container_memory_usage_bytes</code> and <code>container_spec_memory_limit_bytes</code>. Here also check container awareness (does runtime see cgroup limits) and correct limit detection (see <strong><a href="ideal-deployment.html">Ideal application deployment</a></strong>, block 4).
+* <strong>Is there free memory right now?</strong> - check <code>node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes</code> and its dynamics: sharp drops often match latency degradation. Also check if you hit a threshold visually - it can be due to limits (cgroup limits/requests).
+* <strong>Is swap present and used?</strong> - two different questions:
+  * <strong>swap enabled</strong>: <code>node_memory_SwapTotal_bytes &gt; 0</code> - swap exists (not yet a problem, it may be empty, but it is a flag to check more).
+  * <strong>swap used</strong>: <code>node_memory_SwapTotal_bytes - node_memory_SwapFree_bytes</code> (plus <code>node_memory_SwapCached_bytes</code>) - how much data is already swapped out. "Swap used" does not mean disk is busy now, but it is a risk: access will need disk page-in and is much slower than RAM.
+  * <strong>swap actively used</strong>: <code>node_vmstat_pswpin</code> / <code>node_vmstat_pswpout</code> (use rate) - pages move between RAM and swap right now. This is where disk affects latency: swap-in blocks threads on memory access path.
+* <strong>Do we read pages from disk due to major faults?</strong> - <code>node_vmstat_pgmajfault</code>: growth means page faults became "major", kernel had to read a page from disk before continuing. The disk can be (1) swap (swap-in), (2) file-backed pages (page cache miss / mmap). <code>node_vmstat_pswpin</code>/<code>node_vmstat_pswpout</code> count pages that went through swap: if <code>pgmajfault</code> grows with <code>pswpin</code>, then major faults are swap; if <code>pgmajfault</code> grows but <code>pswpin/pswpout</code> do not, it is more often file-backed pages.
+* <strong>Minor faults: do they matter?</strong> - minor faults are normal (first touch, COW, etc.). They matter when they grow by orders and become notable CPU/latency cost. At node level a rough estimate is <code>node_vmstat_pgfault - node_vmstat_pgmajfault</code>, but interpret only in workload context and dynamics.</p>
+<p>Next actions depend on load: add memory, adjust limits/requests, reduce caches/heap, set GOMEMLIMIT/ActiveProcessorCount, etc. In containers it is important to separate working set from page cache (e.g., <code>container_memory_working_set_bytes</code> vs usage).</p>
+<h3 id="6-if-there-are-no-footprints">6. If there are no footprints<a class="headerlink" href="#6-if-there-are-no-footprints" title="Anchor link to this section">&para;</a></h3>
+<p>PSI ≈ 0, disk/network/memory are calm, but the service is slow? Then the delay is above OS level:</p>
+<ul>
+<li><strong>external dependency (DB, API)</strong> - look in tracing and app metrics;</li>
+<li><strong>lock contention in app</strong> - see <code>futex_wait</code> in off-CPU profilers;</li>
+<li><strong>wrong parallelism</strong> - single-thread hot path, short pool, no backpressure.</li>
+</ul>
+<p>Then move to code profiling (on-CPU and off-CPU profilers, tracing).</p>
+<hr />
+<h2 id="what-to-do-next">What to do next<a class="headerlink" href="#what-to-do-next" title="Anchor link to this section">&para;</a></h2>
+<p>System Footprint Method gives direction, not a solution. Next actions depend on where the problem is:</p>
+<p><strong>If the problem is in the app</strong> (high user time without PSI, lock contention, external API):
+* <strong>Profile the app</strong>: on-CPU (perf, pprof), off-CPU (offcputime), tracing (OpenTelemetry, Jaeger).
+* <strong>Optimize</strong> code, algorithms, parallelism.</p>
+<p><strong>If metrics are not enough</strong> (container shows a problem, but details are hidden):
+* <strong>Go to host level</strong>: check node_exporter metrics for the node where the container runs.
+* <strong>Check</strong> if the bottleneck is shared (CPU, disk, network) with neighbors.
+* <strong>Use system tools</strong>: <code>perf</code>, <code>bpftrace</code>, <code>iotop</code>, <code>tcpdump</code>.</p>
+<p><strong>If the problem is in host resources</strong> (PSI high, util 100%, latency grows):
+* <strong>Tune the system</strong>: scheduler (CFS/nice), I/O scheduler (mq-deadline/kyber), network parameters (RSS/RPS, ring buffers), memory (vm.swappiness, THP).
+* <strong>Add resources</strong>: add CPU/RAM, move to faster disks (NVMe), improve network (10G → 25G, lower RTT).
+* <strong>Move load</strong>: horizontal scaling, move services to other nodes.</p>
+<p>System Footprint Method is a checklist for fast diagnosis, not a replacement for profilers. It shows where to start digging.</p>
+<hr />
+<blockquote>
+<p>In the previous series — <strong><a href="ideal-deployment.html">we talked about deploying the app without throttling</a></strong>.</p>
+<p>Next I will talk about parallelism and concurrency at CPU level.</p>
+</blockquote>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate"], "search": "assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="assets/scripts/hero-bg.js"></script>
+      
+        <script src="assets/scripts/brand-anim.js"></script>
+      
+        <script src="assets/scripts/lang-setup.js"></script>
+      
+        <script src="assets/scripts/post-slider.js"></script>
+      
+        <script src="assets/scripts/image-zoom.js"></script>
+      
+    
+  </body>
+</html>

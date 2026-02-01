@@ -2,114 +2,128 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
         <loc>https://kirillyu.github.io/The-Last-of-9s/index.html</loc>
-        <lastmod>2026-01-10</lastmod>
+        <lastmod>2026-02-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/index.html"/>
         <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/index.html"/>
     </url>
     <url>
-        <loc>https://kirillyu.github.io/The-Last-of-9s/2025-12-20-function-atomic-unit.html</loc>
-        <lastmod>2026-01-10</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/2025-12-20-function-atomic-unit.html"/>
-        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-20-function-atomic-unit.html"/>
-    </url>
-    <url>
-        <loc>https://kirillyu.github.io/The-Last-of-9s/2025-12-21-runtime-models.html</loc>
-        <lastmod>2026-01-10</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/2025-12-21-runtime-models.html"/>
-        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-21-runtime-models.html"/>
-    </url>
-    <url>
-        <loc>https://kirillyu.github.io/The-Last-of-9s/2025-12-22-inner-architecture.html</loc>
-        <lastmod>2026-01-10</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/2025-12-22-inner-architecture.html"/>
-        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-22-inner-architecture.html"/>
-    </url>
-    <url>
-        <loc>https://kirillyu.github.io/The-Last-of-9s/2025-12-23-ideal-deployment.html</loc>
-        <lastmod>2026-01-10</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/2025-12-23-ideal-deployment.html"/>
-        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-23-ideal-deployment.html"/>
-    </url>
-    <url>
         <loc>https://kirillyu.github.io/The-Last-of-9s/about.html</loc>
-        <lastmod>2026-01-10</lastmod>
+        <lastmod>2026-02-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/about.html"/>
         <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/about.html"/>
     </url>
     <url>
+        <loc>https://kirillyu.github.io/The-Last-of-9s/application-footprint.html</loc>
+        <lastmod>2026-02-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/application-footprint.html"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/application-footprint.html"/>
+    </url>
+    <url>
         <loc>https://kirillyu.github.io/The-Last-of-9s/blog.html</loc>
-        <lastmod>2026-01-10</lastmod>
+        <lastmod>2026-02-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/blog.html"/>
         <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/blog.html"/>
     </url>
     <url>
         <loc>https://kirillyu.github.io/The-Last-of-9s/dashboards.html</loc>
-        <lastmod>2026-01-10</lastmod>
+        <lastmod>2026-02-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/dashboards.html"/>
         <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/dashboards.html"/>
     </url>
     <url>
+        <loc>https://kirillyu.github.io/The-Last-of-9s/function-atomic-unit.html</loc>
+        <lastmod>2026-02-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/function-atomic-unit.html"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/function-atomic-unit.html"/>
+    </url>
+    <url>
+        <loc>https://kirillyu.github.io/The-Last-of-9s/ideal-deployment.html</loc>
+        <lastmod>2026-02-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/ideal-deployment.html"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/ideal-deployment.html"/>
+    </url>
+    <url>
+        <loc>https://kirillyu.github.io/The-Last-of-9s/inner-architecture.html</loc>
+        <lastmod>2026-02-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/inner-architecture.html"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/inner-architecture.html"/>
+    </url>
+    <url>
+        <loc>https://kirillyu.github.io/The-Last-of-9s/runtime-models.html</loc>
+        <lastmod>2026-02-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/runtime-models.html"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/runtime-models.html"/>
+    </url>
+    <url>
         <loc>https://kirillyu.github.io/The-Last-of-9s/ru/index.html</loc>
-        <lastmod>2026-01-10</lastmod>
+        <lastmod>2026-02-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/index.html"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/index.html"/>
     </url>
     <url>
-        <loc>https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-20-function-atomic-unit.html</loc>
-        <lastmod>2026-01-10</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-20-function-atomic-unit.html"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/2025-12-20-function-atomic-unit.html"/>
-    </url>
-    <url>
-        <loc>https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-21-runtime-models.html</loc>
-        <lastmod>2026-01-10</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-21-runtime-models.html"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/2025-12-21-runtime-models.html"/>
-    </url>
-    <url>
-        <loc>https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-22-inner-architecture.html</loc>
-        <lastmod>2026-01-10</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-22-inner-architecture.html"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/2025-12-22-inner-architecture.html"/>
-    </url>
-    <url>
-        <loc>https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-23-ideal-deployment.html</loc>
-        <lastmod>2026-01-10</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-23-ideal-deployment.html"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/2025-12-23-ideal-deployment.html"/>
-    </url>
-    <url>
         <loc>https://kirillyu.github.io/The-Last-of-9s/ru/about.html</loc>
-        <lastmod>2026-01-10</lastmod>
+        <lastmod>2026-02-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/about.html"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/about.html"/>
     </url>
     <url>
+        <loc>https://kirillyu.github.io/The-Last-of-9s/ru/application-footprint.html</loc>
+        <lastmod>2026-02-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/application-footprint.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/application-footprint.html"/>
+    </url>
+    <url>
         <loc>https://kirillyu.github.io/The-Last-of-9s/ru/blog.html</loc>
-        <lastmod>2026-01-10</lastmod>
+        <lastmod>2026-02-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/blog.html"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/blog.html"/>
     </url>
     <url>
         <loc>https://kirillyu.github.io/The-Last-of-9s/ru/dashboards.html</loc>
-        <lastmod>2026-01-10</lastmod>
+        <lastmod>2026-02-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/dashboards.html"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/dashboards.html"/>
+    </url>
+    <url>
+        <loc>https://kirillyu.github.io/The-Last-of-9s/ru/function-atomic-unit.html</loc>
+        <lastmod>2026-02-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/function-atomic-unit.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/function-atomic-unit.html"/>
+    </url>
+    <url>
+        <loc>https://kirillyu.github.io/The-Last-of-9s/ru/ideal-deployment.html</loc>
+        <lastmod>2026-02-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/ideal-deployment.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/ideal-deployment.html"/>
+    </url>
+    <url>
+        <loc>https://kirillyu.github.io/The-Last-of-9s/ru/inner-architecture.html</loc>
+        <lastmod>2026-02-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/inner-architecture.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/inner-architecture.html"/>
+    </url>
+    <url>
+        <loc>https://kirillyu.github.io/The-Last-of-9s/ru/runtime-models.html</loc>
+        <lastmod>2026-02-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://kirillyu.github.io/The-Last-of-9s/ru/runtime-models.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://kirillyu.github.io/The-Last-of-9s/runtime-models.html"/>
     </url>
 </urlset>

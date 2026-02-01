@@ -1,30 +1,30 @@
 
 <!doctype html>
-<html lang="ru" class="no-js">
+<html lang="en" class="no-js">
   <head>
     
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="The First Nine Guide, блок 1: атом кода, сложность и ресурсы">
+        <meta name="description" content="The First Nine Guide, block 1: complexity, resources, and concurrency safety">
       
       
         <meta name="author" content="Kirill Yu">
       
       
-        <link rel="canonical" href="https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-20-function-atomic-unit.html">
+        <link rel="canonical" href="https://kirillyu.github.io/The-Last-of-9s/function-atomic-unit.html">
       
       
       
       
         
-          <link rel="alternate" href="../2025-12-20-function-atomic-unit.html" hreflang="en">
+          <link rel="alternate" href="function-atomic-unit.html" hreflang="en">
         
-          <link rel="alternate" href="2025-12-20-function-atomic-unit.html" hreflang="ru">
+          <link rel="alternate" href="ru/function-atomic-unit.html" hreflang="ru">
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
     
     
@@ -33,10 +33,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.618322db.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,15 +49,15 @@
       
     
     
-      <link rel="stylesheet" href="../assets/styles/fonts.css">
+      <link rel="stylesheet" href="assets/styles/fonts.css">
     
-      <link rel="stylesheet" href="../assets/styles/brand.css">
+      <link rel="stylesheet" href="assets/styles/brand.css">
     
-      <link rel="stylesheet" href="../assets/styles/layout.css">
+      <link rel="stylesheet" href="assets/styles/layout.css">
     
-      <link rel="stylesheet" href="../assets/styles/components.css">
+      <link rel="stylesheet" href="assets/styles/components.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -95,11 +95,7 @@
         { name: "Telegram", href: "https://t.me/r9yo11yp9e", svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.04 15.55 8.9 19.2c.55 0 .8-.24 1.1-.53l2.64-2.52 5.47 4c1 .55 1.72.26 1.98-.93l3.6-16.9c.35-1.64-.6-2.28-1.64-1.9L1.9 9.3c-1.58.62-1.56 1.5-.28 1.9l5.46 1.7 12.67-7.98c.6-.36 1.15-.16.7.2L9.04 15.55Z"/></svg>' },
       ];
 
-      const ensure = () => {
-        const header = document.querySelector(".md-header__inner");
-        if (!header) return false;
-        if (header.querySelector(".tl9-header-social")) return true;
-
+      const buildWrap = () => {
         const wrap = document.createElement("div");
         wrap.className = "md-header__option tl9-header-social";
         wrap.setAttribute("aria-label", "Social links");
@@ -115,11 +111,28 @@
           a.innerHTML = item.svg;
           wrap.appendChild(a);
         }
+        return wrap;
+      };
 
-        // Insert before search icon if possible.
-        const searchLabel = header.querySelector('label[for="__search"]');
-        if (searchLabel && searchLabel.parentElement) {
-          searchLabel.parentElement.insertBefore(wrap, searchLabel);
+      const findAnchor = (header) => {
+        if (!header) return null;
+        return (
+          header.querySelector('label[for="__search"]') ||
+          header.querySelector('[data-md-component="header-search"]') ||
+          header.querySelector('.md-search') ||
+          header.querySelector('.md-header__option')
+        );
+      };
+
+      const ensure = () => {
+        const header = document.querySelector(".md-header__inner");
+        if (!header) return false;
+        if (header.querySelector(".tl9-header-social")) return true;
+
+        const wrap = buildWrap();
+        const anchor = findAnchor(header);
+        if (anchor && anchor.parentElement) {
+          anchor.parentElement.insertBefore(wrap, anchor);
         } else {
           header.appendChild(wrap);
         }
@@ -136,10 +149,26 @@
         }, 100);
       };
 
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", run, { once: true });
-      } else {
+      const watch = () => {
+        const root = document.body;
+        if (!root) return;
+        const observer = new MutationObserver(() => {
+          if (!document.querySelector(".tl9-header-social")) {
+            run();
+          }
+        });
+        observer.observe(root, { childList: true, subtree: true });
+      };
+
+      document.addEventListener("DOMContentLoaded", () => {
         run();
+        watch();
+      }, { once: true });
+      document.addEventListener("navigation.instant", run);
+      window.addEventListener("pageshow", run);
+      if (document.readyState !== "loading") {
+        run();
+        watch();
       }
     })();
   </script>
@@ -156,14 +185,14 @@
     <meta name="twitter:title" content="Function: the atomic unit of code">
   
   
-    <meta property="og:description" content="The First Nine Guide, блок 1: атом кода, сложность и ресурсы">
-    <meta name="twitter:description" content="The First Nine Guide, блок 1: атом кода, сложность и ресурсы">
+    <meta property="og:description" content="The First Nine Guide, block 1: complexity, resources, and concurrency safety">
+    <meta name="twitter:description" content="The First Nine Guide, block 1: complexity, resources, and concurrency safety">
   
   
-    <meta property="og:url" content="https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-20-function-atomic-unit.html">
+    <meta property="og:url" content="https://kirillyu.github.io/The-Last-of-9s/function-atomic-unit.html">
   
   <meta property="og:site_name" content="The Last of 9s">
-  <meta property="og:type" content="article">
+  <meta property="og:type" content="website">
   
     <meta property="og:image" content="https://kirillyu.github.io/The-Last-of-9s/assets/logo-optimized.png">
     <meta name="twitter:image" content="https://kirillyu.github.io/The-Last-of-9s/assets/logo-optimized.png">
@@ -190,7 +219,7 @@
       
         
         <a href="#function-the-atomic-unit-of-code" class="md-skip">
-          Перейти к содержанию
+          Skip to content
         </a>
       
     </div>
@@ -204,10 +233,10 @@
   
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="Верхний колонтитул">
+  <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="index.html" title="The Last of 9s" class="md-header__button md-logo" aria-label="The Last of 9s" data-md-component="logo">
       
-  <img src="../assets/logo-optimized.png" alt="logo">
+  <img src="assets/logo-optimized.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -274,20 +303,20 @@
       <div class="md-header__option">
   <div class="md-select">
     
-    <button class="md-header__button md-icon" aria-label="Выберите язык">
+    <button class="md-header__button md-icon" aria-label="Select language">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
     </button>
     <div class="md-select__inner">
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="../2025-12-20-function-atomic-unit.html" hreflang="en" class="md-select__link">
+            <a href="function-atomic-unit.html" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
         
           <li class="md-select__item">
-            <a href="2025-12-20-function-atomic-unit.html" hreflang="ru" class="md-select__link">
+            <a href="ru/function-atomic-unit.html" hreflang="ru" class="md-select__link">
               Русский
             </a>
           </li>
@@ -297,6 +326,19 @@
   </div>
 </div>
     
+
+    <div class="md-header__option tl9-header-social" aria-label="Social links">
+      <a class="md-header__button tl9-social-btn" href="https://github.com/kirillyu" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <a class="md-header__button tl9-social-btn" href="https://www.linkedin.com/in/kirillyu/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 3A2 2 0 0 1 21 5v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14Zm-11.75 7H5.5v9h1.75v-9ZM6.38 7.25A1.13 1.13 0 0 0 7.5 6.12 1.12 1.12 0 0 0 6.38 5 1.12 1.12 0 0 0 5.25 6.12c0 .62.5 1.13 1.13 1.13ZM19 13.75c0-2.02-1.08-3.25-2.82-3.25-1.25 0-1.97.69-2.32 1.18V10H12.1v9h1.75v-4.72c0-1.24.63-1.99 1.7-1.99 1.05 0 1.45.74 1.45 1.99V19H19v-5.25Z"/></svg>
+      </a>
+      <a class="md-header__button tl9-social-btn" href="https://t.me/r9yo11yp9e" target="_blank" rel="noopener noreferrer" aria-label="Telegram" title="Telegram">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.04 15.55 8.9 19.2c.55 0 .8-.24 1.1-.53l2.64-2.52 5.47 4c1 .55 1.72.26 1.98-.93l3.6-16.9c.35-1.64-.6-2.28-1.64-1.9L1.9 9.3c-1.58.62-1.56 1.5-.28 1.9l5.46 1.7 12.67-7.98c.6-.36 1.15-.16.7.2L9.04 15.55Z"/></svg>
+      </a>
+    </div>
+
     
       
       
@@ -308,21 +350,21 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Поиск" placeholder="Поиск" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
       </label>
-      <nav class="md-search__options" aria-label="Поиск">
+      <nav class="md-search__options" aria-label="Search">
         
-          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Поделиться" aria-label="Поделиться" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
             
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
           </a>
         
-        <button type="reset" class="md-search__icon md-icon" title="Очистить" aria-label="Очистить" tabindex="-1">
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
@@ -335,7 +377,7 @@
       <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
-            Инициализация поиска
+            Initializing search
           </div>
           <ol class="md-search-result__list" role="presentation"></ol>
         </div>
@@ -350,7 +392,7 @@
   
     
       
-<nav class="md-tabs" aria-label="Вкладки" data-md-component="tabs">
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
   <div class="md-grid">
     <ul class="md-tabs__list">
       
@@ -366,7 +408,7 @@
   
     
   
-  Главная
+  Home
 
       </a>
     </li>
@@ -385,7 +427,7 @@
   
     
   
-  Блог
+  Blog
 
       </a>
     </li>
@@ -404,7 +446,7 @@
   
     
   
-  Обо мне
+  About
 
       </a>
     </li>
@@ -437,11 +479,11 @@
   
 
 
-<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Навигация" data-md-level="0">
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="index.html" title="The Last of 9s" class="md-nav__button md-logo" aria-label="The Last of 9s" data-md-component="logo">
       
-  <img src="../assets/logo-optimized.png" alt="logo">
+  <img src="assets/logo-optimized.png" alt="logo">
 
     </a>
     The Last of 9s
@@ -463,7 +505,7 @@
   <span class="md-ellipsis">
     
   
-    Главная
+    Home
   
 
     
@@ -490,7 +532,7 @@
   <span class="md-ellipsis">
     
   
-    Блог
+    Blog
   
 
     
@@ -517,7 +559,7 @@
   <span class="md-ellipsis">
     
   
-    Обо мне
+    About
   
 
     
@@ -543,7 +585,7 @@
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="Содержание">
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
@@ -552,15 +594,15 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Содержание
+      Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#algorithmic-complexity" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Алгоритмическая сложность
+        Algorithmic complexity
       
     </span>
   </a>
@@ -568,10 +610,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#resource-profiles" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Типы потребляемых ресурсов
+        Resource profiles
       
     </span>
   </a>
@@ -579,10 +621,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#concurrency-safety" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Потокобезопасность
+        Concurrency safety
       
     </span>
   </a>
@@ -601,10 +643,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#common-traps-take-them-with-you" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Типичные ловушки (заворачиваем с собой)
+        Common traps (take them with you)
       
     </span>
   </a>
@@ -629,106 +671,106 @@
 
 
 <h1 id="function-the-atomic-unit-of-code">Function: the atomic unit of code<a class="headerlink" href="#function-the-atomic-unit-of-code" title="Anchor link to this section">&para;</a></h1>
-<p><strong>The First Nine Guide. Блок 1</strong></p>
+<p><strong>The First Nine Guide. Block 1</strong></p>
 <hr />
-<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-20-function-atomic-unit_01.png" /></p>
-<p>Функции - важная штука внутри каждого приложения. Когда в сервис приходят запросы, они вызывают под собой функции. Какие-то работают медленно, какие-то быстро. Чтобы лучше понимать в чем их разница и какие они вообще бывают, я классифицирую их по нескольким признакам:</p>
+<p><img alt="Illustration" src="assets/first-nine/en/function-atomic-unit_01.png" /></p>
+<p>Functions are the basic unit of every application. Requests call functions; some are fast, some are slow. To reason about performance, I classify functions by a few traits:</p>
 <ol>
-<li>По сложности алгоритма внутри функции.</li>
-<li>По типу ресурса, который потребляет функция.</li>
-<li>По потокобезопасности.</li>
+<li>Algorithmic complexity.</li>
+<li>Resource profile.</li>
+<li>Concurrency safety.</li>
 </ol>
-<p>Погнали по порядку.</p>
+<p>Let's go in order.</p>
 <hr />
-<h2 id="_1">Алгоритмическая сложность<a class="headerlink" href="#_1" title="Anchor link to this section">&para;</a></h2>
-<p>Функция - это базовый кирпич производительности. Первая и самая грубая оценка ее поведения - это Big-O (O-большое).</p>
-<p>Перед тем как вы будете закатывать глаза, скажу: не буду мучать математикой, тут все предельно просто. Чтобы не потеряться при анализе медленного кода, достаточно:</p>
+<h2 id="algorithmic-complexity">Algorithmic complexity<a class="headerlink" href="#algorithmic-complexity" title="Anchor link to this section">&para;</a></h2>
+<p>A function is a building block of performance. The first and roughest estimate of its behavior is Big-O.</p>
+<p>Before you roll your eyes: no heavy math here. To analyze slow code you only need to:</p>
 <ul>
-<li>отличать O(1) от O(n^2)</li>
-<li>понимать, что O(n log n) - граница, за ней только вечная боль</li>
-<li>замечать, когда алгоритм внезапно становится O(n!)</li>
+<li>tell O(1) from O(n^2)</li>
+<li>understand that O(n log n) is the boundary; beyond it there is only pain</li>
+<li>notice when an algorithm suddenly becomes O(n!)</li>
 </ul>
-<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-20-function-atomic-unit_02.png" /></p>
-<p>Выше желтой линии начинает деградировать производительность при росте объема данных.</p>
-<p>Вот примеры и пороги для n (для O(n!) реальных примеров придумать не смог):</p>
-<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-20-function-atomic-unit_03.png" /></p>
+<p><img alt="Illustration" src="assets/first-nine/en/function-atomic-unit_02.png" /></p>
+<p>Above the yellow line performance starts degrading as data volume grows.</p>
+<p>Here are examples and thresholds for n (I do not have real-life examples of O(n!)):</p>
+<p><img alt="Illustration" src="assets/first-nine/en/function-atomic-unit_03.png" /></p>
 <hr />
-<h2 id="_2">Типы потребляемых ресурсов<a class="headerlink" href="#_2" title="Anchor link to this section">&para;</a></h2>
-<p>Скорость выполнения - это не все, мы же про перформанс.</p>
-<p>Некоторые функции ждут диск, сеть или кэш, другие - кушают CPU.</p>
-<p>Нам важно классифицировать функцию (желательно на этапе ее написания):</p>
+<h2 id="resource-profiles">Resource profiles<a class="headerlink" href="#resource-profiles" title="Anchor link to this section">&para;</a></h2>
+<p>Speed is not the whole story; we're doing performance engineering.</p>
+<p>Some functions wait on disk, network, or cache. Others burn CPU.</p>
+<p>Classify functions early (ideally while writing them):</p>
 <ul>
-<li>IO-bound - ждет сеть, диск, БД</li>
-<li>CPU-bound - парсит, считает</li>
-<li>Memory-bound - тащит данные из RAM, но не нагружает CPU</li>
-<li>GPU-bound - понятно, кушает GPU</li>
+<li>IO-bound - waits on network, disk, or DB</li>
+<li>CPU-bound - parses and computes</li>
+<li>Memory-bound - pulls data from RAM without heavy CPU</li>
+<li>GPU-bound - obviously, uses GPU</li>
 </ul>
-<p>Это важно, чтобы понимать, где может быть зарыт ботлнек: в ядре, памяти, сокете или в алгоритме.</p>
-<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-20-function-atomic-unit_04.png" /></p>
+<p>This tells you where the bottleneck hides: CPU, memory, socket, or the algorithm itself.</p>
+<p><img alt="Illustration" src="assets/first-nine/en/function-atomic-unit_04.png" /></p>
 <hr />
-<h2 id="_3">Потокобезопасность<a class="headerlink" href="#_3" title="Anchor link to this section">&para;</a></h2>
-<p>Если код запускается параллельно - а он почти всегда запускается параллельно - важно ответить на вопросы:</p>
+<h2 id="concurrency-safety">Concurrency safety<a class="headerlink" href="#concurrency-safety" title="Anchor link to this section">&para;</a></h2>
+<p>If code runs in parallel - and it almost always does - ask two questions:</p>
 <ul>
-<li>а мы не испортим ли общие данные?</li>
-<li>а мы не заблокируем ли соседей?</li>
+<li>will we corrupt shared data?</li>
+<li>will we block our neighbors?</li>
 </ul>
-<p>Разделяют 3 категории функций:</p>
+<p>Three categories:</p>
 <ul>
-<li>Thread-safe - можно вызывать из любого потока</li>
-<li>Thread-unsafe - может все поломать (знайте их в лицо)</li>
-<li>Conditionally-safe - безопасен только при соблюдении условий</li>
+<li>Thread-safe - can be called from any thread</li>
+<li>Thread-unsafe - can break everything</li>
+<li>Conditionally safe - safe only under certain conditions</li>
 </ul>
-<p><strong>Потокобезопасные (Thread-safe):</strong></p>
+<p><strong>Thread-safe:</strong></p>
 <ol>
-<li>Работают с неизменяемыми (immutable) данными.</li>
-<li>Не имеют общего изменяемого состояния.</li>
-<li>Доступ к общим данным синхронизирован (через локи).</li>
-<li>Используют только атомарные операции.</li>
+<li>Works with immutable data.</li>
+<li>Has no shared mutable state.</li>
+<li>Synchronizes access to shared data (locks).</li>
+<li>Uses atomic operations.</li>
 </ol>
-<p><strong>Потоконебезопасные (Thread-unsafe):</strong></p>
+<p><strong>Thread-unsafe:</strong></p>
 <ol>
-<li>Изменяют глобальное состояние.</li>
-<li>Используют статичные изменяемые переменные.</li>
-<li>Выполняют неатомарные операции "чтение-модификация-запись".</li>
-<li>Примеры: strtok() в C, SimpleDateFormat в Java.</li>
+<li>Mutates global state.</li>
+<li>Uses static mutable variables.</li>
+<li>Does non-atomic read-modify-write.</li>
+<li>Examples: strtok() in C, SimpleDateFormat in Java.</li>
 </ol>
-<p><strong>Условно-безопасные:</strong></p>
+<p><strong>Conditionally safe:</strong></p>
 <ol>
-<li>Безопасны при использовании внешней синхронизации.</li>
-<li>Операции только для чтения над общими данными.</li>
+<li>Safe under external synchronization.</li>
+<li>Read-only operations on shared data.</li>
 </ol>
 <hr />
 <h2 id="call-overhead">Call overhead<a class="headerlink" href="#call-overhead" title="Anchor link to this section">&para;</a></h2>
-<p>Каждый вызывающий вызов, любой функции, создает отдельный участок памяти под себя - он называется stack frame.</p>
-<p>Каждый новый вызов создает новый фрейм наверху стека. Когда функция выполнена, кадр удаляется. Даже int sum(int a, int b) создает 16-64 байта накладных расходов.</p>
-<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-20-function-atomic-unit_05.png" /></p>
-<p><strong>Зачем это вообще знать?</strong></p>
-<p>Просто:</p>
+<p>Every function call allocates its own memory region called a stack frame.</p>
+<p>Each call creates a new frame at the top of the stack; when the function completes, the frame is removed. Even int sum(int a, int b) costs 16-64 bytes of overhead.</p>
+<p><img alt="Illustration" src="assets/first-nine/en/function-atomic-unit_05.png" /></p>
+<p><strong>Why should you care?</strong></p>
+<p>Simple:</p>
 <ul>
-<li>Сколько времени требуется на создание stack frame? 10-50 CPU циклов (очень быстро, но вот в цикле может быть больно).</li>
+<li>Creating a stack frame takes 10-50 CPU cycles (fast, but it hurts in tight loops).</li>
 </ul>
-<p>Чем глубже закопана функция в коде через цепочку вызовов, тем дороже ее вызывать (привет, stack overflow). Лямбды/анонимные функции еще дороже.</p>
-<p>Грязный хак: inline-функция. Она не тащит создание stack frame, но try/catch/finally ломают inlining.</p>
+<p>The deeper a function sits in a call chain, the more expensive it becomes (hello, stack overflow). Lambdas and anonymous functions are even pricier.</p>
+<p>Dirty hack: inline functions. They remove the frame cost, but try/catch/finally breaks inlining.</p>
 <hr />
-<h2 id="_4">Типичные ловушки (заворачиваем с собой)<a class="headerlink" href="#_4" title="Anchor link to this section">&para;</a></h2>
-<p><strong>Циклы:</strong></p>
+<h2 id="common-traps-take-them-with-you">Common traps (take them with you)<a class="headerlink" href="#common-traps-take-them-with-you" title="Anchor link to this section">&para;</a></h2>
+<p><strong>Loops:</strong></p>
 <ul>
-<li>Конкатенация строк в цикле (str += char часто дает O(n^2)).</li>
-<li>Вложенные циклы по большим коллекциям (особенно не конечным коллекциям).</li>
+<li>String concatenation in a loop (str += char often becomes O(n^2)).</li>
+<li>Nested loops over large collections (especially unbounded ones).</li>
 </ul>
-<p><strong>Риск переполнения стека (Stack Overflow):</strong></p>
+<p><strong>Stack overflow risk:</strong></p>
 <ul>
-<li>Каждый вызов функции создает фрейм на стеке (~100-1000 байт).</li>
-<li>Слишком глубокая рекурсия исчерпает стек (обычно ~1 МБ по умолчанию).</li>
+<li>Each call creates a stack frame (~100-1000 bytes).</li>
+<li>Deep recursion will exhaust the stack (~1 MB by default).</li>
 </ul>
-<p><strong>Hybrid-bound функции, смешивание типов:</strong></p>
+<p><strong>Hybrid-bound functions:</strong></p>
 <ul>
-<li>Blocking I/O в CPU функции сложно дебажить и скейлить, лучше избегать.</li>
+<li>Blocking I/O inside CPU functions is hard to debug and scale. Avoid it.</li>
 </ul>
 <blockquote>
-<p>В следующем выпуске - разбор <strong><a href="2025-12-21-runtime-models.html">runtime моделей</a></strong>.</p>
+<p>Next up: a breakdown of <strong><a href="runtime-models.html">runtime models</a></strong>.</p>
 </blockquote>
-<p>Подписывайся на канал <a href="https://t.me/r9yo11yp9e">@r9yo11yp9e</a> - будем искать девятки вместе.</p>
+<p>Follow the channel <a href="https://t.me/r9yo11yp9e">@r9yo11yp9e</a> - we will keep chasing the nines.</p>
 
 
 
@@ -755,7 +797,7 @@
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
-  К началу
+  Back to top
 </button>
         
       </main>
@@ -789,16 +831,20 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "\u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e \u0432 \u0431\u0443\u0444\u0435\u0440", "clipboard.copy": "\u041a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432 \u0431\u0443\u0444\u0435\u0440", "search.result.more.one": "\u0415\u0449\u0451 1 \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.more.other": "\u0415\u0449\u0451 # \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.none": "\u0421\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e", "search.result.one": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e 1 \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0435", "search.result.other": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439: #", "search.result.placeholder": "\u041d\u0430\u0447\u043d\u0438\u0442\u0435 \u043f\u0435\u0447\u0430\u0442\u0430\u0442\u044c \u0434\u043b\u044f \u043f\u043e\u0438\u0441\u043a\u0430", "search.result.term.missing": "\u041e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u0435\u0442", "select.version": "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0435\u0440\u0441\u0438\u044e"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate"], "search": "assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      <script src="assets/javascripts/bundle.e71a0d61.min.js"></script>
       
-        <script src="../assets/scripts/hero-bg.js"></script>
+        <script src="assets/scripts/hero-bg.js"></script>
       
-        <script src="../assets/scripts/brand-anim.js"></script>
+        <script src="assets/scripts/brand-anim.js"></script>
       
-        <script src="../assets/scripts/lang-setup.js"></script>
+        <script src="assets/scripts/lang-setup.js"></script>
+      
+        <script src="assets/scripts/post-slider.js"></script>
+      
+        <script src="assets/scripts/image-zoom.js"></script>
       
     
   </body>

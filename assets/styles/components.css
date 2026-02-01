@@ -423,6 +423,22 @@
   color: var(--tl9-green);
 }
 
+.post-card__cover {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.24);
+  background: rgba(0, 0, 0, 0.2);
+  margin-bottom: 0.8rem;
+}
+
+[data-md-color-scheme="default"] .post-card__cover {
+  border-color: rgba(25, 35, 45, 0.16);
+  box-shadow: 0 12px 26px rgba(20, 25, 32, 0.16);
+  background: rgba(255, 255, 255, 0.7);
+}
+
 .signal {
   display: inline-flex;
   align-items: center;
@@ -492,13 +508,181 @@
 
 /* Header social icons */
 .tl9-header-social {
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
-  gap: 0.15rem;
+  gap: 0.2rem;
+  margin-left: 0.35rem;
+  max-width: 100% !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
-.tl9-social-btn svg {
+.tl9-header-social .tl9-social-btn {
+  color: rgba(227, 232, 239, 0.92);
+}
+
+[data-md-color-scheme="default"] .tl9-header-social .tl9-social-btn {
+  color: rgba(25, 35, 45, 0.9);
+}
+
+.tl9-header-social .tl9-social-btn svg {
   width: 1.1rem;
   height: 1.1rem;
-  display: block;
+}
+
+/* ------------------------------------------------------------
+   TL9: Image zoom
+   ------------------------------------------------------------ */
+.tl9-img-zoomable {
+  cursor: zoom-in;
+}
+
+.tl9-img-zoom {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 12, 16, 0.88);
+  z-index: 9999;
+  padding: 2.5rem 1.5rem;
+}
+
+.tl9-img-zoom.is-open {
+  display: flex;
+}
+
+.tl9-img-zoom__img {
+  max-width: min(96vw, 1400px);
+  max-height: 90vh;
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.5);
+  cursor: grab;
+  background: rgba(0, 0, 0, 0.2);
+  touch-action: none;
+}
+
+.tl9-img-zoom__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  background: rgba(10, 14, 18, 0.8);
+  color: rgba(230, 236, 244, 0.9);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+[data-md-color-scheme="default"] .tl9-img-zoom {
+  background: rgba(245, 240, 232, 0.92);
+}
+
+[data-md-color-scheme="default"] .tl9-img-zoom__img {
+  border-color: rgba(25, 35, 45, 0.2);
+  box-shadow: 0 24px 60px rgba(20, 25, 32, 0.2);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+[data-md-color-scheme="default"] .tl9-img-zoom__close {
+  border-color: rgba(25, 35, 45, 0.2);
+  background: rgba(255, 255, 255, 0.9);
+  color: rgba(25, 35, 45, 0.9);
+}
+
+
+/* ------------------------------------------------------------
+   TL9: Post Slider
+   ------------------------------------------------------------ */
+.post-slider {
+  margin: 3rem 0;
+  position: relative;
+}
+
+.post-slider__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.post-slider__header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.post-slider__controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.slider-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.7);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.slider-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.slider-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.slider-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+[data-md-color-scheme="default"] .slider-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.6);
+}
+
+[data-md-color-scheme="default"] .slider-btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+
+.post-grid--slider {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 1.5rem; /* Space for scrollbar if visible, layout breathing */
+  margin: 0 -1rem; /* Negative internal margin to allow cards to touch edges visually */
+  padding: 0 1rem 1.5rem; /* Padding to compensate for negative margin */
+  
+  /* Hide scrollbar for cleaner look */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.post-grid--slider::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.post-grid--slider .post-card {
+  min-width: 280px;
+  max-width: 320px;
+  flex: 0 0 auto;
+  scroll-snap-align: start;
 }

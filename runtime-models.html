@@ -6,21 +6,21 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="The First Nine Guide, block 1: complexity, resources, and concurrency safety">
+        <meta name="description" content="The First Nine Guide, block 2: execution models and their tradeoffs">
       
       
         <meta name="author" content="Kirill Yu">
       
       
-        <link rel="canonical" href="https://kirillyu.github.io/The-Last-of-9s/2025-12-20-function-atomic-unit.html">
+        <link rel="canonical" href="https://kirillyu.github.io/The-Last-of-9s/runtime-models.html">
       
       
       
       
         
-          <link rel="alternate" href="2025-12-20-function-atomic-unit.html" hreflang="en">
+          <link rel="alternate" href="runtime-models.html" hreflang="en">
         
-          <link rel="alternate" href="ru/2025-12-20-function-atomic-unit.html" hreflang="ru">
+          <link rel="alternate" href="ru/runtime-models.html" hreflang="ru">
         
       
       
@@ -29,7 +29,7 @@
     
     
       
-        <title>Function: the atomic unit of code - The Last of 9s</title>
+        <title>Runtime models: running thousands of functions at once - The Last of 9s</title>
       
     
     
@@ -95,11 +95,7 @@
         { name: "Telegram", href: "https://t.me/r9yo11yp9e", svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.04 15.55 8.9 19.2c.55 0 .8-.24 1.1-.53l2.64-2.52 5.47 4c1 .55 1.72.26 1.98-.93l3.6-16.9c.35-1.64-.6-2.28-1.64-1.9L1.9 9.3c-1.58.62-1.56 1.5-.28 1.9l5.46 1.7 12.67-7.98c.6-.36 1.15-.16.7.2L9.04 15.55Z"/></svg>' },
       ];
 
-      const ensure = () => {
-        const header = document.querySelector(".md-header__inner");
-        if (!header) return false;
-        if (header.querySelector(".tl9-header-social")) return true;
-
+      const buildWrap = () => {
         const wrap = document.createElement("div");
         wrap.className = "md-header__option tl9-header-social";
         wrap.setAttribute("aria-label", "Social links");
@@ -115,11 +111,28 @@
           a.innerHTML = item.svg;
           wrap.appendChild(a);
         }
+        return wrap;
+      };
 
-        // Insert before search icon if possible.
-        const searchLabel = header.querySelector('label[for="__search"]');
-        if (searchLabel && searchLabel.parentElement) {
-          searchLabel.parentElement.insertBefore(wrap, searchLabel);
+      const findAnchor = (header) => {
+        if (!header) return null;
+        return (
+          header.querySelector('label[for="__search"]') ||
+          header.querySelector('[data-md-component="header-search"]') ||
+          header.querySelector('.md-search') ||
+          header.querySelector('.md-header__option')
+        );
+      };
+
+      const ensure = () => {
+        const header = document.querySelector(".md-header__inner");
+        if (!header) return false;
+        if (header.querySelector(".tl9-header-social")) return true;
+
+        const wrap = buildWrap();
+        const anchor = findAnchor(header);
+        if (anchor && anchor.parentElement) {
+          anchor.parentElement.insertBefore(wrap, anchor);
         } else {
           header.appendChild(wrap);
         }
@@ -136,10 +149,26 @@
         }, 100);
       };
 
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", run, { once: true });
-      } else {
+      const watch = () => {
+        const root = document.body;
+        if (!root) return;
+        const observer = new MutationObserver(() => {
+          if (!document.querySelector(".tl9-header-social")) {
+            run();
+          }
+        });
+        observer.observe(root, { childList: true, subtree: true });
+      };
+
+      document.addEventListener("DOMContentLoaded", () => {
         run();
+        watch();
+      }, { once: true });
+      document.addEventListener("navigation.instant", run);
+      window.addEventListener("pageshow", run);
+      if (document.readyState !== "loading") {
+        run();
+        watch();
       }
     })();
   </script>
@@ -152,18 +181,18 @@
     
   
   
-    <meta property="og:title" content="Function: the atomic unit of code">
-    <meta name="twitter:title" content="Function: the atomic unit of code">
+    <meta property="og:title" content="Runtime models: running thousands of functions at once">
+    <meta name="twitter:title" content="Runtime models: running thousands of functions at once">
   
   
-    <meta property="og:description" content="The First Nine Guide, block 1: complexity, resources, and concurrency safety">
-    <meta name="twitter:description" content="The First Nine Guide, block 1: complexity, resources, and concurrency safety">
+    <meta property="og:description" content="The First Nine Guide, block 2: execution models and their tradeoffs">
+    <meta name="twitter:description" content="The First Nine Guide, block 2: execution models and their tradeoffs">
   
   
-    <meta property="og:url" content="https://kirillyu.github.io/The-Last-of-9s/2025-12-20-function-atomic-unit.html">
+    <meta property="og:url" content="https://kirillyu.github.io/The-Last-of-9s/runtime-models.html">
   
   <meta property="og:site_name" content="The Last of 9s">
-  <meta property="og:type" content="article">
+  <meta property="og:type" content="website">
   
     <meta property="og:image" content="https://kirillyu.github.io/The-Last-of-9s/assets/logo-optimized.png">
     <meta name="twitter:image" content="https://kirillyu.github.io/The-Last-of-9s/assets/logo-optimized.png">
@@ -189,7 +218,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#function-the-atomic-unit-of-code" class="md-skip">
+        <a href="#runtime-models-running-thousands-of-functions-at-once" class="md-skip">
           Skip to content
         </a>
       
@@ -224,7 +253,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Function: the atomic unit of code
+              Runtime models: running thousands of functions at once
             
           </span>
         </div>
@@ -281,13 +310,13 @@
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="2025-12-20-function-atomic-unit.html" hreflang="en" class="md-select__link">
+            <a href="runtime-models.html" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
         
           <li class="md-select__item">
-            <a href="ru/2025-12-20-function-atomic-unit.html" hreflang="ru" class="md-select__link">
+            <a href="ru/runtime-models.html" hreflang="ru" class="md-select__link">
               Русский
             </a>
           </li>
@@ -297,6 +326,19 @@
   </div>
 </div>
     
+
+    <div class="md-header__option tl9-header-social" aria-label="Social links">
+      <a class="md-header__button tl9-social-btn" href="https://github.com/kirillyu" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <a class="md-header__button tl9-social-btn" href="https://www.linkedin.com/in/kirillyu/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 3A2 2 0 0 1 21 5v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14Zm-11.75 7H5.5v9h1.75v-9ZM6.38 7.25A1.13 1.13 0 0 0 7.5 6.12 1.12 1.12 0 0 0 6.38 5 1.12 1.12 0 0 0 5.25 6.12c0 .62.5 1.13 1.13 1.13ZM19 13.75c0-2.02-1.08-3.25-2.82-3.25-1.25 0-1.97.69-2.32 1.18V10H12.1v9h1.75v-4.72c0-1.24.63-1.99 1.7-1.99 1.05 0 1.45.74 1.45 1.99V19H19v-5.25Z"/></svg>
+      </a>
+      <a class="md-header__button tl9-social-btn" href="https://t.me/r9yo11yp9e" target="_blank" rel="noopener noreferrer" aria-label="Telegram" title="Telegram">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.04 15.55 8.9 19.2c.55 0 .8-.24 1.1-.53l2.64-2.52 5.47 4c1 .55 1.72.26 1.98-.93l3.6-16.9c.35-1.64-.6-2.28-1.64-1.9L1.9 9.3c-1.58.62-1.56 1.5-.28 1.9l5.46 1.7 12.67-7.98c.6-.36 1.15-.16.7.2L9.04 15.55Z"/></svg>
+      </a>
+    </div>
+
     
       
       
@@ -557,10 +599,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#algorithmic-complexity" class="md-nav__link">
+  <a href="#1-thread-per-request" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Algorithmic complexity
+        1. Thread-per-request
       
     </span>
   </a>
@@ -568,10 +610,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#resource-profiles" class="md-nav__link">
+  <a href="#2-thread-pool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Resource profiles
+        2. Thread pool
       
     </span>
   </a>
@@ -579,10 +621,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#concurrency-safety" class="md-nav__link">
+  <a href="#3-event-loop" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Concurrency safety
+        3. Event loop
       
     </span>
   </a>
@@ -590,10 +632,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#call-overhead" class="md-nav__link">
+  <a href="#4-fibers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Call overhead
+        4. Fibers
       
     </span>
   </a>
@@ -601,10 +643,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#common-traps-take-them-with-you" class="md-nav__link">
+  <a href="#5-green-threads" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Common traps (take them with you)
+        5. Green threads
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-virtual-threads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Virtual threads
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-actor-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Actor model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary table
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hybrid-models-and-where-they-live" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hybrid models and where they live
       
     </span>
   </a>
@@ -628,105 +714,104 @@
 
 
 
-<h1 id="function-the-atomic-unit-of-code">Function: the atomic unit of code<a class="headerlink" href="#function-the-atomic-unit-of-code" title="Anchor link to this section">&para;</a></h1>
-<p><strong>The First Nine Guide. Block 1</strong></p>
+<h1 id="runtime-models-running-thousands-of-functions-at-once">Runtime models - running thousands of functions at once<a class="headerlink" href="#runtime-models-running-thousands-of-functions-at-once" title="Anchor link to this section">&para;</a></h1>
+<p><strong>The First Nine Guide. Block 2</strong></p>
 <hr />
-<p><img alt="Illustration" src="assets/first-nine/en/2025-12-20-function-atomic-unit_01.png" /></p>
-<p>Functions are the basic unit of every application. Requests call functions; some are fast, some are slow. To reason about performance, I classify functions by a few traits:</p>
+<p><img alt="Illustration" src="assets/first-nine/en/runtime-models_01.png" /></p>
+<p><strong>Disclaimer:</strong> real systems blend multiple models. Pure versions are rare.</p>
+<hr />
+<p>In the previous part we discussed the atom of code - the function. We saw how complexity and characteristics affect performance.</p>
+<p>But real systems execute not one, but thousands and tens of thousands of functions at the same time. Who manages that chaos? The answer is the <strong>runtime model</strong>. The choice of model is a foundation of software architecture.</p>
+<p>Each model answers two questions:</p>
 <ol>
-<li>Algorithmic complexity.</li>
-<li>Resource profile.</li>
-<li>Concurrency safety.</li>
+<li>Who owns the threads? (runtime or application code)</li>
+<li>What happens when a thread blocks?</li>
 </ol>
-<p>Let's go in order.</p>
+<p>Let's go through the tradeoffs and where each model fits.</p>
 <hr />
-<h2 id="algorithmic-complexity">Algorithmic complexity<a class="headerlink" href="#algorithmic-complexity" title="Anchor link to this section">&para;</a></h2>
-<p>A function is a building block of performance. The first and roughest estimate of its behavior is Big-O.</p>
-<p>Before you roll your eyes: no heavy math here. To analyze slow code you only need to:</p>
-<ul>
-<li>tell O(1) from O(n^2)</li>
-<li>understand that O(n log n) is the boundary; beyond it there is only pain</li>
-<li>notice when an algorithm suddenly becomes O(n!)</li>
-</ul>
-<p><img alt="Illustration" src="assets/first-nine/en/2025-12-20-function-atomic-unit_02.png" /></p>
-<p>Above the yellow line performance starts degrading as data volume grows.</p>
-<p>Here are examples and thresholds for n (I do not have real-life examples of O(n!)):</p>
-<p><img alt="Illustration" src="assets/first-nine/en/2025-12-20-function-atomic-unit_03.png" /></p>
-<hr />
-<h2 id="resource-profiles">Resource profiles<a class="headerlink" href="#resource-profiles" title="Anchor link to this section">&para;</a></h2>
-<p>Speed is not the whole story; we're doing performance engineering.</p>
-<p>Some functions wait on disk, network, or cache. Others burn CPU.</p>
-<p>Classify functions early (ideally while writing them):</p>
-<ul>
-<li>IO-bound - waits on network, disk, or DB</li>
-<li>CPU-bound - parses and computes</li>
-<li>Memory-bound - pulls data from RAM without heavy CPU</li>
-<li>GPU-bound - obviously, uses GPU</li>
-</ul>
-<p>This tells you where the bottleneck hides: CPU, memory, socket, or the algorithm itself.</p>
-<p><img alt="Illustration" src="assets/first-nine/en/2025-12-20-function-atomic-unit_04.png" /></p>
-<hr />
-<h2 id="concurrency-safety">Concurrency safety<a class="headerlink" href="#concurrency-safety" title="Anchor link to this section">&para;</a></h2>
-<p>If code runs in parallel - and it almost always does - ask two questions:</p>
-<ul>
-<li>will we corrupt shared data?</li>
-<li>will we block our neighbors?</li>
-</ul>
-<p>Three categories:</p>
-<ul>
-<li>Thread-safe - can be called from any thread</li>
-<li>Thread-unsafe - can break everything</li>
-<li>Conditionally safe - safe only under certain conditions</li>
-</ul>
-<p><strong>Thread-safe:</strong></p>
-<ol>
-<li>Works with immutable data.</li>
-<li>Has no shared mutable state.</li>
-<li>Synchronizes access to shared data (locks).</li>
-<li>Uses atomic operations.</li>
-</ol>
-<p><strong>Thread-unsafe:</strong></p>
-<ol>
-<li>Mutates global state.</li>
-<li>Uses static mutable variables.</li>
-<li>Does non-atomic read-modify-write.</li>
-<li>Examples: strtok() in C, SimpleDateFormat in Java.</li>
-</ol>
-<p><strong>Conditionally safe:</strong></p>
-<ol>
-<li>Safe under external synchronization.</li>
-<li>Read-only operations on shared data.</li>
-</ol>
-<hr />
-<h2 id="call-overhead">Call overhead<a class="headerlink" href="#call-overhead" title="Anchor link to this section">&para;</a></h2>
-<p>Every function call allocates its own memory region called a stack frame.</p>
-<p>Each call creates a new frame at the top of the stack; when the function completes, the frame is removed. Even int sum(int a, int b) costs 16-64 bytes of overhead.</p>
-<p><img alt="Illustration" src="assets/first-nine/en/2025-12-20-function-atomic-unit_05.png" /></p>
-<p><strong>Why should you care?</strong></p>
-<p>Simple:</p>
-<ul>
-<li>Creating a stack frame takes 10-50 CPU cycles (fast, but it hurts in tight loops).</li>
-</ul>
-<p>The deeper a function sits in a call chain, the more expensive it becomes (hello, stack overflow). Lambdas and anonymous functions are even pricier.</p>
-<p>Dirty hack: inline functions. They remove the frame cost, but try/catch/finally breaks inlining.</p>
-<hr />
-<h2 id="common-traps-take-them-with-you">Common traps (take them with you)<a class="headerlink" href="#common-traps-take-them-with-you" title="Anchor link to this section">&para;</a></h2>
-<p><strong>Loops:</strong></p>
-<ul>
-<li>String concatenation in a loop (str += char often becomes O(n^2)).</li>
-<li>Nested loops over large collections (especially unbounded ones).</li>
-</ul>
-<p><strong>Stack overflow risk:</strong></p>
-<ul>
-<li>Each call creates a stack frame (~100-1000 bytes).</li>
-<li>Deep recursion will exhaust the stack (~1 MB by default).</li>
-</ul>
-<p><strong>Hybrid-bound functions:</strong></p>
-<ul>
-<li>Blocking I/O inside CPU functions is hard to debug and scale. Avoid it.</li>
-</ul>
+<h2 id="1-thread-per-request">1. Thread-per-request<a class="headerlink" href="#1-thread-per-request" title="Anchor link to this section">&para;</a></h2>
+<p>One of the oldest models:</p>
 <blockquote>
-<p>Next up: a breakdown of <strong><a href="2025-12-21-runtime-models.html">runtime models</a></strong>.</p>
+<p>one request - one thread - request completes - thread dies.</p>
+</blockquote>
+<p><strong>Who owns it:</strong> application code creates heavy threads and forgets them</p>
+<p><strong>Weight:</strong> 1-8 MB per stack; creation ~100 microseconds</p>
+<p><strong>If it blocks:</strong> hardware sits idle</p>
+<p><img alt="Illustration" src="assets/first-nine/en/runtime-models_02.png" /></p>
+<p><strong>Use it if:</strong> legacy monolith at 3 RPS - otherwise no.</p>
+<hr />
+<h2 id="2-thread-pool">2. Thread pool<a class="headerlink" href="#2-thread-pool" title="Anchor link to this section">&para;</a></h2>
+<p>A logical evolution. We remove creation/destruction overhead, keep a fixed pool of heavy threads and a task queue. This is still common in the wild.</p>
+<p><strong>Who owns it:</strong> the pool assigns tasks to ready threads</p>
+<p><strong>If it blocks:</strong> the thread hangs, the queue grows</p>
+<p><img alt="Illustration" src="assets/first-nine/en/runtime-models_03.png" /></p>
+<p><strong>Use it if:</strong> mixed load (CPU + I/O), you want transparency, and you hate "modern" trends.</p>
+<hr />
+<blockquote>
+<p>The next models try to solve the biggest pool problem: heavy threads idle while waiting on I/O.</p>
+</blockquote>
+<hr />
+<h2 id="3-event-loop">3. Event loop<a class="headerlink" href="#3-event-loop" title="Anchor link to this section">&para;</a></h2>
+<p>A radical shift. Instead of an army of workers you have one fast <strong>event loop</strong> on a single heavy thread. It kicks off an async operation (DB call, etc.) and immediately moves to other events. When the result is ready, it handles it.</p>
+<blockquote>
+<p>poll I/O - callbacks - timers - ...</p>
+</blockquote>
+<p><strong>Who owns it:</strong> the loop itself; only one heavy thread</p>
+<p><strong>If it blocks:</strong> the whole application freezes</p>
+<p><img alt="Illustration" src="assets/first-nine/en/runtime-models_04.png" /></p>
+<p><strong>Use it if:</strong> mostly I/O with minimal CPU.</p>
+<hr />
+<h2 id="4-fibers">4. Fibers<a class="headerlink" href="#4-fibers" title="Anchor link to this section">&para;</a></h2>
+<p>Not a separate model but an approach that upgrades the event loop (and beyond), partially solving callback hell. Logic is written inside lightweight fibers. The loop still orchestrates everything, but instead of callbacks it resumes the right fiber. When a fiber hits I/O it yields, keeping the code linear. Fibers can call each other following business logic rather than runtime logic.</p>
+<p><strong>Who owns it:</strong> more control for the developer, but the runtime still drives</p>
+<p><strong>If it blocks:</strong> it blocks the loop as well</p>
+<p><img alt="Illustration" src="assets/first-nine/en/runtime-models_05.png" /></p>
+<p><strong>Use it if:</strong> you want clean async in an I/O service.</p>
+<hr />
+<h2 id="5-green-threads">5. Green threads<a class="headerlink" href="#5-green-threads" title="Anchor link to this section">&para;</a></h2>
+<p>An older model and the ancestor of many new ones. Many lightweight threads live inside one heavy thread. The runtime switches them on a timer.</p>
+<p><strong>Who owns it:</strong> the runtime; everyone lives on one heavy thread</p>
+<p><strong>If it blocks:</strong> any blocking sys-call in a lightweight thread blocks the heavy thread. Everything stops.</p>
+<p><img alt="Illustration" src="assets/first-nine/en/runtime-models_06.png" /></p>
+<p><strong>Use it if:</strong> a prototype, small script, lab project.</p>
+<hr />
+<h2 id="6-virtual-threads">6. Virtual threads<a class="headerlink" href="#6-virtual-threads" title="Anchor link to this section">&para;</a></h2>
+<p>A game changer. The evolution of green threads. Millions of lightweight threads managed by the runtime scheduler and executed on a small pool of heavy threads. The key win is blocking behavior.</p>
+<p><strong>Who owns it:</strong> the runtime creates lightweight threads and schedules them onto a heavy pool</p>
+<p><strong>If it blocks:</strong> when a lightweight thread initiates I/O, the scheduler parks it and runs another. Heavy threads do not idle.</p>
+<p><em>With blocking I/O (e.g., Thread.sleep() or File.read() on a regular socket) pinning may occur and reduce efficiency.</em></p>
+<p><img alt="Illustration" src="assets/first-nine/en/runtime-models_07.png" /></p>
+<p><strong>Use it if:</strong> modern high-load systems with many network calls. But still use mutexes, timeouts, and fail-fast to avoid millions of parked threads.</p>
+<hr />
+<h2 id="7-actor-model">7. Actor model<a class="headerlink" href="#7-actor-model" title="Anchor link to this section">&para;</a></h2>
+<p>Not exactly a runtime model but a concurrency model that heavily shapes architecture. There is no shared memory: actors communicate via messages. The scheduler spreads actors across worker threads.</p>
+<p>Principles:</p>
+<ul>
+<li>no shared state</li>
+<li>only message passing, no shared memory or locks</li>
+<li>one actor processes one message at a time</li>
+<li>"let it crash" resilience philosophy</li>
+</ul>
+<p><strong>Who owns it:</strong> the actor runtime; an actor handles one message at a time</p>
+<p><strong>If it blocks:</strong> it blocks only itself; others keep working</p>
+<p><img alt="Illustration" src="assets/first-nine/en/runtime-models_08.png" /></p>
+<p><strong>Use it if:</strong> you need high resilience and a ready-made framework. Works for microservices and internal service architecture.</p>
+<hr />
+<h2 id="summary-table">Summary table<a class="headerlink" href="#summary-table" title="Anchor link to this section">&para;</a></h2>
+<p><img alt="Illustration" src="assets/first-nine/en/runtime-models_09.png" /></p>
+<hr />
+<h2 id="hybrid-models-and-where-they-live">Hybrid models and where they live<a class="headerlink" href="#hybrid-models-and-where-they-live" title="Anchor link to this section">&para;</a></h2>
+<p>Pure models are rare. Modern runtimes combine approaches to patch weaknesses.</p>
+<p>Short list:</p>
+<ol>
+<li>Worker threads + event loop. Common in Node.js (with Worker Threads). The main event loop handles I/O and a worker pool handles CPU.</li>
+<li>Multi-loop architecture. Seen in Vert.x. Multiple event loops run in parallel, each on its own heavy thread. A balancer distributes incoming connections.</li>
+<li>Actor model + thread pools. Typical Akka approach with configurable dispatchers. Different actor types sit on different pools: I/O actors on a large pool, CPU actors on a small one, critical ones on dedicated threads.</li>
+</ol>
+<hr />
+<blockquote>
+<p>Next up: <strong><a href="inner-architecture.html">typical application architecture</a></strong>.</p>
+<p>Previous: <strong><a href="function-atomic-unit.html">function attributes</a></strong>.</p>
 </blockquote>
 <p>Follow the channel <a href="https://t.me/r9yo11yp9e">@r9yo11yp9e</a> - we will keep chasing the nines.</p>
 
@@ -799,6 +884,10 @@
         <script src="assets/scripts/brand-anim.js"></script>
       
         <script src="assets/scripts/lang-setup.js"></script>
+      
+        <script src="assets/scripts/post-slider.js"></script>
+      
+        <script src="assets/scripts/image-zoom.js"></script>
       
     
   </body>

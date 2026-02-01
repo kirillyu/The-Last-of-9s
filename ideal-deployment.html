@@ -6,21 +6,21 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="The First Nine Guide, block 3: request layers and internal service anatomy">
+        <meta name="description" content="The First Nine Guide, block 4: deploying without throttling surprises">
       
       
         <meta name="author" content="Kirill Yu">
       
       
-        <link rel="canonical" href="https://kirillyu.github.io/The-Last-of-9s/2025-12-22-inner-architecture.html">
+        <link rel="canonical" href="https://kirillyu.github.io/The-Last-of-9s/ideal-deployment.html">
       
       
       
       
         
-          <link rel="alternate" href="2025-12-22-inner-architecture.html" hreflang="en">
+          <link rel="alternate" href="ideal-deployment.html" hreflang="en">
         
-          <link rel="alternate" href="ru/2025-12-22-inner-architecture.html" hreflang="ru">
+          <link rel="alternate" href="ru/ideal-deployment.html" hreflang="ru">
         
       
       
@@ -29,7 +29,7 @@
     
     
       
-        <title>Typical web-application inner architecture - The Last of 9s</title>
+        <title>Ideal application deployment - The Last of 9s</title>
       
     
     
@@ -95,11 +95,7 @@
         { name: "Telegram", href: "https://t.me/r9yo11yp9e", svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.04 15.55 8.9 19.2c.55 0 .8-.24 1.1-.53l2.64-2.52 5.47 4c1 .55 1.72.26 1.98-.93l3.6-16.9c.35-1.64-.6-2.28-1.64-1.9L1.9 9.3c-1.58.62-1.56 1.5-.28 1.9l5.46 1.7 12.67-7.98c.6-.36 1.15-.16.7.2L9.04 15.55Z"/></svg>' },
       ];
 
-      const ensure = () => {
-        const header = document.querySelector(".md-header__inner");
-        if (!header) return false;
-        if (header.querySelector(".tl9-header-social")) return true;
-
+      const buildWrap = () => {
         const wrap = document.createElement("div");
         wrap.className = "md-header__option tl9-header-social";
         wrap.setAttribute("aria-label", "Social links");
@@ -115,11 +111,28 @@
           a.innerHTML = item.svg;
           wrap.appendChild(a);
         }
+        return wrap;
+      };
 
-        // Insert before search icon if possible.
-        const searchLabel = header.querySelector('label[for="__search"]');
-        if (searchLabel && searchLabel.parentElement) {
-          searchLabel.parentElement.insertBefore(wrap, searchLabel);
+      const findAnchor = (header) => {
+        if (!header) return null;
+        return (
+          header.querySelector('label[for="__search"]') ||
+          header.querySelector('[data-md-component="header-search"]') ||
+          header.querySelector('.md-search') ||
+          header.querySelector('.md-header__option')
+        );
+      };
+
+      const ensure = () => {
+        const header = document.querySelector(".md-header__inner");
+        if (!header) return false;
+        if (header.querySelector(".tl9-header-social")) return true;
+
+        const wrap = buildWrap();
+        const anchor = findAnchor(header);
+        if (anchor && anchor.parentElement) {
+          anchor.parentElement.insertBefore(wrap, anchor);
         } else {
           header.appendChild(wrap);
         }
@@ -136,10 +149,26 @@
         }, 100);
       };
 
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", run, { once: true });
-      } else {
+      const watch = () => {
+        const root = document.body;
+        if (!root) return;
+        const observer = new MutationObserver(() => {
+          if (!document.querySelector(".tl9-header-social")) {
+            run();
+          }
+        });
+        observer.observe(root, { childList: true, subtree: true });
+      };
+
+      document.addEventListener("DOMContentLoaded", () => {
         run();
+        watch();
+      }, { once: true });
+      document.addEventListener("navigation.instant", run);
+      window.addEventListener("pageshow", run);
+      if (document.readyState !== "loading") {
+        run();
+        watch();
       }
     })();
   </script>
@@ -152,18 +181,18 @@
     
   
   
-    <meta property="og:title" content="Typical web-application inner architecture">
-    <meta name="twitter:title" content="Typical web-application inner architecture">
+    <meta property="og:title" content="Ideal application deployment">
+    <meta name="twitter:title" content="Ideal application deployment">
   
   
-    <meta property="og:description" content="The First Nine Guide, block 3: request layers and internal service anatomy">
-    <meta name="twitter:description" content="The First Nine Guide, block 3: request layers and internal service anatomy">
+    <meta property="og:description" content="The First Nine Guide, block 4: deploying without throttling surprises">
+    <meta name="twitter:description" content="The First Nine Guide, block 4: deploying without throttling surprises">
   
   
-    <meta property="og:url" content="https://kirillyu.github.io/The-Last-of-9s/2025-12-22-inner-architecture.html">
+    <meta property="og:url" content="https://kirillyu.github.io/The-Last-of-9s/ideal-deployment.html">
   
   <meta property="og:site_name" content="The Last of 9s">
-  <meta property="og:type" content="article">
+  <meta property="og:type" content="website">
   
     <meta property="og:image" content="https://kirillyu.github.io/The-Last-of-9s/assets/logo-optimized.png">
     <meta name="twitter:image" content="https://kirillyu.github.io/The-Last-of-9s/assets/logo-optimized.png">
@@ -189,7 +218,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#typical-web-application-inner-architecture" class="md-skip">
+        <a href="#ideal-application-deployment" class="md-skip">
           Skip to content
         </a>
       
@@ -224,7 +253,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Typical web-application inner architecture
+              Ideal application deployment
             
           </span>
         </div>
@@ -281,13 +310,13 @@
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="2025-12-22-inner-architecture.html" hreflang="en" class="md-select__link">
+            <a href="ideal-deployment.html" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
         
           <li class="md-select__item">
-            <a href="ru/2025-12-22-inner-architecture.html" hreflang="ru" class="md-select__link">
+            <a href="ru/ideal-deployment.html" hreflang="ru" class="md-select__link">
               Русский
             </a>
           </li>
@@ -297,6 +326,19 @@
   </div>
 </div>
     
+
+    <div class="md-header__option tl9-header-social" aria-label="Social links">
+      <a class="md-header__button tl9-social-btn" href="https://github.com/kirillyu" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <a class="md-header__button tl9-social-btn" href="https://www.linkedin.com/in/kirillyu/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 3A2 2 0 0 1 21 5v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14Zm-11.75 7H5.5v9h1.75v-9ZM6.38 7.25A1.13 1.13 0 0 0 7.5 6.12 1.12 1.12 0 0 0 6.38 5 1.12 1.12 0 0 0 5.25 6.12c0 .62.5 1.13 1.13 1.13ZM19 13.75c0-2.02-1.08-3.25-2.82-3.25-1.25 0-1.97.69-2.32 1.18V10H12.1v9h1.75v-4.72c0-1.24.63-1.99 1.7-1.99 1.05 0 1.45.74 1.45 1.99V19H19v-5.25Z"/></svg>
+      </a>
+      <a class="md-header__button tl9-social-btn" href="https://t.me/r9yo11yp9e" target="_blank" rel="noopener noreferrer" aria-label="Telegram" title="Telegram">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.04 15.55 8.9 19.2c.55 0 .8-.24 1.1-.53l2.64-2.52 5.47 4c1 .55 1.72.26 1.98-.93l3.6-16.9c.35-1.64-.6-2.28-1.64-1.9L1.9 9.3c-1.58.62-1.56 1.5-.28 1.9l5.46 1.7 12.67-7.98c.6-.36 1.15-.16.7.2L9.04 15.55Z"/></svg>
+      </a>
+    </div>
+
     
       
       
@@ -557,102 +599,90 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#http-request-layers" class="md-nav__link">
+  <a href="#java-virtual-machine-11" class="md-nav__link">
     <span class="md-ellipsis">
       
-        HTTP request layers
+        Java Virtual Machine 11+
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="HTTP request layers">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#network-layer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        NETWORK LAYER
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#request-processing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        REQUEST PROCESSING
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#business-logic" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        BUSINESS LOGIC
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#response-formation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        RESPONSE FORMATION
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#full-picture" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Full picture
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#internal-architecture" class="md-nav__link">
+  <a href="#java-virtual-machine-21-virtual-threads" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Internal architecture
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Internal architecture">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#bag-of-advice" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Bag of advice
+        Java Virtual Machine 21+ (Virtual Threads)
       
     </span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#golang-110" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Golang 1.10+
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nodejs-1820" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.js 18+/20+
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-38-gunicorn-uvicorn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 3.8+ (Gunicorn / Uvicorn)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ruby-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ruby 3+
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#php-fpm-74" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PHP-FPM 7.4+
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#net-6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .NET 6+
+      
+    </span>
+  </a>
   
 </li>
       
@@ -673,105 +703,133 @@
 
 
 
-<h1 id="typical-web-application-inner-architecture">Typical web-application inner architecture<a class="headerlink" href="#typical-web-application-inner-architecture" title="Anchor link to this section">&para;</a></h1>
-<p><strong>The First Nine Guide. Block 3</strong></p>
+<h1 id="ideal-application-deployment">Ideal application deployment<a class="headerlink" href="#ideal-application-deployment" title="Anchor link to this section">&para;</a></h1>
+<p><strong>The First Nine Guide. Block 4</strong></p>
 <hr />
-<p><img alt="Illustration" src="assets/first-nine/en/2025-12-22-inner-architecture_01.png" /></p>
-<p><strong>Disclaimer:</strong> real-world application architectures vary, but there are common layers that show up almost everywhere. That's what we'll cover.</p>
-<hr />
-<p>In the previous part we discussed runtime models. A runtime alone is not a web application. Today we will look at what an application must implement inside a runtime to earn that name.</p>
-<p>I tried to find a good reference that explained web applications independent of language and runtime. I could not. So here is my own interpretation to fix two problems:</p>
+<p><img alt="Illustration" src="assets/first-nine/en/ideal-deployment_01.png" /></p>
+<p>So, we finally built the ideal web application:</p>
 <ol>
-<li>Many engineers do not want to dive into application internals - it feels too complex or unclear where to start.</li>
-<li>The opposite view is also common: "there is a box, an input, an output, and business logic in the middle." That hides what resource each function actually consumes.</li>
+<li>We reduced method complexity and function cost (block 1).</li>
+<li>We picked the right runtime model for the workload (block 2).</li>
+<li>We understood the internal architecture, which made the system resilient (block 3).</li>
 </ol>
-<p>Let's open the box.</p>
+<p>Now it's time to ship to production. And of course, into a container. Let's see what can go wrong. We'll also rate runtimes by how well they avoid traps on this path.</p>
+<p><strong>How we will do it:</strong> each runtime gets the same three container variants:</p>
+<p>1) Naive - run as-is, no tuning. Typical problems show up.</p>
+<p>2) Tuned - remove CPU limits (quota=0) and keep base resources: no CFS throttling, less jitter.</p>
+<p>3) Ideal - aligned requests/parallelism with memory limits.</p>
+<p>On the right of each diagram I show thread behavior, parallelism, and mapping to heavy OS threads.</p>
+<p><strong>Why remove CPU limits?</strong></p>
+<ul>
+<li>Simplified: the kernel artificially slows the process (CFS throttling). Latency spikes and short bursts starve for CPU.</li>
+<li>What stays: cpu.requests (Kubernetes target share) plus memory.requests and memory.limits.</li>
+</ul>
+<p>(There will be a dedicated post, but feel free to argue in the comments.)</p>
+<p><strong>When should limits stay?</strong></p>
+<p>When CPU usage is uncontrolled and can eat the whole node. Limits are justified for untrusted code or shared clusters. A no-limits approach requires over-provisioned cpu.requests and careful monitoring. Test before removing limits.</p>
 <hr />
-<h2 id="http-request-layers">HTTP request layers<a class="headerlink" href="#http-request-layers" title="Anchor link to this section">&para;</a></h2>
-<p>Start with the layers a request passes through. We'll separate four internal layers.</p>
-<h3 id="network-layer">NETWORK LAYER<a class="headerlink" href="#network-layer" title="Anchor link to this section">&para;</a></h3>
-<p><strong>Goal:</strong> turn an HTTP request into structured data for business logic.</p>
-<p><img alt="Illustration" src="assets/first-nine/en/2025-12-22-inner-architecture_02.png" /></p>
-<p><strong>What happens here:</strong></p>
-<ul>
-<li>socket listen (ports 8080, 443)</li>
-<li>accept connections</li>
-<li>TLS handshake - decrypt HTTPS traffic</li>
-<li>HTTP parsing - headers and body</li>
-</ul>
-<p>Many assume this is IO-only. With large HTTPS bodies it can become CPU-bound.</p>
-<h3 id="request-processing">REQUEST PROCESSING<a class="headerlink" href="#request-processing" title="Anchor link to this section">&para;</a></h3>
-<p><strong>Goal:</strong> turn an HTTP request into a function call and route it to the correct handler.</p>
-<p><img alt="Illustration" src="assets/first-nine/en/2025-12-22-inner-architecture_03.png" /></p>
-<p><strong>What happens here:</strong></p>
-<ul>
-<li>deserialize (JSON/XML/Proto)</li>
-<li>validation &amp; auth</li>
-<li>rate limiting</li>
-<li>request routing by URL</li>
-</ul>
-<p>Rate limits are usually memory-bound if local. Distributed limits live in Redis and become IO.</p>
-<h3 id="business-logic">BUSINESS LOGIC<a class="headerlink" href="#business-logic" title="Anchor link to this section">&para;</a></h3>
-<p><strong>Goal:</strong> execute the core logic of the service.</p>
-<p><img alt="Illustration" src="assets/first-nine/en/2025-12-22-inner-architecture_04.png" /></p>
-<p><strong>What happens here:</strong></p>
-<ul>
-<li>domain operations - algorithms and business rules</li>
-<li>calculations - compute, transform</li>
-<li>external API calls</li>
-<li>database queries - PostgreSQL/MySQL/MongoDB</li>
-<li>cache operations - Redis/Memcached</li>
-</ul>
-<p>This is the SRE favorite for incidents. Slow SQL, locks, external APIs without timeouts, and heavy O(n!) compute all live here.</p>
-<h3 id="response-formation">RESPONSE FORMATION<a class="headerlink" href="#response-formation" title="Anchor link to this section">&para;</a></h3>
-<p><strong>Goal:</strong> package the result into an HTTP response and send it back.</p>
-<p><img alt="Illustration" src="assets/first-nine/en/2025-12-22-inner-architecture_05.png" /></p>
-<p><strong>What happens here:</strong></p>
-<ul>
-<li>serialization (JSON/XML/Proto)</li>
-<li>compression (gzip/brotli)</li>
-<li>encryption for HTTPS</li>
-<li>send to socket</li>
-</ul>
-<p>The same problems as the first layer.</p>
-<h3 id="full-picture">Full picture<a class="headerlink" href="#full-picture" title="Anchor link to this section">&para;</a></h3>
-<p><img alt="Illustration" src="assets/first-nine/en/2025-12-22-inner-architecture_06.png" /></p>
+<h2 id="java-virtual-machine-11">Java Virtual Machine 11+<a class="headerlink" href="#java-virtual-machine-11" title="Anchor link to this section">&para;</a></h2>
+<p>I wrote about JVM tuning before; here is the short version.</p>
+<p><img alt="Illustration" src="assets/first-nine/en/ideal-deployment_02.png" /></p>
+<p><strong>Naive deployment</strong></p>
+<p>JVM sees a 2 CPU limit and sizes its parallelism accordingly: GC, ForkJoinPool, and web server pools (Tomcat). The problem may look like this: throttling during warm-up, latency spikes, off-heap leaks.</p>
+<p><strong>Remove throttling</strong></p>
+<p>In container B we remove limits. Trap: without limits JVM assumes the whole node. availableProcessors() becomes 128 and the runtime spawns a massive number of threads. Context switching explodes and performance degrades. The app tries to use 128 cores with a 1 CPU guarantee.</p>
+<p><strong>Ideal deployment</strong></p>
+<p>Remove limits, but tell JVM the real budget. Set -XX:ActiveProcessorCount=1 (equals requests). JVM aligns its internal parallelism and avoids thread explosion. Also tune memory (-XX:MaxRAMPercentage, -XX:MaxMetaspaceSize) to avoid OOM killer.</p>
 <hr />
-<h2 id="internal-architecture">Internal architecture<a class="headerlink" href="#internal-architecture" title="Anchor link to this section">&para;</a></h2>
-<p>Now that we have layers, let's draw an abstract architecture as if this were a microservice system.</p>
-<p><img alt="Illustration" src="assets/first-nine/en/2025-12-22-inner-architecture_07.png" /></p>
-<p>Meet the components. The real system may have more or fewer. The idea is what matters: isolate anything that has its own worker pool or executes outside the application.</p>
-<p>List:</p>
-<ul>
-<li><strong>HTTP Ingress</strong> - entry point, initial routing, load balancing across instances.</li>
-<li><strong>Dispatcher</strong> - distributes requests to workers, manages queues and priorities.</li>
-<li><strong>Worker Execution</strong> - core business logic, controllers and services.</li>
-<li><strong>Runtime Overhead</strong> - GC, schedulers, thread scheduling. The name is intentionally harsh to highlight cost.</li>
-<li><strong>Cache Access</strong> - in-memory caches and external caches (Redis/Memcached).</li>
-<li><strong>Scripting &amp; Serialization</strong> - JSON/XML/Protobuf, template engines, data transforms.</li>
-<li><strong>Logging &amp; Instrumentation</strong> - structured logging and tracing.</li>
-<li><strong>External Interaction</strong> - databases, queues, HTTP APIs, microservices.</li>
-</ul>
-<p>Why does this matter? A simple timeout example:</p>
-<ul>
-<li>Business logic issues an SQL query. The DB has its own pool (e.g., Hikari).</li>
-<li>The pool is exhausted. A worker thread waits for a connection.</li>
-<li>Goroutines accumulate or the worker pool stalls.</li>
-</ul>
-<p>Sure, a timeout in the DB pool helps, but in reactive runtimes this is often missed.</p>
-<h3 id="bag-of-advice">Bag of advice<a class="headerlink" href="#bag-of-advice" title="Anchor link to this section">&para;</a></h3>
-<p>Knowing the internal architecture makes resilience patterns easier:</p>
-<ul>
-<li>timeouts and TTLs on internal queues</li>
-<li>bulkheads and pool separation (CPU vs IO pools)</li>
-<li>fallback mechanics, even internal circuit breakers</li>
-</ul>
-<p>More on patterns later.</p>
+<h2 id="java-virtual-machine-21-virtual-threads">Java Virtual Machine 21+ (Virtual Threads)<a class="headerlink" href="#java-virtual-machine-21-virtual-threads" title="Anchor link to this section">&para;</a></h2>
+<p>Add a note on JVM with virtual threads.</p>
+<p><img alt="Illustration" src="assets/first-nine/en/ideal-deployment_03.png" /></p>
+<p><strong>Naive deployment</strong></p>
+<p>Same as JVM 11+: requests/limits and throttling. The virtual thread scheduler also sizes itself based on limits.</p>
+<p><strong>Remove throttling</strong></p>
+<p>Without limits the scheduler spawns too many heavy threads; virtual threads pile up.</p>
+<p><strong>Ideal deployment</strong></p>
+<p>Remove limits and do what we do in JVM 11+, plus one more flag:</p>
+<ol>
+<li>-XX:ActiveProcessorCount=1 - controls GC and ForkJoinPool parallelism.</li>
+<li>-Djdk.virtualThreadScheduler.parallelism=1 - sizes the heavy thread pool for virtual threads.</li>
+</ol>
+<p>This aligns runtime parallelism with guaranteed resources.</p>
 <hr />
-<p>That's all for now.</p>
+<h2 id="golang-110">Golang 1.10+<a class="headerlink" href="#golang-110" title="Anchor link to this section">&para;</a></h2>
+<p><img alt="Illustration" src="assets/first-nine/en/ideal-deployment_04.png" /></p>
+<p><strong>Naive deployment</strong></p>
+<p>Run with requests and limits. Go sees limits and runtime.NumCPU() returns 2. Issues: CPU throttling and GC not respecting container boundaries (OOMKill risk).</p>
+<p><strong>Remove throttling</strong></p>
+<p>Remove limits. Trap: Go now sees the whole machine, runtime.NumCPU() returns 128. The scheduler spawns 128 system threads. Performance degrades.</p>
+<p><strong>Ideal deployment</strong></p>
+<p>Set GOMAXPROCS=1 (from requests). Set GOMEMLIMIT to 70-90% of memory limit because Go ignores memory.limit. For automation, use automemlimit. The runtime respects container boundaries and behaves predictably.</p>
+<hr />
+<h2 id="nodejs-1820">Node.js 18+/20+<a class="headerlink" href="#nodejs-1820" title="Anchor link to this section">&para;</a></h2>
+<p><img alt="Illustration" src="assets/first-nine/en/ideal-deployment_05.png" /></p>
+<p><strong>Naive deployment</strong></p>
+<p>Requests 1, limits 2. Node's main thread is single-threaded; libuv pool defaults to 4. Problems are minimal, except CPU throttling on CPU-bound workloads.</p>
+<p><strong>Remove throttling</strong></p>
+<p>Almost nothing happens. Node will not explode or try to use all cores. But you still do not get effective parallelism.</p>
+<p><strong>Ideal deployment</strong></p>
+<p>The right answer is scale-out. Keep process count aligned with requests. This yields predictable throughput and clarity.</p>
+<hr />
+<h2 id="python-38-gunicorn-uvicorn">Python 3.8+ (Gunicorn / Uvicorn)<a class="headerlink" href="#python-38-gunicorn-uvicorn" title="Anchor link to this section">&para;</a></h2>
+<p><img alt="Illustration" src="assets/first-nine/en/ideal-deployment_06.png" /></p>
+<p><strong>Naive deployment</strong></p>
+<p>Python has the GIL, so execution is single-threaded. You can use multi-process pseudo-parallelism. Naive deployment is usually fine, but throttling can happen.</p>
+<p><strong>Remove throttling</strong></p>
+<p>Remove limits. Trap: C libraries (NumPy, Pandas, OpenCV) may see 128 cores and parallelize aggressively, creating resource contention.</p>
+<p><strong>Ideal deployment</strong></p>
+<ul>
+<li>Gunicorn processes = requests.</li>
+<li>For risky libraries: OPENBLAS_NUM_THREADS=1 and similar limits.</li>
+<li>For long-lived workers: max-requests(+jitter), preload.</li>
+</ul>
+<hr />
+<h2 id="ruby-3">Ruby 3+<a class="headerlink" href="#ruby-3" title="Anchor link to this section">&para;</a></h2>
+<p><img alt="Illustration" src="assets/first-nine/en/ideal-deployment_07.png" /></p>
+<p><strong>Naive deployment</strong></p>
+<p>Single-threaded MRI. Same throttling risks, but usually acceptable.</p>
+<p><strong>Remove throttling</strong></p>
+<p>Remove limits. Trap: Puma uses Etc.nprocessors. Without limits it sees all cores and may spawn too many processes or threads.</p>
+<p><strong>Ideal deployment</strong></p>
+<p>Set it explicitly:</p>
+<ul>
+<li>WEB_CONCURRENCY=1 (from requests) - worker processes.</li>
+<li>RAILS_MAX_THREADS=5 - thread pool size per worker (depends on workload).</li>
+<li>For Unicorn and Sidekiq, set worker/worker concurrency explicitly as well.</li>
+</ul>
+<hr />
+<h2 id="php-fpm-74">PHP-FPM 7.4+<a class="headerlink" href="#php-fpm-74" title="Anchor link to this section">&para;</a></h2>
+<p><img alt="Illustration" src="assets/first-nine/en/ideal-deployment_08.png" /></p>
+<p><strong>Naive deployment</strong></p>
+<p>PHP-FPM runs in dynamic mode by default, creating and removing child processes as needed (process-per-request). Heavy apps hit limits and suffer. Dynamic mode (pm=dynamic) also causes memory spikes and unpredictability.</p>
+<p><strong>Remove throttling</strong></p>
+<p>Remove limits. PHP-FPM itself does not explode. Trap: if a library queries CPU via getconf _NPROCESSORS_ONLN, it will see all 128 cores.</p>
+<p><strong>Ideal deployment</strong></p>
+<ul>
+<li>Process manager: pm = static.</li>
+<li>Worker count: pm.max_children = 1 (equals cpu.requests).</li>
+</ul>
+<p>This yields stable and predictable behavior. PHP-FPM is harder to instrument due to its short-lived runtime, but Roadrunner or FrankenPHP can help.</p>
+<hr />
+<h2 id="net-6">.NET 6+<a class="headerlink" href="#net-6" title="Anchor link to this section">&para;</a></h2>
+<p><img alt="Illustration" src="assets/first-nine/en/ideal-deployment_09.png" /></p>
+<p><strong>Naive deployment</strong></p>
+<p>.NET is container-aware: it sees a 2 CPU limit and sizes ThreadPool and GC accordingly. Throttling can still happen.</p>
+<p><strong>Remove throttling</strong></p>
+<p>Remove limits. Trap: .NET sees all host cores and inflates ThreadPool. You get a 1 CPU guarantee but plan for 128.</p>
+<p><strong>Ideal deployment</strong></p>
+<p>Tune runtime to requests:</p>
+<ul>
+<li>DOTNET_PROCESSOR_COUNT=1 - inherited by all pools.</li>
+<li>DOTNET_GCServer=true - server GC for predictable throughput (not always required, but reduces uncertainty).</li>
+</ul>
+<hr />
+<p>I once tried to build a subjective runtime score table. Now I believe it is impossible to do objectively. So I dropped it and focus on traps and recommendations instead.</p>
+<hr />
+<p>I will keep updating this article as a living cheat sheet. If you spot issues or gaps, leave comments.</p>
 <blockquote>
-<p>Next: we finish designing the ideal application and deploy it.</p>
-<p>Previous: <strong><a href="2025-12-21-runtime-models.html">runtime models</a></strong>.</p>
+<p>Next: we finally define what a "heavy thread" is and how to live with it.</p>
+<p>Previous: <strong><a href="inner-architecture.html">web server internals</a></strong>.</p>
 </blockquote>
 <p>Follow the channel <a href="https://t.me/r9yo11yp9e">@r9yo11yp9e</a> - we will keep chasing the nines.</p>
 
@@ -844,6 +902,10 @@
         <script src="assets/scripts/brand-anim.js"></script>
       
         <script src="assets/scripts/lang-setup.js"></script>
+      
+        <script src="assets/scripts/post-slider.js"></script>
+      
+        <script src="assets/scripts/image-zoom.js"></script>
       
     
   </body>

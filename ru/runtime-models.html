@@ -6,21 +6,21 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="The First Nine Guide, блок 4: как деплоить без троттлинга и сюрпризов">
+        <meta name="description" content="The First Nine Guide, блок 2: модели исполнения и их компромиссы">
       
       
         <meta name="author" content="Kirill Yu">
       
       
-        <link rel="canonical" href="https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-23-ideal-deployment.html">
+        <link rel="canonical" href="https://kirillyu.github.io/The-Last-of-9s/ru/runtime-models.html">
       
       
       
       
         
-          <link rel="alternate" href="../2025-12-23-ideal-deployment.html" hreflang="en">
+          <link rel="alternate" href="../runtime-models.html" hreflang="en">
         
-          <link rel="alternate" href="2025-12-23-ideal-deployment.html" hreflang="ru">
+          <link rel="alternate" href="runtime-models.html" hreflang="ru">
         
       
       
@@ -29,7 +29,7 @@
     
     
       
-        <title>Ideal application deployment - The Last of 9s</title>
+        <title>Runtime models: как запускать тысячи функций одновременно - The Last of 9s</title>
       
     
     
@@ -95,11 +95,7 @@
         { name: "Telegram", href: "https://t.me/r9yo11yp9e", svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.04 15.55 8.9 19.2c.55 0 .8-.24 1.1-.53l2.64-2.52 5.47 4c1 .55 1.72.26 1.98-.93l3.6-16.9c.35-1.64-.6-2.28-1.64-1.9L1.9 9.3c-1.58.62-1.56 1.5-.28 1.9l5.46 1.7 12.67-7.98c.6-.36 1.15-.16.7.2L9.04 15.55Z"/></svg>' },
       ];
 
-      const ensure = () => {
-        const header = document.querySelector(".md-header__inner");
-        if (!header) return false;
-        if (header.querySelector(".tl9-header-social")) return true;
-
+      const buildWrap = () => {
         const wrap = document.createElement("div");
         wrap.className = "md-header__option tl9-header-social";
         wrap.setAttribute("aria-label", "Social links");
@@ -115,11 +111,28 @@
           a.innerHTML = item.svg;
           wrap.appendChild(a);
         }
+        return wrap;
+      };
 
-        // Insert before search icon if possible.
-        const searchLabel = header.querySelector('label[for="__search"]');
-        if (searchLabel && searchLabel.parentElement) {
-          searchLabel.parentElement.insertBefore(wrap, searchLabel);
+      const findAnchor = (header) => {
+        if (!header) return null;
+        return (
+          header.querySelector('label[for="__search"]') ||
+          header.querySelector('[data-md-component="header-search"]') ||
+          header.querySelector('.md-search') ||
+          header.querySelector('.md-header__option')
+        );
+      };
+
+      const ensure = () => {
+        const header = document.querySelector(".md-header__inner");
+        if (!header) return false;
+        if (header.querySelector(".tl9-header-social")) return true;
+
+        const wrap = buildWrap();
+        const anchor = findAnchor(header);
+        if (anchor && anchor.parentElement) {
+          anchor.parentElement.insertBefore(wrap, anchor);
         } else {
           header.appendChild(wrap);
         }
@@ -136,10 +149,26 @@
         }, 100);
       };
 
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", run, { once: true });
-      } else {
+      const watch = () => {
+        const root = document.body;
+        if (!root) return;
+        const observer = new MutationObserver(() => {
+          if (!document.querySelector(".tl9-header-social")) {
+            run();
+          }
+        });
+        observer.observe(root, { childList: true, subtree: true });
+      };
+
+      document.addEventListener("DOMContentLoaded", () => {
         run();
+        watch();
+      }, { once: true });
+      document.addEventListener("navigation.instant", run);
+      window.addEventListener("pageshow", run);
+      if (document.readyState !== "loading") {
+        run();
+        watch();
       }
     })();
   </script>
@@ -152,18 +181,18 @@
     
   
   
-    <meta property="og:title" content="Ideal application deployment">
-    <meta name="twitter:title" content="Ideal application deployment">
+    <meta property="og:title" content="Runtime models: как запускать тысячи функций одновременно">
+    <meta name="twitter:title" content="Runtime models: как запускать тысячи функций одновременно">
   
   
-    <meta property="og:description" content="The First Nine Guide, блок 4: как деплоить без троттлинга и сюрпризов">
-    <meta name="twitter:description" content="The First Nine Guide, блок 4: как деплоить без троттлинга и сюрпризов">
+    <meta property="og:description" content="The First Nine Guide, блок 2: модели исполнения и их компромиссы">
+    <meta name="twitter:description" content="The First Nine Guide, блок 2: модели исполнения и их компромиссы">
   
   
-    <meta property="og:url" content="https://kirillyu.github.io/The-Last-of-9s/ru/2025-12-23-ideal-deployment.html">
+    <meta property="og:url" content="https://kirillyu.github.io/The-Last-of-9s/ru/runtime-models.html">
   
   <meta property="og:site_name" content="The Last of 9s">
-  <meta property="og:type" content="article">
+  <meta property="og:type" content="website">
   
     <meta property="og:image" content="https://kirillyu.github.io/The-Last-of-9s/assets/logo-optimized.png">
     <meta name="twitter:image" content="https://kirillyu.github.io/The-Last-of-9s/assets/logo-optimized.png">
@@ -189,7 +218,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ideal-application-deployment" class="md-skip">
+        <a href="#runtime-models-" class="md-skip">
           Перейти к содержанию
         </a>
       
@@ -224,7 +253,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Ideal application deployment
+              Runtime models: как запускать тысячи функций одновременно
             
           </span>
         </div>
@@ -281,13 +310,13 @@
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="../2025-12-23-ideal-deployment.html" hreflang="en" class="md-select__link">
+            <a href="../runtime-models.html" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
         
           <li class="md-select__item">
-            <a href="2025-12-23-ideal-deployment.html" hreflang="ru" class="md-select__link">
+            <a href="runtime-models.html" hreflang="ru" class="md-select__link">
               Русский
             </a>
           </li>
@@ -297,6 +326,19 @@
   </div>
 </div>
     
+
+    <div class="md-header__option tl9-header-social" aria-label="Social links">
+      <a class="md-header__button tl9-social-btn" href="https://github.com/kirillyu" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <a class="md-header__button tl9-social-btn" href="https://www.linkedin.com/in/kirillyu/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 3A2 2 0 0 1 21 5v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14Zm-11.75 7H5.5v9h1.75v-9ZM6.38 7.25A1.13 1.13 0 0 0 7.5 6.12 1.12 1.12 0 0 0 6.38 5 1.12 1.12 0 0 0 5.25 6.12c0 .62.5 1.13 1.13 1.13ZM19 13.75c0-2.02-1.08-3.25-2.82-3.25-1.25 0-1.97.69-2.32 1.18V10H12.1v9h1.75v-4.72c0-1.24.63-1.99 1.7-1.99 1.05 0 1.45.74 1.45 1.99V19H19v-5.25Z"/></svg>
+      </a>
+      <a class="md-header__button tl9-social-btn" href="https://t.me/r9yo11yp9e" target="_blank" rel="noopener noreferrer" aria-label="Telegram" title="Telegram">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.04 15.55 8.9 19.2c.55 0 .8-.24 1.1-.53l2.64-2.52 5.47 4c1 .55 1.72.26 1.98-.93l3.6-16.9c.35-1.64-.6-2.28-1.64-1.9L1.9 9.3c-1.58.62-1.56 1.5-.28 1.9l5.46 1.7 12.67-7.98c.6-.36 1.15-.16.7.2L9.04 15.55Z"/></svg>
+      </a>
+    </div>
+
     
       
       
@@ -557,10 +599,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#java-virtual-machine-11" class="md-nav__link">
+  <a href="#1-thread-per-request" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Java Virtual Machine 11+
+        1. Thread-per-request
       
     </span>
   </a>
@@ -568,10 +610,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#java-virtual-machine-21-virtual-threads" class="md-nav__link">
+  <a href="#2-thread-pool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Java Virtual Machine 21+ (Virtual Threads)
+        2. Thread pool
       
     </span>
   </a>
@@ -579,10 +621,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#golang-110" class="md-nav__link">
+  <a href="#3-event-loop" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Golang 1.10+
+        3. Event loop
       
     </span>
   </a>
@@ -590,10 +632,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#nodejs-1820" class="md-nav__link">
+  <a href="#4-fibers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Node.js 18+/20+
+        4. Fibers
       
     </span>
   </a>
@@ -601,10 +643,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#python-38-gunicorn-uvicorn" class="md-nav__link">
+  <a href="#5-green-threads" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Python 3.8+ (Gunicorn / Uvicorn)
+        5. Green threads
       
     </span>
   </a>
@@ -612,10 +654,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ruby-3" class="md-nav__link">
+  <a href="#6-virtual-threads" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Ruby 3+
+        6. Virtual threads
       
     </span>
   </a>
@@ -623,10 +665,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#php-fpm-74" class="md-nav__link">
+  <a href="#7-actor-model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        PHP-FPM 7.4+
+        7. Actor model
       
     </span>
   </a>
@@ -634,10 +676,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#net-6" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        .NET 6+
+        Сводная таблица
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Гибридные модели и где они обитают
       
     </span>
   </a>
@@ -661,134 +714,104 @@
 
 
 
-<h1 id="ideal-application-deployment">Ideal application deployment<a class="headerlink" href="#ideal-application-deployment" title="Anchor link to this section">&para;</a></h1>
-<p><strong>The First Nine Guide. Блок 4</strong></p>
+<h1 id="runtime-models-">Runtime models - как запускать тысячи функций одновременно<a class="headerlink" href="#runtime-models-" title="Anchor link to this section">&para;</a></h1>
+<p><strong>The First Nine Guide. Блок 2</strong></p>
 <hr />
-<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-23-ideal-deployment_01.png" /></p>
-<p>Итак, наконец-то - мы написали идеальное веб-приложение:</p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/runtime-models_01.png" /></p>
+<p><strong>Дисклеймер</strong> - в реальном мире системы и бэкенды сочетают несколько моделей, в чистом виде их почти нигде не существует.</p>
+<hr />
+<p>В прошлой части мы разобрали атом кода - функцию. Поняли, как ее сложность и характеристики влияют на производительность.</p>
+<p>Но в реальном мире приложения обрабатывают не одну, а тысячи и десятки тысяч функций одновременно. Кто управляет этим хаосом? Ответ - <strong>модель исполнения (runtime model)</strong>. Выбор этой модели - фундамент софтварной архитектуры.</p>
+<p>Каждая модель отвечает на два вопроса:</p>
 <ol>
-<li>В нем проработана и снижена комплексность каждого метода и функции, как это мы разбирали в блоке 1.</li>
-<li>Мы выбрали лучший рантайм под задачу, опираясь на модели из блока 2.</li>
-<li>При написании кода мы понимали внутреннюю архитектуру, от этого приложение получилось устойчивым.</li>
+<li>Кто рулит потоками? (ядро рантайма или сам код)</li>
+<li>Что будет, если поток блокируется?</li>
 </ol>
-<p>И подошли вплотную к моменту, когда нам надо запускать его в проде. Ну и конечно в контейнере. Разберемся, что может пойти не так. Попутно оценим языки и фреймворки за то, насколько они позволяют пройти этот путь без ловушек и боли.</p>
-<p><strong>Как будем разбираться?</strong> Всем сделаем схему в ключевых вариантах упаковки в контейнер.</p>
-<p>В каждой схеме три контейнера сверху вниз:</p>
-<p>1) Наивный - запускаем "как есть", без тюнинга: проявляются типовые проблемы.</p>
-<p>2) Подкрученный - снимаем CPU limits (quota=0) и фиксируем базовые ресурсы: убираем CFS throttling и непредсказуемость.</p>
-<p>3) Идеальный - согласованные ресурсы (requests/параллелизм) и лимиты памяти.</p>
-<p>Справа от контейнеров подсвечиваю работу с тредами, параллелизм и их маппинг на тяжелые потоки ОС.</p>
-<p><strong>Почему рекомендую снимать CPU limits?</strong></p>
-<ul>
-<li>Максимально упрощенно: ядро начинает искусственно притормаживать процесс (CFS throttling). Время ответа скачет, при коротких пиках не хватает CPU.</li>
-<li>Что оставляем: cpu.requests - целевая доля CPU для планировщика Kubernetes, и обязательно memory.limits + memory.requests.</li>
-</ul>
-<p>(в целом на это будет отдельный пост в канале, но ради холивара - залетайте в комменты)</p>
-<p><strong>Когда лимиты нужно оставить?</strong></p>
-<p>Когда у вас неконтролируемое потребление CPU, например если контейнер хочет съесть все ядра ноды. Лимиты оправданы при недоверенном коде или шаренном кластере. Подход без cpu.limits требует завышать cpu.requests относительно реального потребления, за этим надо следить. Тестируйте перед тем как снимать лимиты.</p>
+<p>Обсудим плюсы, минусы и где их использовать.</p>
 <hr />
-<h2 id="java-virtual-machine-11">Java Virtual Machine 11+<a class="headerlink" href="#java-virtual-machine-11" title="Anchor link to this section">&para;</a></h2>
-<p>Ранее я писал пост про то как настраивать JVM и не взорваться в проде. Коротко продублирую, чтобы статья была полной.</p>
-<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-23-ideal-deployment_02.png" /></p>
-<p><strong>Наивный деплой</strong></p>
-<p>JVM видит лимит в 2 CPU и настраивает параллелизм под него: GC, ForkJoinPool и пулы веб-серверов (Tomcat). Проблема: троттлинг на старте, скачки латенси, off-heap утечки.</p>
-<p><strong>Снимаем троттлинг</strong></p>
-<p>В контейнере B убираем лимиты. Ловушка: JVM, не видя лимита, смотрит на всю ноду и решает, что ей доступны все 128 ядер. availableProcessors() возвращает 128, рантайм создает огромное число потоков. Итог: контекстные переключения, борьба за ресурсы, деградация. Приложение пытается использовать 128 ядер, имея гарантию только на одно.</p>
-<p><strong>Идеальный деплой</strong></p>
-<p>Убираем лимиты, но даем JVM понять, сколько ресурсов реально гарантировано. Выставляем -XX:ActiveProcessorCount=1 (равно requests). JVM корректно настраивает параллелизм, избегает троттлинга и не взрывает количество потоков. Дополнительно настраиваем память (-XX:MaxRAMPercentage, -XX:MaxMetaspaceSize), чтобы избежать OOM Killer.</p>
-<hr />
-<h2 id="java-virtual-machine-21-virtual-threads">Java Virtual Machine 21+ (Virtual Threads)<a class="headerlink" href="#java-virtual-machine-21-virtual-threads" title="Anchor link to this section">&para;</a></h2>
-<p>Добавим про JVM с virtual threads.</p>
-<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-23-ideal-deployment_03.png" /></p>
-<p><strong>Наивный деплой</strong></p>
-<p>Все как в JVM 11+: реквесты/лимиты, троттлинг. Плюс планировщик virtual threads тоже ориентируется на лимиты.</p>
-<p><strong>Снимаем троттлинг</strong></p>
-<p>Убираем лимиты - тяжелых тредов планировщика становится слишком много, от этого копятся виртуальные потоки.</p>
-<p><strong>Идеальный деплой</strong></p>
-<p>Убираем лимиты и делаем как в JVM 11+, но добавляем второй флаг:</p>
-<ol>
-<li>-XX:ActiveProcessorCount=1 - управление параллелизмом GC и ForkJoinPool.</li>
-<li>-Djdk.virtualThreadScheduler.parallelism=1 - настройка пула тяжелых потоков для виртуальных тредов.</li>
-</ol>
-<p>Так мы согласовываем параллелизм рантайма с выделенными ресурсами и получаем предсказуемое поведение.</p>
-<hr />
-<h2 id="golang-110">Golang 1.10+<a class="headerlink" href="#golang-110" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-23-ideal-deployment_04.png" /></p>
-<p><strong>Наивный деплой</strong></p>
-<p>Запускаем с реквестами и лимитами. Рантайм Go видит лимиты, runtime.NumCPU() вернет 2. Проблемы: CPU throttling и GC не знает границы контейнера - возможен OOMKill.</p>
-<p><strong>Снимаем троттлинг</strong></p>
-<p>Убираем лимиты. Ловушка: рантайм Go видит всю машину и runtime.NumCPU() возвращает 128. Планировщик создает 128 системных потоков. Итог - деградация.</p>
-<p><strong>Идеальный деплой</strong></p>
-<p>Явно указываем, сколько ядер использовать: GOMAXPROCS=1 (из requests). GOMEMLIMIT лучше ставить в 70-90% от memory limit, так как Go игнорирует memory.limit. Для автоматизации - automemlimit. Рантайм понимает границы контейнера и предсказуемо масштабируется.</p>
-<hr />
-<h2 id="nodejs-1820">Node.js 18+/20+<a class="headerlink" href="#nodejs-1820" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-23-ideal-deployment_05.png" /></p>
-<p><strong>Наивный деплой</strong></p>
-<p>Реквесты 1, лимиты 2. Основной поток Node.js однопоточный, libuv pool по умолчанию 4. Проблем минимум, кроме CPU throttling при CPU-bound задачах.</p>
-<p><strong>Снимаем троттлинг</strong></p>
-<p>Тут почти ничего не случится. Node.js не взорвется и не попытается использовать все ядра. Но и эффективного параллелизма не появится.</p>
-<p><strong>Идеальный деплой</strong></p>
-<p>Правильный деплой для Node.js - масштабирование. Рекомендую держать количество процессов равным requests. Это дает прозрачность и утилизацию.</p>
-<hr />
-<h2 id="python-38-gunicorn-uvicorn">Python 3.8+ (Gunicorn / Uvicorn)<a class="headerlink" href="#python-38-gunicorn-uvicorn" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-23-ideal-deployment_06.png" /></p>
-<p><strong>Наивный деплой</strong></p>
-<p>В сердце Python живет GIL, код выполняется в одном потоке. Можно уходить в псевдопараллелизм на уровне процессов. Наивный деплой обычно ок, но троттлинг возможен.</p>
-<p><strong>Снимаем троттлинг</strong></p>
-<p>Убираем лимиты. Ловушка: C-библиотеки (NumPy, Pandas, OpenCV) могут увидеть 128 ядер и распараллелить вычисления. Результат - борьба за ресурсы.</p>
-<p><strong>Идеальный деплой</strong></p>
-<ul>
-<li>Gunicorn processes = requests.</li>
-<li>Для взрывоопасных библиотек: OPENBLAS_NUM_THREADS=1 и аналоги.</li>
-<li>Для долгоживущих воркеров: max-requests(+jitter), preload.</li>
-</ul>
-<hr />
-<h2 id="ruby-3">Ruby 3+<a class="headerlink" href="#ruby-3" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-23-ideal-deployment_07.png" /></p>
-<p><strong>Наивный деплой</strong></p>
-<p>Однопоточный рантайм MRI. Проблемы троттлинга те же, но в целом наивный деплой чаще всего терпим.</p>
-<p><strong>Снимаем троттлинг</strong></p>
-<p>Убираем лимиты. Ловушка: Puma использует Etc.nprocessors. Без лимитов он увидит все ядра и попытается создать слишком много процессов или потоков.</p>
-<p><strong>Идеальный деплой</strong></p>
-<p>Настраиваем явно:</p>
-<ul>
-<li>WEB_CONCURRENCY=1 (по requests) - количество процессов-воркеров.</li>
-<li>RAILS_MAX_THREADS=5 - размер пула потоков внутри воркера (зависит от нагрузки).</li>
-<li>Для Unicorn и Sidekiq аналогично задаем воркеры/конкурентность явно.</li>
-</ul>
-<hr />
-<h2 id="php-fpm-74">PHP-FPM 7.4+<a class="headerlink" href="#php-fpm-74" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-23-ideal-deployment_08.png" /></p>
-<p><strong>Наивный деплой</strong></p>
-<p>PHP-FPM работает в режиме dynamic (по умолчанию), создавая и удаляя процессы по мере необходимости (process-per-request). Прожорливое приложение почти всегда упирается в лимиты и страдает. Динамический режим (pm=dynamic) может давать скачки памяти и непредсказуемость.</p>
-<p><strong>Снимаем троттлинг</strong></p>
-<p>Лимиты убираем. PHP-FPM не взрывается сам по себе. Ловушка: если библиотека пытается определить CPU через getconf _NPROCESSORS_ONLN, она увидит все 128 ядер.</p>
-<p><strong>Идеальный деплой</strong></p>
-<ul>
-<li>Режим управления процессами: pm = static.</li>
-<li>Количество процессов: pm.max_children = 1 (равно cpu.requests).</li>
-</ul>
-<p>Такое распределение дает стабильное и предсказуемое поведение. Из-за отсутствия постоянного рантайма PHP-FPM сложнее профилировать, но это решают Roadrunner и FrankenPHP.</p>
-<hr />
-<h2 id="net-6">.NET 6+<a class="headerlink" href="#net-6" title="Anchor link to this section">&para;</a></h2>
-<p><img alt="Illustration" src="../assets/first-nine/ru/2025-12-23-ideal-deployment_09.png" /></p>
-<p><strong>Наивный деплой</strong></p>
-<p>Рантайм .NET хорошо container-aware: видит лимит в 2 CPU, настраивает ThreadPool и GC. Но троттлинг все равно возможен.</p>
-<p><strong>Снимаем троттлинг</strong></p>
-<p>Убираем лимиты. Ловушка: рантайм видит все ядра ноды и раздувает ThreadPool. Приложение получает гарантию 1 CPU, но планирует на 128.</p>
-<p><strong>Идеальный деплой</strong></p>
-<p>Настраиваем рантайм под requests:</p>
-<ul>
-<li>DOTNET_PROCESSOR_COUNT=1 - наследуется во все пулы.</li>
-<li>DOTNET_GCServer=true - серверный GC для предсказуемости (иногда не нужен, но уменьшает неопределенность).</li>
-</ul>
-<hr />
-<p>Ранее я пытался приводить сводную таблицу с субъективной оценкой рантаймов. Сейчас считаю, что объективно ее провести нельзя. Поэтому оставил эту затею и сфокусировался на ловушках и рекомендациях.</p>
-<hr />
-<p>Статью буду дополнять, чтобы она служила актуальной шпаргалкой. Буду фиксить найденные узкие места и неточности - велкам в комменты.</p>
+<h2 id="1-thread-per-request">1. Thread-per-request<a class="headerlink" href="#1-thread-per-request" title="Anchor link to this section">&para;</a></h2>
+<p>Первая и одна из древнейших моделей:</p>
 <blockquote>
-<p>В следующем выпуске мы наконец-то поймем кто такой "тяжелый поток" и как с ним поладить.</p>
-<p>В предыдущей серии - <strong><a href="2025-12-22-inner-architecture.html">разбирались с тем, как устроен веб-сервер внутри</a></strong>.</p>
+<p>один запрос - один поток - запрос завершился - поток умер.</p>
+</blockquote>
+<p><strong>Кто рулит:</strong> сам код создает тяжелые потоки и сразу забывает</p>
+<p><strong>Вес:</strong> 1-8 МБ на стек; создание ~100 мкс</p>
+<p><strong>Если блокируется:</strong> железо тупо простаивает</p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/runtime-models_02.png" /></p>
+<p><strong>Брать, если:</strong> унаследованный монолит и 3 RPS - иначе нет.</p>
+<hr />
+<h2 id="2-thread-pool">2. Thread pool<a class="headerlink" href="#2-thread-pool" title="Anchor link to this section">&para;</a></h2>
+<p>Логичная эволюция предыдущей модели. Убираем оверхэд на создание и смерть, держим фиксированный пул тяжелых потоков и очередь задач. Сейчас в мире полно таких приложений, хотя модель олдскульная.</p>
+<p><strong>Кто рулит:</strong> пул раздает задачи готовым потокам</p>
+<p><strong>Если блокируется:</strong> поток висит, очередь пухнет</p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/runtime-models_03.png" /></p>
+<p><strong>Можно брать, если:</strong> нагрузка смешанная (CPU + I/O), хотите прозрачности, тошнит от модного и молодежного.</p>
+<hr />
+<blockquote>
+<p>Следующие модели - попытка решить главную проблему пулов: простой тяжелых потоков во время ожидания I/O.</p>
+</blockquote>
+<hr />
+<h2 id="3-event-loop">3. Event loop<a class="headerlink" href="#3-event-loop" title="Anchor link to this section">&para;</a></h2>
+<p>Радикально иной подход. Вместо армии воркеров у нас есть один, но шустрый <strong>диспетчер (event loop)</strong>, работающий на одном тяжелом потоке. Он инициирует асинхронную операцию (например, запрос в БД) и тут же переключается на другие события. Когда результат готов, обрабатывает его.</p>
+<blockquote>
+<p>опрос I/O - колбэки - таймеры - ...</p>
+</blockquote>
+<p><strong>Кто рулит:</strong> сам loop; тяжелый поток всего один</p>
+<p><strong>Если блокируется:</strong> замирает все приложение</p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/runtime-models_04.png" /></p>
+<p><strong>Брать, если:</strong> чистый I/O и минимум CPU.</p>
+<hr />
+<h2 id="4-fibers">4. Fibers<a class="headerlink" href="#4-fibers" title="Anchor link to this section">&para;</a></h2>
+<p>Это не отдельная модель, а подход, который прокачивает event loop (и не только), частично решая проблему callback hell. Логика пишется внутри легких потоков (файберов). Event loop по-прежнему управляет всем, но теперь он не вызывает колбэки, а возобновляет (resume) нужный файбер. Сам файбер, дойдя до I/O, добровольно отдает управление (yield), позволяя коду выглядеть линейным. Файберы могут вызывать друг друга по логике, которую диктует не рантайм, а сам разработчик.</p>
+<p><strong>Кто рулит:</strong> больше контроля у разработчика, но руль у рантайма</p>
+<p><strong>Если блокируется:</strong> блокирует loop так же</p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/runtime-models_05.png" /></p>
+<p><strong>Брать, если:</strong> хочется чистый асинхрон в I/O-сервисе.</p>
+<hr />
+<h2 id="5-green-threads">5. Green threads<a class="headerlink" href="#5-green-threads" title="Anchor link to this section">&para;</a></h2>
+<p>Это старая модель, прототип многих новых. В ней много легких потоков внутри одного тяжелого. Рантайм переключает их по таймеру.</p>
+<p><strong>Кто рулит:</strong> рантайм, все живут в одном тяжелом потоке</p>
+<p><strong>Если блокируется:</strong> если любой из легких потоков делает блокирующий системный вызов, он блокирует тот единственный тяжелый поток. Вся работа останавливается.</p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/runtime-models_06.png" /></p>
+<p><strong>Брать, если:</strong> прототип, маленький скрипт, лабораторка.</p>
+<hr />
+<h2 id="6-virtual-threads">6. Virtual threads<a class="headerlink" href="#6-virtual-threads" title="Anchor link to this section">&para;</a></h2>
+<p>Это геймченджер. Эволюция green threads. Миллионы легких потоков, управляемых планировщиком рантайма и исполняемых на небольшом пуле тяжелых потоков. Реальная крутость - в блокировках.</p>
+<p><strong>Кто рулит:</strong> рантайм создает легкие потоки, планировщик распределяет их по пулу тяжелых</p>
+<p><strong>Если блокируется:</strong> легкий поток инициирует I/O, планировщик не дает ему заблокировать тяжелый поток. Он "паркует" легкий поток и ставит на его место другой. Тяжелый поток не простаивает.</p>
+<p><em>При blocking I/O (например, Thread.sleep() или File.read() на обычном сокете) возможен pinning, что снижает эффективность.</em></p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/runtime-models_07.png" /></p>
+<p><strong>Брать, если:</strong> современный high-load и море сетевых вызовов. Но не забывайте про mutex, таймауты и fail-fast, чтобы не накапливать миллионы легких потоков в ожидании.</p>
+<hr />
+<h2 id="7-actor-model">7. Actor model<a class="headerlink" href="#7-actor-model" title="Anchor link to this section">&para;</a></h2>
+<p>Это не совсем модель рантайма, а модель конкурентности, но сильно влияет на архитектуру. В ней нет общей памяти: акторы общаются сообщениями. Планировщик разбрасывает акторов по потокам-исполнителям.</p>
+<p>Принципы:</p>
+<ul>
+<li>нет общего состояния</li>
+<li>только обмен сообщениями, никакой шаренной памяти или локов</li>
+<li>один актор обрабатывает одно сообщение за раз</li>
+<li>"let it crash" философия устойчивости</li>
+</ul>
+<p><strong>Кто рулит:</strong> рантайм акторов; актор обрабатывает по одному сообщению</p>
+<p><strong>Если блокируется:</strong> блокирует только себя, остальные работают</p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/runtime-models_08.png" /></p>
+<p><strong>Брать, если:</strong> нужна высокая отказоустойчивость и готовый фреймворк. Можно применять и к микросервисам, и к внутренней архитектуре сервиса.</p>
+<hr />
+<h2 id="_1">Сводная таблица<a class="headerlink" href="#_1" title="Anchor link to this section">&para;</a></h2>
+<p><img alt="Illustration" src="../assets/first-nine/ru/runtime-models_09.png" /></p>
+<hr />
+<h2 id="_2">Гибридные модели и где они обитают<a class="headerlink" href="#_2" title="Anchor link to this section">&para;</a></h2>
+<p>В реальности чистые модели встречаются редко. Современные рантаймы комбинируют подходы, устраняя слабости каждого.</p>
+<p>Шортлист:</p>
+<ol>
+<li>Worker threads + event loop. Видим в Node.js (c Worker Threads). Основной event loop для I/O + пул воркеров для CPU-задач.</li>
+<li>Multi-loop architecture. Встречается в Vert.x. Несколько event loop'ов работают параллельно, каждый на своем тяжелом потоке. Балансировщик распределяет входящие соединения.</li>
+<li>Actor model + thread pools. Типичный подход Akka с настраиваемыми диспетчерами. Разные типы акторов на разных пулах: I/O-акторы на большом пуле, CPU-акторы на маленьком, критичные на выделенных потоках.</li>
+</ol>
+<hr />
+<blockquote>
+<p>В следующем выпуске - <strong><a href="inner-architecture.html">разбор типичных архитектур приложения</a></strong>.</p>
+<p>В предыдущей серии - <strong><a href="function-atomic-unit.html">разбирались с атрибутами функции</a></strong>.</p>
 </blockquote>
 <p>Подписывайся на канал <a href="https://t.me/r9yo11yp9e">@r9yo11yp9e</a> - будем искать девятки вместе.</p>
 
@@ -861,6 +884,10 @@
         <script src="../assets/scripts/brand-anim.js"></script>
       
         <script src="../assets/scripts/lang-setup.js"></script>
+      
+        <script src="../assets/scripts/post-slider.js"></script>
+      
+        <script src="../assets/scripts/image-zoom.js"></script>
       
     
   </body>

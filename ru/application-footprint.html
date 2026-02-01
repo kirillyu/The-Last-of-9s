@@ -1,0 +1,1296 @@
+
+<!doctype html>
+<html lang="ru" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="System Footprint: как отличать проблемы OS и приложения по следам в метриках">
+      
+      
+        <meta name="author" content="Kirill Yu">
+      
+      
+        <link rel="canonical" href="https://kirillyu.github.io/The-Last-of-9s/ru/application-footprint.html">
+      
+      
+      
+      
+        
+          <link rel="alternate" href="../application-footprint.html" hreflang="en">
+        
+          <link rel="alternate" href="application-footprint.html" hreflang="ru">
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Application footprint in operating system - The Last of 9s</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../assets/styles/fonts.css">
+    
+      <link rel="stylesheet" href="../assets/styles/brand.css">
+    
+      <link rel="stylesheet" href="../assets/styles/layout.css">
+    
+      <link rel="stylesheet" href="../assets/styles/components.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  
+  <script>
+    // Ensure language selector links always navigate (base-path safe).
+    // Registered early (in <head>) so it can win against later event handlers.
+    (() => {
+      window.addEventListener(
+        "click",
+        (e) => {
+          const target = e.target;
+          if (!(target instanceof Element)) return;
+          const link = target.closest("a.md-select__link");
+          if (!link) return;
+          const href = link.getAttribute("href");
+          if (!href || href.startsWith("javascript:")) return;
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          window.location.href = link.href;
+        },
+        true
+      );
+    })();
+  </script>
+  <script>
+    // TL9: add static social icons to header (GitHub / LinkedIn / Telegram).
+    // URLs are taken from the About page "Contacts" section.
+    (() => {
+      const SOCIAL = [
+        { name: "GitHub", href: "https://github.com/kirillyu", svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>' },
+        { name: "LinkedIn", href: "https://www.linkedin.com/in/kirillyu/", svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 3A2 2 0 0 1 21 5v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14Zm-11.75 7H5.5v9h1.75v-9ZM6.38 7.25A1.13 1.13 0 0 0 7.5 6.12 1.12 1.12 0 0 0 6.38 5 1.12 1.12 0 0 0 5.25 6.12c0 .62.5 1.13 1.13 1.13ZM19 13.75c0-2.02-1.08-3.25-2.82-3.25-1.25 0-1.97.69-2.32 1.18V10H12.1v9h1.75v-4.72c0-1.24.63-1.99 1.7-1.99 1.05 0 1.45.74 1.45 1.99V19H19v-5.25Z"/></svg>' },
+        { name: "Telegram", href: "https://t.me/r9yo11yp9e", svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.04 15.55 8.9 19.2c.55 0 .8-.24 1.1-.53l2.64-2.52 5.47 4c1 .55 1.72.26 1.98-.93l3.6-16.9c.35-1.64-.6-2.28-1.64-1.9L1.9 9.3c-1.58.62-1.56 1.5-.28 1.9l5.46 1.7 12.67-7.98c.6-.36 1.15-.16.7.2L9.04 15.55Z"/></svg>' },
+      ];
+
+      const buildWrap = () => {
+        const wrap = document.createElement("div");
+        wrap.className = "md-header__option tl9-header-social";
+        wrap.setAttribute("aria-label", "Social links");
+
+        for (const item of SOCIAL) {
+          const a = document.createElement("a");
+          a.className = "md-header__button tl9-social-btn";
+          a.href = item.href;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.setAttribute("aria-label", item.name);
+          a.title = item.name;
+          a.innerHTML = item.svg;
+          wrap.appendChild(a);
+        }
+        return wrap;
+      };
+
+      const findAnchor = (header) => {
+        if (!header) return null;
+        return (
+          header.querySelector('label[for="__search"]') ||
+          header.querySelector('[data-md-component="header-search"]') ||
+          header.querySelector('.md-search') ||
+          header.querySelector('.md-header__option')
+        );
+      };
+
+      const ensure = () => {
+        const header = document.querySelector(".md-header__inner");
+        if (!header) return false;
+        if (header.querySelector(".tl9-header-social")) return true;
+
+        const wrap = buildWrap();
+        const anchor = findAnchor(header);
+        if (anchor && anchor.parentElement) {
+          anchor.parentElement.insertBefore(wrap, anchor);
+        } else {
+          header.appendChild(wrap);
+        }
+        return true;
+      };
+
+      const run = () => {
+        if (ensure()) return;
+        // Retry a few times: Material builds header async on some pages.
+        let tries = 0;
+        const t = setInterval(() => {
+          tries += 1;
+          if (ensure() || tries > 20) clearInterval(t);
+        }, 100);
+      };
+
+      const watch = () => {
+        const root = document.body;
+        if (!root) return;
+        const observer = new MutationObserver(() => {
+          if (!document.querySelector(".tl9-header-social")) {
+            run();
+          }
+        });
+        observer.observe(root, { childList: true, subtree: true });
+      };
+
+      document.addEventListener("DOMContentLoaded", () => {
+        run();
+        watch();
+      }, { once: true });
+      document.addEventListener("navigation.instant", run);
+      window.addEventListener("pageshow", run);
+      if (document.readyState !== "loading") {
+        run();
+        watch();
+      }
+    })();
+  </script>
+  
+  
+  
+  
+  
+  
+    
+  
+  
+    <meta property="og:title" content="Application footprint in operating system">
+    <meta name="twitter:title" content="Application footprint in operating system">
+  
+  
+    <meta property="og:description" content="System Footprint: как отличать проблемы OS и приложения по следам в метриках">
+    <meta name="twitter:description" content="System Footprint: как отличать проблемы OS и приложения по следам в метриках">
+  
+  
+    <meta property="og:url" content="https://kirillyu.github.io/The-Last-of-9s/ru/application-footprint.html">
+  
+  <meta property="og:site_name" content="The Last of 9s">
+  <meta property="og:type" content="website">
+  
+    <meta property="og:image" content="https://kirillyu.github.io/The-Last-of-9s/assets/logo-optimized.png">
+    <meta name="twitter:image" content="https://kirillyu.github.io/The-Last-of-9s/assets/logo-optimized.png">
+  
+  <meta name="twitter:card" content="summary">
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#application-footprint-in-operating-system" class="md-skip">
+          Перейти к содержанию
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Верхний колонтитул">
+    <a href="index.html" title="The Last of 9s" class="md-header__button md-logo" aria-label="The Last of 9s" data-md-component="logo">
+      
+  <img src="../assets/logo-optimized.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The Last of 9s
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Application footprint in operating system
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="green"  aria-label="Switch to light theme"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light theme" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="green"  aria-label="Switch to dark theme"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark theme" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="green"  aria-label="Switch to auto theme"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to auto theme" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Выберите язык">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../application-footprint.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="application-footprint.html" hreflang="ru" class="md-select__link">
+              Русский
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+
+    <div class="md-header__option tl9-header-social" aria-label="Social links">
+      <a class="md-header__button tl9-social-btn" href="https://github.com/kirillyu" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <a class="md-header__button tl9-social-btn" href="https://www.linkedin.com/in/kirillyu/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 3A2 2 0 0 1 21 5v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14Zm-11.75 7H5.5v9h1.75v-9ZM6.38 7.25A1.13 1.13 0 0 0 7.5 6.12 1.12 1.12 0 0 0 6.38 5 1.12 1.12 0 0 0 5.25 6.12c0 .62.5 1.13 1.13 1.13ZM19 13.75c0-2.02-1.08-3.25-2.82-3.25-1.25 0-1.97.69-2.32 1.18V10H12.1v9h1.75v-4.72c0-1.24.63-1.99 1.7-1.99 1.05 0 1.45.74 1.45 1.99V19H19v-5.25Z"/></svg>
+      </a>
+      <a class="md-header__button tl9-social-btn" href="https://t.me/r9yo11yp9e" target="_blank" rel="noopener noreferrer" aria-label="Telegram" title="Telegram">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.04 15.55 8.9 19.2c.55 0 .8-.24 1.1-.53l2.64-2.52 5.47 4c1 .55 1.72.26 1.98-.93l3.6-16.9c.35-1.64-.6-2.28-1.64-1.9L1.9 9.3c-1.58.62-1.56 1.5-.28 1.9l5.46 1.7 12.67-7.98c.6-.36 1.15-.16.7.2L9.04 15.55Z"/></svg>
+      </a>
+    </div>
+
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Поиск" placeholder="Поиск" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Поиск">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Поделиться" aria-label="Поделиться" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Очистить" aria-label="Очистить" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Инициализация поиска
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Вкладки" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Главная
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="blog.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Блог
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="about.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Обо мне
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Навигация" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="The Last of 9s" class="md-nav__button md-logo" aria-label="The Last of 9s" data-md-component="logo">
+      
+  <img src="../assets/logo-optimized.png" alt="logo">
+
+    </a>
+    The Last of 9s
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Главная
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="blog.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Блог
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="about.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Обо мне
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Содержание">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Содержание
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#on-cpu-off-cpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Анатомия работы: On-CPU и Off-CPU
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Анатомия работы: On-CPU и Off-CPU">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-on-cpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. On-CPU (Тред исполняется)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-off-cpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Off-CPU
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Шкала «дороговизны» операций (переход к методу)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-footprint-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Footprint Method
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="System Footprint Method">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#0-process-states-running-vs-blocked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. Process States: Running vs Blocked
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-psi-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. PSI Overview
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-footprint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Как проверить System Footprint сверху вниз
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Как проверить System Footprint сверху вниз">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2-cpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. CPU: давление, расход и баланс
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-disk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Disk: латентность и очереди
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Network: потери и очереди (мой самый любимый блок)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-memory-fault" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Memory: давление и fault'ы
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Если отпечатков нет
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Что делать дальше
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="application-footprint-in-operating-system">Application footprint in operating system<a class="headerlink" href="#application-footprint-in-operating-system" title="Anchor link to this section">&para;</a></h1>
+<p><strong>The First Nine Guide. Блок 5</strong></p>
+<hr />
+<p><img alt="Illustration" src="../assets/first-nine/ru/application-footprint_01.png" /></p>
+<p>Вот вы пришли на инцидент, где вам сказали, что продукт что-то начал делать медленно, и вам предстоит понять проблема в системном слое или в самом программном обеспечении, кто виноват и кого звать на помощь. Годами я искал максимально универсальный вариант и, думаю, нашел. У варианта большое количество "но" и поэтому универсальный он, пока, только теоретически.</p>
+<p>Это последняя статья, где мы смотрим на приложение через отпечатки ОС. Дальше ныряем в саму операционную систему.</p>
+<p>В прошлых статьях мы с вами осознавали такую вещь как потоки. Я обзывал их "легкие" и "тяжелые" потоки. И "тяжелые" это те, которые создаются на уровне операционной системы, а "легкие" существуют только внутри приложения и не несут всех накладных расходов, которые есть у потоков операционной системы. Но самое главное, чтобы потреблять хоть какой-то ресурс, будь то процессор или диск, нашему приложению, а точнее, его процессу нужны именно потоки операционной системы, то есть "тяжелые".</p>
+<p>Именно здесь находится мост между миром приложения/рантайма и миром операционной системы.</p>
+<p>Думаю очень многим известно, что любой код совершает работу в каком-то потоке/треде/воркере (часто это синонимы). И в последней статье про деплой идеального приложения я везде подписывал, как потоковая модель рантайма маппится на потоки операционной системы. Именно этот маппинг и стал зоной моего исследования. Когда перед нами стоит вопрос между приложением и операционкой, на самом деле это выбор между user space и kernel space.</p>
+<p><img alt="Illustration" src="../assets/first-nine/ru/application-footprint_02.png" /></p>
+<p>Итак, любое замедление кода это в первую очередь замедление "работы". Работа бывает очень разная, но почти всегда, когда нашему приложению надо что-то от операционной системы, то совершается syscall (системный вызов). Их бывает много, и например чтение диска это системный вызов "read()", а открытие файла "open()". Syscall выполняется только потоком операционной системы. Для аналогии, можно сказать, что ОС это некий веб-сервер с привычным тред пулом, а syscall это вызовы апи. Но чтобы быть полностью честным, стоит сказать, что у операционной системы помимо syscalls есть и другой "интерфейс" - это виртуальная память процесса. С ней чуть сложнее: мы пишем в память напрямую, без явных syscall. Но если мы обращаемся к адресу виртуальной памяти, которому еще не назначена физическая страница RAM (или она была выгружена в swap), специальный блок процессора под названием <a href="https://docs.kernel.org/admin-guide/mm/concepts.html">MMU</a> триггерит аппаратное прерывание (<a href="https://docs.oracle.com/cd/E19504-01/802-5880/tif-21/index.html">Page Fault</a>). Управление мгновенно переходит ядру, оно подкладывает нужный кусок памяти и возвращает управление программе. Для кода это происходит прозрачно, но с точки зрения задержек - это реальная остановка работы потока.</p>
+<p>Теперь для того чтобы понять, что может повлиять на то насколько быстро происходит наша "работа", надо понять какая она бывает. Сама операционная система довольно хорошо покрыта метриками, поэтому по ним можно понять какая именно работа выполнялась довольно точно. </p>
+<h2 id="on-cpu-off-cpu">Анатомия работы: On-CPU и Off-CPU<a class="headerlink" href="#on-cpu-off-cpu" title="Anchor link to this section">&para;</a></h2>
+<p>Работа может выполняться на каком-то CPU, а может и без CPU (ожидание - это тоже работа, потому что ждать тоже должен какой-то тред, а значит он в этот момент занят). Работа может ждать чего-то внутри приложения и внутри системы. Для внутрисистемных ожиданий есть механизм под названием <strong>Wait Channel (WCHAN)</strong>, который приостанавливает тред с какой-то конкретной причиной.</p>
+<p>WCHAN появляется только если тред был усыплён ядром. Работа может выполняться медленно из-за нехватки какого-то ресурса, часто в таком случае мы можем видеть <strong>PSI метрику</strong> (описана <a href="https://docs.kernel.org/accounting/psi.html">тут</a>). PSI фиксирует долю времени, когда задачи вынужденно ждали ресурс. WCHAN довольно слабо покрыт профилировщиками, знать о нём полезно архитектурно, но практически он редко доступен в метриках. Еще одна из плоскостей, описывающая состояние потоков - это их <a href="https://www.baeldung.com/linux/process-states">состояние</a>: R, D, S и др. Этим попробуем воспользоваться.</p>
+<p>Вернемся к работе. В перформанс анализе (<a href="https://www.brendangregg.com/offcpuanalysis.html">по Брендану Греггу</a>) ее принято делить на две большие категории: <strong>On-CPU</strong> (на процессоре) и <strong>Off-CPU</strong> (вне процессора).</p>
+<h3 id="1-on-cpu">1. On-CPU (Тред исполняется)<a class="headerlink" href="#1-on-cpu" title="Anchor link to this section">&para;</a></h3>
+<p>Это состояние, когда тред использует ядро CPU прямо сейчас. Статус потока - R (Running).</p>
+<p>Здесь есть три сценария:</p>
+<h4 id="11-system-mode">1.1. System Mode (Работа в ядре)<a class="headerlink" href="#11-system-mode" title="Anchor link to this section">&para;</a></h4>
+<p>Поток выполняет код ядра по своему запросу (через syscall).</p>
+<ul>
+<li><strong>Примеры:</strong><code>getpid()</code>, <code>fstat()</code>, <code>open()</code>, <code>read()</code>.</li>
+<li><strong>Суть:</strong> Переходит в kernel-space. Часть syscalls вроде <code>getpid()</code> выполняется мгновенно, но многие (<code>open()</code>, <code>read()</code>, <code>connect()</code>) могут блокироваться на ресурсе и переводить тред в ожидание.</li>
+<li><strong>Метрики:</strong> Растет <code>system time</code>. При блокировке появляются WCHAN и PSI IO.</li>
+</ul>
+<h4 id="12-pure-user-space">1.2. Pure User-space (Полезная работа)<a class="headerlink" href="#12-pure-user-space" title="Anchor link to this section">&para;</a></h4>
+<p>Классическое исполнение кода вашего приложения. Оно делается без kernel напрямую делая вычисления на процессоре.</p>
+<ul>
+<li><strong>Примеры: </strong>математика, парсинг, работа GC.</li>
+<li><strong>Суть:</strong> Полностью в user-space.</li>
+<li><strong>Метрики:</strong> Растет <code>user time</code>. Нет ядра, нет syscall, нет WCHAN, нет PSI.</li>
+</ul>
+<h4 id="13-user-space-busy-wait">1.3. User-space Busy Wait (Ложная работа)<a class="headerlink" href="#13-user-space-busy-wait" title="Anchor link to this section">&para;</a></h4>
+<p>Ситуация, когда код логически ждет или бесконечно зациклился, но фактически жжет CPU.</p>
+<ul>
+<li><strong>Примеры</strong>: спинлок или while(!flag) {}</li>
+<li><strong>Суть:</strong> Тред крутится в цикле. С точки зрения ОС он <strong>работает</strong> (On-CPU). С точки зрения логики кода - завис.</li>
+<li><strong>Метрики:</strong> В метриках это выглядит как <code>user time</code> и часто вводит в заблуждение.</li>
+</ul>
+<p>Мы различаем, что делает поток (R/S/D - статус потока), какой тип потребления CPU и есть ли у нас ожидание какого-то ресурса (PSI). Это три разных слоя наблюдения, их нельзя путать - мы их склеиваем в набор сигналов, чтобы понять природу задержки.</p>
+<p>On-CPU время делится на знакомые 8 вариантов работы. Вот сводная табличка по ним с маппингом на состояние тредов и PSI:</p>
+<table>
+<thead>
+<tr>
+<th><strong>CPU type</strong></th>
+<th><strong>Thread State</strong></th>
+<th><strong>вероятный PSI</strong></th>
+<th><strong>Интерпретация</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user</td>
+<td>R (Runnable)</td>
+<td><code>psi.cpu.some</code>*</td>
+<td>Код приложения (полезный или Busy Wait)</td>
+</tr>
+<tr>
+<td>system</td>
+<td>R (Runnable)</td>
+<td>-</td>
+<td>Работа ядра (syscalls)</td>
+</tr>
+<tr>
+<td>iowait</td>
+<td>D (Uninterruptible)</td>
+<td><code>psi.io.some</code> / <code>full</code></td>
+<td>CPU свободен, поток ждет I/O</td>
+</tr>
+<tr>
+<td>irq / softirq</td>
+<td>-</td>
+<td>-</td>
+<td>Прерывания (сеть, таймер)</td>
+</tr>
+<tr>
+<td>idle</td>
+<td>S (Interruptible)</td>
+<td>-</td>
+<td>CPU свободен, поток спит</td>
+</tr>
+<tr>
+<td>steal</td>
+<td>R / -</td>
+<td><code>psi.cpu.some</code> / <code>full</code></td>
+<td>Гипервизор отобрал CPU у виртуалки</td>
+</tr>
+<tr>
+<td>nice</td>
+<td>S / R</td>
+<td><code>psi.cpu.full</code></td>
+<td>Процессы с низким приоритетом</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><em>Сам работающий поток не генерирует PSI для себя, но создает очередь для других.</em></p>
+</blockquote>
+<p>Собрал маленький разговорник с линуксового (остальное по ссылкам выше):</p>
+<ul>
+<li><strong>R (running)</strong> - поток на CPU или ждёт CPU в очереди.</li>
+<li><strong>S (sleep)</strong> - поток спит (сеть, таймер), его можно разбудить/прервать.</li>
+<li><strong>D (uninterruptible sleep)</strong> - поток спит в ядре, ждёт железо (в основном диск).</li>
+<li><strong>%iowait</strong> - CPU простаивает, ожидая I/O, пока потоки в статусе D.</li>
+<li><strong>PSI.XYZ.some</strong> - как минимум один тред страдал, ожидая ресурс (CPU/IO/Mem). Прямой индикатор конкуренции за ресурсы.</li>
+<li><strong>PSI.XYZ.full</strong> - все треды ожидали ресурс (CPU/IO/Mem). </li>
+</ul>
+<hr />
+<p>Ниже я хочу показать, насколько вообще эта работа покрыта метриками и на каком они уровне. Вот классические метрики всеми любимого <code>node_exporter</code>, другими словами мониторинг ноды/хоста/сервера:</p>
+<table>
+<thead>
+<tr>
+<th>CPU type</th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user</td>
+<td><code>node_cpu_seconds_total{mode="user"}</code></td>
+<td><code>node_pressure_cpu_waiting_seconds_total</code></td>
+<td><code>node_procs_running</code></td>
+</tr>
+<tr>
+<td>system</td>
+<td><code>node_cpu_seconds_total{mode="system"}</code></td>
+<td>-</td>
+<td><code>node_procs_running</code></td>
+</tr>
+<tr>
+<td>iowait</td>
+<td><code>node_cpu_seconds_total{mode="iowait"}</code></td>
+<td><code>node_pressure_io_waiting_seconds_total</code></td>
+<td><code>node_procs_blocked</code></td>
+</tr>
+<tr>
+<td>irq</td>
+<td><code>node_cpu_seconds_total{mode="irq"}</code></td>
+<td>-</td>
+<td><code>node_intr_total</code></td>
+</tr>
+<tr>
+<td>softirq</td>
+<td><code>node_cpu_seconds_total{mode="softirq"}</code></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>idle</td>
+<td><code>node_cpu_seconds_total{mode="idle"}</code></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>steal</td>
+<td><code>node_cpu_seconds_total{mode="steal"}</code></td>
+<td><code>node_pressure_cpu_waiting_seconds_total</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td>nice</td>
+<td><code>node_cpu_seconds_total{mode="nice"}</code></td>
+<td><code>node_pressure_cpu_waiting_seconds_total</code></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<p>Метрики <code>cpu_seconds</code> показывают <strong>потребление</strong> (кто сейчас владеет ресурсом), а метрики PSI показывают <strong>нехватку</strong> (кто стоит в очереди).</p>
+<ul>
+<li><strong>User/Nice:</strong> Сами по себе не генерируют PSI для текущего потока, но их активная работа создает <code>cpu_waiting</code> для <em>других</em> процессов, ожидающих в очереди.</li>
+<li><strong>IO:</strong><code>waiting</code> (Some) - диск тормозит процесс, но другие могут работать. <code>stalled</code> (Full) - диск полностью заблокировал работу системы (критично!).</li>
+</ul>
+<p>А вот метрики из контейнеров, то что показывает <code>cAdvisor</code>:</p>
+<table>
+<thead>
+<tr>
+<th>CPU type</th>
+<th>container metrics</th>
+<th>container_tasks_state</th>
+<th>PSI metrics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user</td>
+<td><code>container_cpu_user_seconds_total</code></td>
+<td><code>running</code></td>
+<td><code>container_pressure_cpu_waiting_seconds_total</code></td>
+</tr>
+<tr>
+<td>system</td>
+<td><code>container_cpu_system_seconds_total</code></td>
+<td><code>running</code></td>
+<td><code>container_pressure_cpu_waiting_seconds_total</code></td>
+</tr>
+<tr>
+<td>iowait</td>
+<td>-</td>
+<td><code>iowait</code></td>
+<td><code>container_pressure_io_waiting_seconds_total</code></td>
+</tr>
+<tr>
+<td>throttled</td>
+<td><code>container_cpu_cfs_throttled_seconds_total</code></td>
+<td><code>running</code>*</td>
+<td><code>container_pressure_cpu_stalled_seconds_total</code></td>
+</tr>
+<tr>
+<td>steal</td>
+<td>-</td>
+<td>-</td>
+<td><code>container_pressure_cpu_waiting_seconds_total</code></td>
+</tr>
+<tr>
+<td>irq / soft</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>idle</td>
+<td>-</td>
+<td><code>sleeping</code></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Throttled процессы формально в состоянии <code>running</code> (готовы работать), но kernel не даёт им CPU из-за исчерпания квоты (CFS bandwidth control). Это уникальное состояние потому что они ожидают разрешения от cgroup находясь в состоянии R. Правильно их считать как Off-CPU.</p>
+</blockquote>
+<p>Метрик, на мой взгляд, маловато (но мне редко когда хватает). Метрики PSI - восхитительны, типы работы CPU часто недооцениваются, а они полезны. Совсем мало кто смотрит на процессы и их состояния (<code>running</code>/<code>blocked</code>), пользы в них немного, но это может сильно помочь в сепарации проблем, если процессов несколько.</p>
+<hr />
+<h3 id="2-off-cpu">2. Off-CPU<a class="headerlink" href="#2-off-cpu" title="Anchor link to this section">&para;</a></h3>
+<p>Здесь тред временно не исполняется, CPU свободен.</p>
+<p>Я собрал категоризацию для Off-CPU ожиданий исходя из их свойств и того, как они выглядят в системе.</p>
+<h4 id="21-syscall-based">2.1. Syscall-based (Явное ожидание)<a class="headerlink" href="#21-syscall-based" title="Anchor link to this section">&para;</a></h4>
+<p>Мы сами попросили ядро подождать (сеть, таймер, лок).</p>
+<ul>
+<li><strong>Примеры:</strong><code>futex()</code>, <code>epoll_wait()</code>.</li>
+<li><strong>Суть:</strong> Ядро переводит тред в sleep(S или D), помещает в wait queue.</li>
+<li><strong>Метрики:</strong> PSI бывает, если ждём перегруженный ресурс. WCHAN при этом есть всегда (ядро усыпило тред в конкретной точке), но в типовых метриках (node_exporter/cAdvisor) его нет — увидеть причину сна можно только зайдя на саму ноду.</li>
+</ul>
+<h4 id="22-page-faults">2.2. Page Faults (Неявное ожидание)<a class="headerlink" href="#22-page-faults" title="Anchor link to this section">&para;</a></h4>
+<p>Мы просто обратились к памяти.</p>
+<ul>
+<li><strong>Примеры:</strong> По сути page faults неизбежны при работе с памятью, он вызывается всегда когда мы обращаемся к адресам, у которых нет страниц в RAM.</li>
+<li><strong>Суть:</strong> MMU триггерит прерывание, ядро останавливает нас и лезет на диск/swap.</li>
+<li><strong>Метрики:</strong> WCHAN (<code>do_page_fault</code>) и может быть PSI Memory.</li>
+</ul>
+<p>Табличка ниже для демонстрации того какое количество, даже системных ожиданий мы не видим в метриках, не говоря уже про ожидания внутри самого софта.</p>
+<table>
+<thead>
+<tr>
+<th><strong>Тип ожидания</strong></th>
+<th><strong>Как распознать (WCHAN)</strong></th>
+<th><strong>Node Exporter (PSI)</strong></th>
+<th><strong>CAdvisor (PSI)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Таймер / сон</td>
+<td><code>nanosleep</code>, <code>hrtimer_sleep</code>, <code>pause</code></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Локи (app)</td>
+<td><code>futex_wait_queue_me</code>, <code>pthread_cond_wait</code></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>События / сеть</td>
+<td><code>ep_poll</code>, <code>poll_schedule_timeout</code></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Ожидание IO</td>
+<td><code>io_schedule</code></td>
+<td><code>io_waiting</code> / <code>io_stalled</code></td>
+<td><code>io_waiting</code> / <code>io_stalled</code></td>
+</tr>
+<tr>
+<td>Page Fault</td>
+<td><code>do_page_fault</code>, <code>swap_readpage</code></td>
+<td><code>memory_stalled</code></td>
+<td><code>memory_stalled</code></td>
+</tr>
+</tbody>
+</table>
+<p>Таким образом, не существует универсальной метрики или простого подхода, который бы сразу показал, что вызывает задержки в работе софта. Ниже я попробую выжать максимум из того набора метрик, которые чаще всего есть.</p>
+<p>Для начала про сам подход, я его называю <strong>System Footprint</strong>. Он основан на допущении, что в 90% кейсов у нас будет доступ либо к метрикам <code>node_exporter</code>, либо к метрикам контейнера <code>cAdvisor</code> (а может и к тем, и к другим). Метрики дают нам прозрачность работы ОС. Приложение же обычно покрыто метриками довольно специфично и неуниверсально, поэтому оно часто остается для нас черным ящиком (ну или серым).</p>
+<p>Метафора для запоминания подхода: мы узнаем о состоянии Black Box за счет того, что он размещен внутри Glass Box и мы видим, как приложение взаимодействует с системой. Отсюда можно сделать много выводов (даже полезных) относительно работы софта.</p>
+<h3 id="_1">Шкала «дороговизны» операций (переход к методу)<a class="headerlink" href="#_1" title="Anchor link to this section">&para;</a></h3>
+<p>Берём более прикладную шкалу, чтобы калиброваться:</p>
+<ul>
+<li><strong>Дешево</strong> - наносекунды: регистры/кэш L1/L2.</li>
+<li><strong>Умеренно</strong> - микросекунды: syscalls, context switch, доступ к RAM, NVMe I/O (~30-40 µs). При миллионах в секунду становится заметно.</li>
+<li><strong>Дорого</strong> - миллисекунды: сеть внутри DC, небольшие очереди диска, HDD sequential.</li>
+<li><strong>Очень дорого</strong> - десятки миллисекунд и выше: HDD random, swap/major faults, RTO/многократные ретрансмиты, длинные очереди диска.</li>
+</ul>
+<p>Диапазоны зависят от железа и профиля нагрузки, это ориентир без жёстких порогов.</p>
+<h2 id="system-footprint-method">System Footprint Method<a class="headerlink" href="#system-footprint-method" title="Anchor link to this section">&para;</a></h2>
+<p><strong>System Footprint Method</strong> - это методика комплексного анализа производительности, основанная на <a href="https://www.brendangregg.com/usemethod.html">USE-методе</a> Brendan Gregg и расширяющая его взглядом через призму «следов» нагрузки по ключевым системным метрикам. Идея forensic-анализа: выяснить, куда уходит время работы CPU и приложений, обнаруживая признаки (отпечатки) загрузки или ожидания на каждом уровне системы. Мы последовательно просматриваем состояния процессов, разбивку времени CPU, показатели Pressure Stall Information (PSI) и основные подсистемы (CPU, диск, сеть, память), чтобы определить узкое место. Если в какой-то подсистеме есть аномальные метрики - значит, там «следы» задержек, и мы исследуем эту область. Если же на графиках <strong>нет</strong> признаков проблем (нет отпечатков), то предполагаем, что система простаивает либо ждет внешние ресурсы (блокировки, сетевые вызовы), т.е. причина вне CPU/диска/памяти.</p>
+<p>Для этой методики я подготовил <a href="../dashboards/system-footprint.json">дашборд в Grafana</a>, который визуализирует все описанные ниже метрики. Но сам метод универсален и применим с любыми инструментами мониторинга.</p>
+<p>Ниже - последовательность анализа и рекомендации по чтению метрик.</p>
+<h3 id="0-process-states-running-vs-blocked">0. Process States: Running vs Blocked<a class="headerlink" href="#0-process-states-running-vs-blocked" title="Anchor link to this section">&para;</a></h3>
+<p>Вначале, вдохновляясь картинкой выше, где сверху у нас приложение, а потоки идут вниз в kernel, очень полезно глянуть на треды: метрики есть по двум состояниям - Running (R) и Blocked (D). Изначально поймите порядок, с которым имеете дело: это наши работяги, которые могут совершать деятельность вашего приложения. Метрики могут рассказать о двух состояниях:</p>
+<ul>
+<li><strong>Running (R)</strong> - если число тредов ОС в состоянии <em>R</em> заметно превышает количество ядер CPU, значит образуется очередь на CPU (треды ждут, когда освободится ядро). Это признак перегрузки CPU: вычислительных задач больше, чем доступной мощности. Даже если рантайм прячет ожидания внутри себя (например, веб-пул в JVM), по R-state видно, что тяжёлые потоки не успевают получить квант. В метриках ноды это обычно видно через <code>node_procs_running</code> (счётчик тредов ОС, включая kernel threads).</li>
+<li><strong>Blocked (D)</strong> - если есть треды ОС в <em>D</em>-состоянии (особенно скачки значений), значит потоки застревают в ожидании операций ввода-вывода. Каждый заблокированный D-тред указывает, что система ждёт дисковую подсистему, и полезная работа простаивает в это время. Резкие всплески D-state сопровождаются ростом времени обработки запросов и деградацией производительности. Так что в целом много D - это ждущие чего-то аппаратного, чаще всего диска. Треды в D-состоянии не потребляют CPU и не видны в загрузке CPU. В метриках ноды это обычно видно через <code>node_procs_blocked</code> (тоже включает kernel threads).</li>
+</ul>
+<p>Важно: метрики обычно дают только R и D (node_exporter, cAdvisor). Состояния S/Z и их вариации либо не видны, либо частично попадают в агрегированные счетчики, поэтому картина неполная - это нормально, учитываем ограничение.</p>
+<p>Рекомендую соотнести значения этих тредов с тем, как по вашему мнению должно было действовать ваше приложение и сколько тредов создавать (конечно в случае если на вашей ноде не сотня приложений). Если тредов сильно больше чем вы ожидали, вероятно ваш рантайм вас немного обманывает или есть косяк в настройках.</p>
+<p>Далее поэтапно: сначала PSI (есть ли давление?), затем блоки по каждому ресурсу - CPU, Disk, Network, Memory.</p>
+<h3 id="1-psi-overview">1. PSI Overview<a class="headerlink" href="#1-psi-overview" title="Anchor link to this section">&para;</a></h3>
+<p>Самое простое и полезное на что можно смотреть всегда (кроме случаев, когда эта метрика недоступна) - PSI. Метрика есть у <a href="https://github.com/prometheus/node_exporter/pull/1325">хоста</a> и у контейнеров <a href="https://kubernetes.io/docs/reference/instrumentation/understand-psi-metrics">внутри куба</a> и <a href="https://github.com/google/cadvisor/pull/3649">вне куба</a>. </p>
+<p><strong>Pressure Stall Information</strong> показывает долю времени, когда задачи были вынужденно заблокированы из‑за нехватки CPU, IO или памяти. Это не загрузка, а процент «потери» времени. <code>some</code> значит, что хотя бы один поток был задержан; <code>full</code> - в этот момент задержаны были все runnable задачи (на хосте cpu.full практически всегда 0, внутри cgroup появляется при упоре в квоты CFS). Важны величина и длительность, а не сам факт «&gt; 0». Load Average полезен как тренд, но смешивает runnable и D-state и не нормирует на ядра; PSI точнее отражает именно время ожидания.</p>
+<p>Как читать и что делать:</p>
+<ul>
+<li><strong>PSI CPU.some</strong> - сигнал конкуренции за ядра. Дальше проверяем: загружен ли <code>user/system</code>, не скрывается ли однопоточность или busy-wait (PSI низкий, <code>user</code> высокий).</li>
+<li><strong>PSI IO.some</strong> - задержки на диске. Смотрим util/latency/queue и количество D-state. Реакция зависит от носителя и паттерна I/O.</li>
+<li><strong>PSI Memory.some</strong> - доля времени, когда задачи не смогли сразу получить память и ждали, пока ядро освободит RAM, вытеснит страницы (из page cache или в swap) и/или дочитает их с диска обратно.</li>
+<li><strong>Все PSI около нуля, а сервис медленный</strong> - задержка может быть в сети или внутри приложения (внешние API, локи). Тогда опираемся на метрики верхнего уровня или профилировщики.</li>
+</ul>
+<p>Где бы ни собирались метрики, логика одна: если PSI есть - выбираем соответствующую подсистему для расследования; если PSI нет - ищем следы вне ядра.</p>
+<h2 id="system-footprint">Как проверить System Footprint сверху вниз<a class="headerlink" href="#system-footprint" title="Anchor link to this section">&para;</a></h2>
+<p>Структура просмотра проста: сначала есть ли давление (PSI), далее по ресурсам - CPU, диск, сеть, память. В каждой группе отвечаем на свой вопрос и решаем, копать глубже или идти дальше.</p>
+<h3 id="2-cpu">2. CPU: давление, расход и баланс<a class="headerlink" href="#2-cpu" title="Anchor link to this section">&para;</a></h3>
+<p>Это про On-CPU часть (user/system/softirq/steal), в связке с PSI CPU и R-state из начала статьи.</p>
+<ul>
+<li><strong>Куда уходит больше CPU?</strong> - смотрим разложение user/system/softirq/steal. Высокий <code>system</code> говорит о времени в ядре (syscalls, драйверы). Большой <code>softirq</code> - ядро занято обработкой сети/диска в контексте software interrupts (не аппаратные, но выполняются в ядре). <code>steal</code> - гипервизор забирает время у ВМ. Реакция: разносить IRQ, ограничивать тяжелые потоки, профилировать код/GC.</li>
+<li><strong>Есть ли конкуренция за CPU?</strong> - совместно читаем PSI CPU и частоту переключений. Node Exporter дает суммарные context switches (<code>node_context_switches_total</code>), без разделения на voluntary/involuntary; в cAdvisor подобных метрик обычно нет. Сам по себе высокий счетчик (или рост) без нормализации на ядра не показатель, но в сочетании с падением производительности может намекать на избыток потоков или lock contention. PSI высокий при невысоких переключениях - возможны квоты cgroup или однопоточность.</li>
+<li><strong>Есть ли неравномерность по ядрам?</strong> - загрузка по ядрам показывает горячие ядра. Один CPU забит, остальные свободны - горячий поток или IRQ привязаны к одному ядру. На виртуалках и без настройки RSS/irqbalance это встречается особенно часто: весь сетевой/дисковый трафик может «прилипнуть» к одному CPU. Лечится распределением IRQ/RPS и правильным числом воркеров (отдельная тема).</li>
+</ul>
+<p>Про load average: это усреднение runnable + D-state за 1/5/15 минут, без нормализации на ядра, и оно включает блокирующие (D) задачи. На многопроцессорных системах LA может быть высоким при равномерной нагрузке или низким при горячем одном ядре. В исследованиях (например, man proc(5), публикации LWN о LA) отмечается, что LA - симптом, а не источник правды, его используем как тренд и всегда подтверждаем PSI, R-state и пер‑CPU загрузкой.</p>
+<p>Если после этого давления по CPU не видно или оно объяснимо, переходим к другим ресурсам.</p>
+<h3 id="3-disk">3. Disk: латентность и очереди<a class="headerlink" href="#3-disk" title="Anchor link to this section">&para;</a></h3>
+<p>Это Off-CPU ожидания из нашей схемы: рост PSI IO и D-state говорит, что треды ушли ждать диск.</p>
+<ul>
+<li><strong>Растёт ли латентность I/O?</strong> - самый универсальный сигнал по диску: среднее время ожидания одной операции (await): это и очередь, и время обслуживания устройством. В node_exporter это: <code>rate(node_disk_read_time_seconds_total) / rate(node_disk_reads_completed_total)</code> (и аналогично для write).</li>
+<li><strong>Если latency растёт - почему?</strong> - дальше добиваем причину двумя вспомогательными сигналами:</li>
+<li><strong>Queue depth</strong> - <code>rate(node_disk_io_time_weighted_seconds_total)</code>. Если очередь растёт, значит запросы накапливаются быстрее, чем диск успевает их обслуживать (закон Литтла: Queue ≈ IOPS × Latency).</li>
+<li><strong>Utilization (занятость)</strong> - <code>rate(node_disk_io_time_seconds_total)</code>. Высокий util означает “диск постоянно занят”, но сам по себе не доказывает узкое место (особенно на SSD/NVMe) - подтверждаем по latency/queue.</li>
+<li><strong>Где здесь место iowait?</strong> - iowait в CPU ряду означает, что CPU простаивает, пока ждёт диск; оно может совпадать с ростом util/latency/PSI IO. User/system и iowait по времени взаимоисключаются на ядре, но эффект для приложения суммируется - ждём диск и не делаем полезную работу.</li>
+<li><strong>Ловушка интерпретации iowait</strong> (<a href="https://lwn.net/Articles/551284/">детали</a>) - iowait это состояние CPU (idle), а не треда. Тред вызвал <code>read()</code> → ушёл в D-state off-CPU → ядро освободилось. Когда ядро idle и есть pending I/O, оно помечает это как iowait. Если придёт работа, ядро переключится на неё, iowait исчезнет с графика, но тред продолжит ждать диск в D. Нюанс: iowait показывает "CPU простаивал при наличии I/O", а не "сколько ждём диск". Само ожидание трекается в <code>procs_blocked</code> и PSI IO. Поэтому при 100% util диска и занятых CPU iowait может быть 0%, хотя треды ждут в D. Ловушка: можно увидеть низкий iowait и решить, что диска нет в проблеме, хотя на самом деле треды стоят в D и работа не идёт - CPU просто занят другими задачами. Смотрите util диска, D-state и PSI IO вместе, а не только iowait.</li>
+<li><strong>Swap stall</strong> - любое появление swap I/O (page-in/page-out) почти всегда означает давление на память: система вынужденно делает дисковый I/O ради освобождения RAM, и это ухудшает latency по диску даже если “диск как устройство” был бы нормальным.</li>
+<li><strong>Ошибки/повторы</strong> - если у вас есть метрики ошибок/ретраев на уровне диска/RAID/NVMe (или хотя бы события в dmesg/SMART), их стоит смотреть обязательно: повторы и деградация носителя почти всегда проявляются ростом latency. В node_exporter явных error-счётчиков по диску обычно нет - тогда опираемся на SMART/dmesg/вендорные метрики.</li>
+</ul>
+<p>Реакция зависит от ситуации: ускорить диск (NVMe, больше IOPS), менять паттерн I/O (батчинг, реже fsync), убирать swap за счёт памяти. Если PSI IO ровный и util низкий, диск с большой вероятностью не главная причина.</p>
+<h3 id="4-network">4. Network: потери и очереди (мой самый любимый блок)<a class="headerlink" href="#4-network" title="Anchor link to this section">&para;</a></h3>
+<p>Сетевые ожидания - это Off-CPU: когда тред ждёт сокет/epoll, он находится в S-state (WCHAN: <code>ep_poll</code> / <code>tcp_recvmsg</code>) и не попадает в PSI.</p>
+<ul>
+<li><strong>Успеваем ли мы принимать трафик?</strong> - ответ дают дропы и очереди на стороне нашей ноды:</li>
+<li><strong>Drops / backlog</strong> - сначала фиксируем <strong>слой</strong>, на котором теряем пакеты:<ul>
+<li><strong>Уровень интерфейса (NIC/драйвер/очереди RX/TX)</strong> - <code>node_network_receive_drop_total</code> / <code>node_network_transmit_drop_total</code> (счётчики по <strong>каждому</strong> интерфейсу). Смотрите не только физические <code>eth*</code>, но и виртуальные (например, <code>veth*</code>/<code>cni*</code>/<code>tap*</code>): бывает, что на физическом NIC дропов нет, а на интерфейсе конкретного контейнера/пода они уже есть.</li>
+<li><strong>Уровень softnet backlog (CPU не успевает прожевать входящий поток)</strong> - <code>node_softnet_dropped_total</code> вместе с <code>node_softnet_processed_total</code>.</li>
+<li><strong>Уровень TCP/socket receive path (пакет дошёл до стека TCP, но дальше упёрлись в очереди/буферы сокета)</strong> - здесь “локализуем где именно переполнилось” <strong>внутри TCP приёмного пути</strong> с помощью TcpExt‑счётчиков: <code>node_netstat_TcpExt_ListenOverflows</code>/<code>node_netstat_TcpExt_ListenDrops</code> (переполнение listen/accept), <code>node_netstat_TcpExt_TCPRcvQDrop</code> (drop в rcv queue из‑за лимитов rcvbuf), <code>node_netstat_TcpExt_TCPOFOQueue</code> (метрика накопления out-of-order очереди).</li>
+<li><strong>Ошибки приёма</strong> - <code>node_netstat_Tcp_InErrs</code>: сколько входящих TCP‑сегментов эта нода приняла с ошибкой на уровне TCP‑стека. Любой рост - сигнал проблем на входящем пути (битые/повреждённые сегменты, checksum/offload/драйвер/порт).
+Дропы на приёме вызывают потери пакетов; дальше по цепочке это приводит к ретрансмиссиям у отправителя и росту latency у клиента/пользователя, что позволяет искать причины и следствия задержек имея только метрики сети.</li>
+</ul>
+</li>
+<li><strong>Успевает ли удалённая сторона (или сеть между нами) принимать трафик?</strong> - ответ дают ретрансмиты:</li>
+<li><strong>Retransmissions</strong> - повторная отправка потерянных пакетов. Метрики: на <strong>ноде</strong> <code>node_netstat_Tcp_RetransSegs</code> (node_exporter), в <strong>контейнере</strong> аналогичные TCP метрики доступны в cAdvisor при включении advanced TCP stats, в <strong>кубе</strong> (урезанный cAdvisor) TCP метрик нет. Отдельно смотрим SYN‑ретраи: <code>node_netstat_TcpExt_TCPSynRetrans</code> (ретрансмит SYN на этапе TCP handshake, таймерный; влияет на connect latency и ошибки установления соединений, особенно при коротких коннектах).
+    Ретрансмиты делятся на <strong>быстрые</strong> (fast retransmit: 3 dupACK → переотправка без таймаута) и <strong>таймаутные</strong> (RTO/backoff: 200 → 400 → 800 → 1600 → 3200 мс … вплоть до десятков секунд).
+    В node_exporter мы упираемся в размерности: <code>node_netstat_Tcp_RetransSegs</code> считает сегменты, а <code>node_netstat_TcpExt_TCPTimeouts</code> считает события таймаута (RTO). Поэтому точную разбивку по “fast vs RTO” без расширенных TcpExt‑полей мы не получаем, но можно сделать честную оптимистичную оценку нижней границы тяжёлых потерь.
+    Ретрансмиты - это нормальное явление: не обязательно их вообще считать проблемой, они встречаются и в мирное время (в т.ч. из‑за out-of-order пакетов, см. <a href="https://datatracker.ietf.org/doc/html/rfc4653">RFC 4653</a>); для диагностики важно смотреть <strong>долю к трафику</strong> и <strong>динамику</strong>.
+    По причинам это две категории: (1) потери/ошибки в сети (линк/порт/перегруз), (2) удалённая сторона не успевает принимать/обрабатывать (очереди, медленный сервер/БД и в целом дропы).
+    Для понимания масштаба: был тест на Linux с алгоритмом CUBIC (дефолтный <a href="https://www.rfc-editor.org/rfc/rfc5681">congestion control</a>) на 10G bulk-трафике и управляемых потерях: при loss 1% throughput был ~2.36 Гбит/с, при loss 5% ~0.512 Гбит/с, при loss 10% ~0.028 Гбит/с, при loss 15% ~0.002 Гбит/с. Для грубой оценки влияния потерь есть <a href="https://en.wikipedia.org/wiki/TCP_congestion_control#Rate_equation">формула Mathis</a> и по ней будет все еще хуже по эффекту. Фактические цифры зависят от алгоритма congestion control и условий сети - используйте формулу и значения из теста как ориентир чтобы понять уровень плавности ситуации. Методика теста описана тут: <a href="https://alebsys.github.io/posts/cwnd-retransmit/">TCP Congestion Control in Action</a>. 
+    Чтобы интерпретировать ретрансмиты и оценить их влияние, смотрим процент присутствия в общем трафике:<ul>
+<li>доля ретрансов в общем TCP‑трафике: <code>rate(node_netstat_Tcp_RetransSegs) / rate(node_netstat_Tcp_OutSegs)</code></li>
+<li>RTO lower bound (нижняя граница тяжёлых потерь): <code>rate(node_netstat_TcpExt_TCPTimeouts) / rate(node_netstat_Tcp_OutSegs)</code>. 1 RTO‑таймаут означает как минимум 1 переотправленный сегмент, и чаще всего это так.</li>
+<li>fast retransmits lower bound (оптимистичная оценка): <code>(rate(node_netstat_Tcp_RetransSegs) - rate(node_netstat_TcpExt_TCPTimeouts)) / rate(node_netstat_Tcp_OutSegs)</code>
+Тогда это дает условный процент полезного/эффективного трафика: <code>(rate(node_netstat_Tcp_OutSegs) - rate(node_netstat_Tcp_RetransSegs)) / rate(node_netstat_Tcp_OutSegs)</code> - ретрансмиты вытесняют полезную передачу.
+Чем больше доля RTO ретрансмитов тем хуже, даже 1% их это уже очень много. Если их нет, то чтобы нанести ущерб вашему трафику быстрых ретрансмитов должно быть порядка 10-20%. Трешхолды из тестов и с то что встречал в проде, могут быть плавающие.</li>
+</ul>
+</li>
+<li><strong>Не упираемся ли мы в системные лимиты сети?</strong> - отдельный класс проблем, часть из них справедлива и для диска, но отнес сюда, для группировки:</li>
+<li><strong>Conntrack / TIME_WAIT</strong> - <strong>Conntrack</strong> (Connection Tracking, <code>nf_conntrack</code>) это таблица в ядре, которая отслеживает активные TCP/UDP соединения для NAT, firewall (iptables/nftables) и stateful фильтрации. Каждое новое соединение добавляет запись; при приближении к лимиту (<code>node_nf_conntrack_entries</code> → <code>node_nf_conntrack_entries_limit</code>) новые коннекты отбрасываются - выглядит как "пинги ходят, но новые соединения к БД висят". <strong>TIME_WAIT</strong> - состояние TCP‑соединения после закрытия (живёт ~60 секунд по умолчанию). Оно остаётся у стороны, которая закрыла соединение первой (часто сервер в HTTP/1.1; в HTTP/2/gRPC эта проблема мягче из‑за персистентных каналов). Большое число TIME_WAIT на клиентах приближает исчерпание ephemeral портов и блокирует исходящие соединения; на практике это упирается в <code>net.ipv4.ip_local_port_range</code> + число сокетов в TIME_WAIT.</li>
+<li><strong>Backlog / somaxconn / SYN backlog</strong> - лимиты очередей входящих соединений. Когда они упираются, это выглядит как “новые коннекты тормозят/падают”, при этом трафик/пинги могут быть нормальными. В метриках это обычно проявляется <code>node_netstat_TcpExt_ListenOverflows</code>/<code>node_netstat_TcpExt_ListenDrops</code> (listen/accept очереди), а для SYN‑фазы - рост <code>node_netstat_TcpExt_TCPSynRetrans</code> у клиентов. Лимиты живут на нескольких уровнях: backlog в приложении (параметр <code>listen()</code>), <code>net.core.somaxconn</code>, и <code>net.ipv4.tcp_max_syn_backlog</code>.</li>
+<li><strong>File descriptors (FD)</strong> - каждое TCP‑соединение/сокет потребляет FD. При упоре в FD новые accept/connect начинают фейлиться (часто это видно уже в логах приложения как “too many open files”). На уровне ноды можно смотреть системный пул: <code>node_filefd_allocated</code> и <code>node_filefd_maximum</code>; отдельно есть лимиты процесса (ulimit/systemd LimitNOFILE) и системные лимиты (<code>fs.file-max</code>/<code>fs.nr_open</code>).</li>
+<li><strong>Inodes</strong> - inode’ы на ФС ограничивают число файлов/директорий. При исчерпании inodes создание новых файлов/директорий (и, например, Unix domain sockets с путём в ФС) начинает ломаться даже при наличии свободного места. На уровне ноды это видно по <code>node_filesystem_files_free</code> / <code>node_filesystem_files</code>.</li>
+</ul>
+<p>При росте ретрансов и дропов сначала проверяем сеть/стек (потери, переполнения очередей), затем приложение. При нормальных drops/retrans и пустом PSI ищем внешние зависимости (API/БД), которые отвечают медленно. Drops/retrans - сигналы потерь/overflow (их видно раньше, чем “упёрлись в throughput”). Для картины “медленно без явных потерь” добавляем таймауты/очереди TCP: <code>node_netstat_TcpExt_TCPTimeouts</code> (RTO) и счётчики переполнений (rcv/OFO/listen). <strong>RTT как величина не живёт в этих счётчиках</strong> - это состояние конкретных сокетов; его смотрят через <code>ss -ti</code> (tcp_info: <code>rtt</code>, <code>rto</code>, <code>retrans</code>) или через метрики приложения/прокси.</p>
+<h3 id="5-memory-fault">5. Memory: давление и fault'ы<a class="headerlink" href="#5-memory-fault" title="Anchor link to this section">&para;</a></h3>
+<p>Начинаем с острых проблем.
+* <strong>Есть ли OOM?</strong> - на ноде смотрим <code>node_vmstat_oom_kill</code>. На уровне контейнера OOM‑события можно увидеть в cAdvisor по <code>container_oom_events_total</code>. Если OOM есть, дальше это уже не “диагностика по отпечаткам”, а разбор лимитов/requests и поведения приложения по памяти.
+* <strong>Упираемся ли в memory limit контейнера?</strong> - в cgroup v1 cAdvisor экспортирует <code>container_memory_failcnt</code> (из <code>memory.failcnt</code>): это число отклонённых аллокаций из-за достижения лимита памяти. Рост failcnt без OOM kill означает работу впритык к лимиту с постоянным reclaim. Для контекста лимита рядом смотрим <code>container_memory_usage_bytes</code> и <code>container_spec_memory_limit_bytes</code>. Здесь же проверяем container awareness (видит ли рантайм cgroup лимиты) и корректность детекта лимитов памяти (см. <strong><a href="ideal-deployment.html">Ideal application deployment</a></strong>, блок 4).
+* <strong>Есть ли запас памяти “прямо сейчас”?</strong> - смотрим долю <code>node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes</code> и её динамику: резкие просадки часто совпадают с деградацией latency. Отдельно проверяем что не упёрлись в какой-то трешхолд визуально - это может быть из-за работы лимитов (например cgroup limits/requests).
+* <strong>Есть ли swap и используется ли он?</strong> - это два разных вопроса:
+  * <strong>swap включён</strong>: <code>node_memory_SwapTotal_bytes &gt; 0</code> - на машине вообще есть swap (это ещё не “проблема”, и он может быть пустым, но повод сделать насторожиться и сделать дополнительные проверки).
+  * <strong>swap занят</strong>: <code>node_memory_SwapTotal_bytes - node_memory_SwapFree_bytes</code> (плюс <code>node_memory_SwapCached_bytes</code>) - сколько данных уже вытеснено из RAM в swap. Сам факт “swap занят” не означает, что диск прямо сейчас нагружен, но означает риск: при обращении к этим страницам придётся делать page‑in с диска и это будет значительно медленнее чем из RAM.
+  * <strong>swap реально используется</strong>: <code>node_vmstat_pswpin</code> / <code>node_vmstat_pswpout</code> (смотрите rate()) - прямо сейчас страницы реально ходят между RAM и swap. Это как раз место, где диск аффектит латенси: swap‑in означает page‑in с диска и блокирует работу тредов на пути доступа к памяти.
+* <strong>Есть ли чтение страниц с диска из-за major faults?</strong> - <code>node_vmstat_pgmajfault</code>: рост означает, что часть page faults стала “major”, то есть ядру пришлось читать страницу с диска, прежде чем продолжить выполнение. Диск тут бывает двух типов: (1) swap (swap‑in), (2) file-backed страницы (page cache miss / mmap). <code>node_vmstat_pswpin</code>/<code>node_vmstat_pswpout</code> - это счётчики страниц, реально прошедших через swap: если вместе с <code>pgmajfault</code> растёт <code>pswpin</code>, значит major faults идут через swap; если <code>pgmajfault</code> растёт, а <code>pswpin/pswpout</code> нет - это чаще чтение file-backed страниц.
+* <strong>Minor faults: важны ли они?</strong> - сами по себе minor faults это норма (первый доступ к страницам, COW и т.п.). Их имеет смысл смотреть, когда они растут на порядки и начинают превращаться в заметные накладные по CPU/latency; на уровне ноды грубо оценивают как <code>node_vmstat_pgfault - node_vmstat_pgmajfault</code>, но интерпретируют только в контексте нагрузки и её динамики.</p>
+<p>Дальнейшие действия зависят от нагрузки: добавить память, скорректировать лимиты/requests, уменьшить кеши/heap, выставить GOMEMLIMIT/ActiveProcessorCount и т.п. В контейнерах важно отличать working set от page cache (например, <code>container_memory_working_set_bytes</code> vs usage).</p>
+<h3 id="6">6. Если отпечатков нет<a class="headerlink" href="#6" title="Anchor link to this section">&para;</a></h3>
+<p>PSI ≈ 0, диск/сеть/память спокойны, но сервис медленный? Значит, задержка лежит выше уровня ОС:</p>
+<ul>
+<li><strong>внешняя зависимость (БД, API)</strong> - ищем по трейсингу и метрикам приложения;</li>
+<li><strong>lock contention в приложении</strong> - см. <code>futex_wait</code> в профилировщиках off-CPU;</li>
+<li><strong>неправильный параллелизм</strong> - однопоточный hot path, короткий пул, отсутствующий backpressure.</li>
+</ul>
+<p>В этом случае переходим к профилированию кода (on-CPU и off-CPU профайлеры, трейсинг).</p>
+<hr />
+<h2 id="_2">Что делать дальше<a class="headerlink" href="#_2" title="Anchor link to this section">&para;</a></h2>
+<p>System Footprint Method даёт направление, но не решение. Дальнейшие действия зависят от того, где обнаружена проблема:</p>
+<p><strong>Если проблема в софте</strong> (высокий user time без PSI, lock contention, внешние API):
+* <strong>Профилируем приложение</strong>: on-CPU (perf, pprof), off-CPU (offcputime), трейсинг (OpenTelemetry, Jaeger).
+* <strong>Оптимизируем</strong> код, алгоритмы, параллелизм.</p>
+<p><strong>Если метрик не хватает</strong> (контейнер показывает проблему, но детали скрыты):
+* <strong>Идём на уровень хоста</strong>: смотрим node_exporter метрики ноды, где работает контейнер.
+* <strong>Проверяем</strong>, не шарится ли узкое место (CPU, диск, сеть) между соседями.
+* <strong>Используем системные инструменты</strong>: <code>perf</code>, <code>bpftrace</code>, <code>iotop</code>, <code>tcpdump</code>.</p>
+<p><strong>Если проблема в ресурсах хоста</strong> (PSI высокий, util 100%, latency растёт):
+* <strong>Тюним систему</strong>: scheduler (CFS/nice), I/O scheduler (mq-deadline/kyber), сетевые параметры (RSS/RPS, ring buffers), память (vm.swappiness, THP).
+* <strong>Накидываем ресурсы</strong>: добавляем CPU/RAM, переходим на более быстрые диски (NVMe), улучшаем сеть (10G → 25G, уменьшаем RTT).
+* <strong>Переносим нагрузку</strong>: горизонтальное масштабирование, перенос сервисов на другие ноды.</p>
+<p>System Footprint Method - это чек-лист для быстрой диагностики, а не замена профилировщикам. Он покажет, с чего начать копать.</p>
+<hr />
+<blockquote>
+<p>В предыдущей серии — <strong><a href="ideal-deployment.html">разбирались с тем, как деплоить приложение без троттлинга</a></strong>.</p>
+<p>Дальше я буду рассказывать про параллелизм и конкурентность на уровне CPU.</p>
+</blockquote>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  К началу
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "\u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e \u0432 \u0431\u0443\u0444\u0435\u0440", "clipboard.copy": "\u041a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432 \u0431\u0443\u0444\u0435\u0440", "search.result.more.one": "\u0415\u0449\u0451 1 \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.more.other": "\u0415\u0449\u0451 # \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.none": "\u0421\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e", "search.result.one": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e 1 \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0435", "search.result.other": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439: #", "search.result.placeholder": "\u041d\u0430\u0447\u043d\u0438\u0442\u0435 \u043f\u0435\u0447\u0430\u0442\u0430\u0442\u044c \u0434\u043b\u044f \u043f\u043e\u0438\u0441\u043a\u0430", "search.result.term.missing": "\u041e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u0435\u0442", "select.version": "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0435\u0440\u0441\u0438\u044e"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="../assets/scripts/hero-bg.js"></script>
+      
+        <script src="../assets/scripts/brand-anim.js"></script>
+      
+        <script src="../assets/scripts/lang-setup.js"></script>
+      
+        <script src="../assets/scripts/post-slider.js"></script>
+      
+        <script src="../assets/scripts/image-zoom.js"></script>
+      
+    
+  </body>
+</html>

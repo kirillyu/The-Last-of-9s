@@ -503,6 +503,21 @@
   }
 }
 
+/* ------------------------------------------------------------
+   TL9: Z-Index Structural Fixes
+   Override brand.css flattening that traps sidebars and search.
+   CRITICAL: .md-container creates a stacking context (z-index: 1)
+   that traps .md-sidebar below .md-overlay (z-index: 400).
+   ------------------------------------------------------------ */
+.md-header {
+  z-index: 20 !important;
+}
+
+.md-main,
+.md-container {
+  z-index: auto !important;
+}
+
 /* Allow long inline code spans to wrap instead of overflowing layout */
 .md-typeset :not(pre)>code {
   white-space: normal;

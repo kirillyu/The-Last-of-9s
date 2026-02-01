@@ -165,6 +165,14 @@ body {
   }
 }
 
+@media screen and (max-width: 768px) {
+  .md-header__title,
+  .md-header__title .md-header__topic,
+  .tl9-title-swap {
+    display: none;
+  }
+}
+
 .md-header__button.md-logo {
   margin-right: 0.3rem;
 }

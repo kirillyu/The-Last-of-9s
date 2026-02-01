@@ -1,8 +1,8 @@
 ---
 title: "Typical web-application inner architecture"
-date: 2025-12-22
 description: "The First Nine Guide, block 3: request layers and internal service anatomy"
 tags: [first-nine, series, architecture, http]
+block: 3
 ---
 
 # Typical web-application inner architecture
@@ -11,7 +11,7 @@ tags: [first-nine, series, architecture, http]
 
 ***
 
-![Illustration](../assets/first-nine/en/2025-12-22-inner-architecture_01.png)
+![Illustration](../assets/first-nine/en/inner-architecture_01.png)
 
 **Disclaimer:** real-world application architectures vary, but there are common layers that show up almost everywhere. That's what we'll cover.
 
@@ -36,7 +36,7 @@ Start with the layers a request passes through. We'll separate four internal lay
 
 **Goal:** turn an HTTP request into structured data for business logic.
 
-![Illustration](../assets/first-nine/en/2025-12-22-inner-architecture_02.png)
+![Illustration](../assets/first-nine/en/inner-architecture_02.png)
 
 **What happens here:**
 
@@ -51,7 +51,7 @@ Many assume this is IO-only. With large HTTPS bodies it can become CPU-bound.
 
 **Goal:** turn an HTTP request into a function call and route it to the correct handler.
 
-![Illustration](../assets/first-nine/en/2025-12-22-inner-architecture_03.png)
+![Illustration](../assets/first-nine/en/inner-architecture_03.png)
 
 **What happens here:**
 
@@ -66,7 +66,7 @@ Rate limits are usually memory-bound if local. Distributed limits live in Redis 
 
 **Goal:** execute the core logic of the service.
 
-![Illustration](../assets/first-nine/en/2025-12-22-inner-architecture_04.png)
+![Illustration](../assets/first-nine/en/inner-architecture_04.png)
 
 **What happens here:**
 
@@ -82,7 +82,7 @@ This is the SRE favorite for incidents. Slow SQL, locks, external APIs without t
 
 **Goal:** package the result into an HTTP response and send it back.
 
-![Illustration](../assets/first-nine/en/2025-12-22-inner-architecture_05.png)
+![Illustration](../assets/first-nine/en/inner-architecture_05.png)
 
 **What happens here:**
 
@@ -95,7 +95,7 @@ The same problems as the first layer.
 
 ### Full picture
 
-![Illustration](../assets/first-nine/en/2025-12-22-inner-architecture_06.png)
+![Illustration](../assets/first-nine/en/inner-architecture_06.png)
 
 ***
 
@@ -103,7 +103,7 @@ The same problems as the first layer.
 
 Now that we have layers, let's draw an abstract architecture as if this were a microservice system.
 
-![Illustration](../assets/first-nine/en/2025-12-22-inner-architecture_07.png)
+![Illustration](../assets/first-nine/en/inner-architecture_07.png)
 
 Meet the components. The real system may have more or fewer. The idea is what matters: isolate anything that has its own worker pool or executes outside the application.
 
@@ -142,6 +142,6 @@ That's all for now.
 
 > Next: we finish designing the ideal application and deploy it.
 >
-> Previous: **[runtime models](2025-12-21-runtime-models.md)**.
+> Previous: **[runtime models](runtime-models.md)**.
 
 Follow the channel [@r9yo11yp9e](https://t.me/r9yo11yp9e) - we will keep chasing the nines.

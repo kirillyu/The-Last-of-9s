@@ -1,8 +1,8 @@
 ---
 title: "Runtime models: как запускать тысячи функций одновременно"
-date: 2025-12-21
 description: "The First Nine Guide, блок 2: модели исполнения и их компромиссы"
 tags: [first-nine, series, runtime, concurrency]
+block: 2
 ---
 
 # Runtime models - как запускать тысячи функций одновременно
@@ -11,7 +11,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 ***
 
-![Illustration](../assets/first-nine/ru/2025-12-21-runtime-models_01.png)
+![Illustration](../assets/first-nine/ru/runtime-models_01.png)
 
 **Дисклеймер** - в реальном мире системы и бэкенды сочетают несколько моделей, в чистом виде их почти нигде не существует.
 
@@ -42,7 +42,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 **Если блокируется:** железо тупо простаивает
 
-![Illustration](../assets/first-nine/ru/2025-12-21-runtime-models_02.png)
+![Illustration](../assets/first-nine/ru/runtime-models_02.png)
 
 **Брать, если:** унаследованный монолит и 3 RPS - иначе нет.
 
@@ -56,7 +56,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 **Если блокируется:** поток висит, очередь пухнет
 
-![Illustration](../assets/first-nine/ru/2025-12-21-runtime-models_03.png)
+![Illustration](../assets/first-nine/ru/runtime-models_03.png)
 
 **Можно брать, если:** нагрузка смешанная (CPU + I/O), хотите прозрачности, тошнит от модного и молодежного.
 
@@ -76,7 +76,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 **Если блокируется:** замирает все приложение
 
-![Illustration](../assets/first-nine/ru/2025-12-21-runtime-models_04.png)
+![Illustration](../assets/first-nine/ru/runtime-models_04.png)
 
 **Брать, если:** чистый I/O и минимум CPU.
 
@@ -90,7 +90,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 **Если блокируется:** блокирует loop так же
 
-![Illustration](../assets/first-nine/ru/2025-12-21-runtime-models_05.png)
+![Illustration](../assets/first-nine/ru/runtime-models_05.png)
 
 **Брать, если:** хочется чистый асинхрон в I/O-сервисе.
 
@@ -104,7 +104,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 **Если блокируется:** если любой из легких потоков делает блокирующий системный вызов, он блокирует тот единственный тяжелый поток. Вся работа останавливается.
 
-![Illustration](../assets/first-nine/ru/2025-12-21-runtime-models_06.png)
+![Illustration](../assets/first-nine/ru/runtime-models_06.png)
 
 **Брать, если:** прототип, маленький скрипт, лабораторка.
 
@@ -120,7 +120,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 *При blocking I/O (например, Thread.sleep() или File.read() на обычном сокете) возможен pinning, что снижает эффективность.*
 
-![Illustration](../assets/first-nine/ru/2025-12-21-runtime-models_07.png)
+![Illustration](../assets/first-nine/ru/runtime-models_07.png)
 
 **Брать, если:** современный high-load и море сетевых вызовов. Но не забывайте про mutex, таймауты и fail-fast, чтобы не накапливать миллионы легких потоков в ожидании.
 
@@ -141,7 +141,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 **Если блокируется:** блокирует только себя, остальные работают
 
-![Illustration](../assets/first-nine/ru/2025-12-21-runtime-models_08.png)
+![Illustration](../assets/first-nine/ru/runtime-models_08.png)
 
 **Брать, если:** нужна высокая отказоустойчивость и готовый фреймворк. Можно применять и к микросервисам, и к внутренней архитектуре сервиса.
 
@@ -149,7 +149,7 @@ tags: [first-nine, series, runtime, concurrency]
 
 ## Сводная таблица
 
-![Illustration](../assets/first-nine/ru/2025-12-21-runtime-models_09.png)
+![Illustration](../assets/first-nine/ru/runtime-models_09.png)
 
 ***
 
@@ -165,8 +165,8 @@ tags: [first-nine, series, runtime, concurrency]
 
 ***
 
-> В следующем выпуске - **[разбор типичных архитектур приложения](2025-12-22-inner-architecture.md)**.
+> В следующем выпуске - **[разбор типичных архитектур приложения](inner-architecture.md)**.
 >
-> В предыдущей серии - **[разбирались с атрибутами функции](2025-12-20-function-atomic-unit.md)**.
+> В предыдущей серии - **[разбирались с атрибутами функции](function-atomic-unit.md)**.
 
 Подписывайся на канал [@r9yo11yp9e](https://t.me/r9yo11yp9e) - будем искать девятки вместе.

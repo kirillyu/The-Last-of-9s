@@ -1,8 +1,8 @@
 ---
 title: "Function: the atomic unit of code"
-date: 2025-12-20
 description: "The First Nine Guide, block 1: complexity, resources, and concurrency safety"
 tags: [first-nine, series, performance, functions]
+block: 1
 ---
 
 # Function: the atomic unit of code
@@ -11,7 +11,7 @@ tags: [first-nine, series, performance, functions]
 
 ***
 
-![Illustration](../assets/first-nine/en/2025-12-20-function-atomic-unit_01.png)
+![Illustration](../assets/first-nine/en/function-atomic-unit_01.png)
 
 Functions are the basic unit of every application. Requests call functions; some are fast, some are slow. To reason about performance, I classify functions by a few traits:
 
@@ -33,13 +33,13 @@ Before you roll your eyes: no heavy math here. To analyze slow code you only nee
 - understand that O(n log n) is the boundary; beyond it there is only pain
 - notice when an algorithm suddenly becomes O(n!)
 
-![Illustration](../assets/first-nine/en/2025-12-20-function-atomic-unit_02.png)
+![Illustration](../assets/first-nine/en/function-atomic-unit_02.png)
 
 Above the yellow line performance starts degrading as data volume grows.
 
 Here are examples and thresholds for n (I do not have real-life examples of O(n!)):
 
-![Illustration](../assets/first-nine/en/2025-12-20-function-atomic-unit_03.png)
+![Illustration](../assets/first-nine/en/function-atomic-unit_03.png)
 
 ***
 
@@ -58,7 +58,7 @@ Classify functions early (ideally while writing them):
 
 This tells you where the bottleneck hides: CPU, memory, socket, or the algorithm itself.
 
-![Illustration](../assets/first-nine/en/2025-12-20-function-atomic-unit_04.png)
+![Illustration](../assets/first-nine/en/function-atomic-unit_04.png)
 
 ***
 
@@ -102,7 +102,7 @@ Every function call allocates its own memory region called a stack frame.
 
 Each call creates a new frame at the top of the stack; when the function completes, the frame is removed. Even int sum(int a, int b) costs 16-64 bytes of overhead.
 
-![Illustration](../assets/first-nine/en/2025-12-20-function-atomic-unit_05.png)
+![Illustration](../assets/first-nine/en/function-atomic-unit_05.png)
 
 **Why should you care?**
 
@@ -132,6 +132,6 @@ Dirty hack: inline functions. They remove the frame cost, but try/catch/finally 
 
 - Blocking I/O inside CPU functions is hard to debug and scale. Avoid it.
 
-> Next up: a breakdown of **[runtime models](2025-12-21-runtime-models.md)**.
+> Next up: a breakdown of **[runtime models](runtime-models.md)**.
 
 Follow the channel [@r9yo11yp9e](https://t.me/r9yo11yp9e) - we will keep chasing the nines.

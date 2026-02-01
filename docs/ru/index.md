@@ -29,35 +29,18 @@ title: Главная
     </div>
 
     <figure class="tl9-cover tl9-cover--featured">
-      <img src="../assets/first-nine/ru/2025-12-21-runtime-models_01.png" alt="Featured cover" width="1248" height="702" loading="eager" decoding="async" fetchpriority="high" />
+      <img src="../assets/first-nine/ru/runtime-models_01.png" alt="Featured cover" width="1248" height="702" loading="eager" decoding="async" fetchpriority="high" />
       <figcaption class="tl9-caption">The First Nine Guide — featured</figcaption>
     </figure>
   </div>
 
   <div class="section-block"></div>
 
-  <div class="tl9-cover-grid">
-    <a class="tl9-mini-cover tl9-spotlight" href="2025-12-20-function-atomic-unit.html">
-      <img src="../assets/first-nine/ru/2025-12-20-function-atomic-unit_01.png" alt="Block 1 cover" width="1248" height="702" loading="lazy" decoding="async" />
-      <span class="tl9-mini-title">Блок 1 — Function</span>
-    </a>
-    <a class="tl9-mini-cover tl9-spotlight" href="2025-12-21-runtime-models.html">
-      <img src="../assets/first-nine/ru/2025-12-22-inner-architecture_01.png" alt="Block 2 cover" width="1248" height="702" loading="lazy" decoding="async" />
-      <span class="tl9-mini-title">Блок 2 — Runtime models</span>
-    </a>
-    <a class="tl9-mini-cover tl9-spotlight" href="2025-12-22-inner-architecture.html">
-      <img src="../assets/first-nine/ru/2025-12-23-ideal-deployment_01.png" alt="Block 3 cover" width="1248" height="702" loading="lazy" decoding="async" />
-      <span class="tl9-mini-title">Блок 3 — Архитектура</span>
-    </a>
-    <a class="tl9-mini-cover tl9-spotlight" href="2025-12-23-ideal-deployment.html">
-      <img src="../assets/first-nine/ru/2025-12-21-runtime-models_01.png" alt="Block 4 cover" width="1248" height="702" loading="lazy" decoding="async" />
-      <span class="tl9-mini-title">Блок 4 — Деплой</span>
-    </a>
+  <div markdown>
+--8<-- "_includes/latest-ru.md"
   </div>
 </div>
 
-
-
 ## О блоге
 
-The Last of 9s - это инженерный блог, в котором я делюсь опытом и подходами к тому, как построить процессы с нуля и решать прикладные задачи вокруг моих любимых аспектов систем. Подробнее в разделе <a href="about.md">Обо мне</a>.
+The Last of 9s - это инженерный блог, в котором я делюсь опытом и подходами к тому, как построить процессы с нуля и решать прикладные задачи вокруг моих любимых аспектов систем. Подробнее в разделе <a href="about.html">Обо мне</a>.

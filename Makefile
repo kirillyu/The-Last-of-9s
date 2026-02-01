@@ -1,4 +1,5 @@
-.PHONY: all generate build build-fast serve serve-dev clean new smoke
+.PHONY: all site generate build build-fast serve serve-dev clean new smoke
+.DEFAULT_GOAL := build
 
 PYTHON ?= python3
 VENV_PYTHON := ./venv/bin/python
@@ -11,16 +12,16 @@ MKDOCS := $(PYTHON) -m mkdocs
 
 all: build
 
-generate:
+build:
 	cd tools/indexgen && go run main.go
-
-build: generate
 	$(MKDOCS) build
 	@# Material pages in /ru/ may request /ru/sitemap.xml; provide a copy to avoid 404 spam.
 	@if [ -f site/sitemap.xml ]; then mkdir -p site/ru && cp -f site/sitemap.xml site/ru/sitemap.xml; fi
 
-build-fast: generate
-	$(MKDOCS) build --dirty
+site: build
+generate build-fast serve-dev:
+	@echo "Use the single build entrypoint: make build" >&2
+	@exit 2
 
 PORT ?= 8001
 BASE_PATH ?= The-Last-of-9s
@@ -29,7 +30,7 @@ serve: build
 	@set -e; \
 	site_dir="site"; \
 	if [ ! -d "$$site_dir" ]; then \
-		echo "Missing $$site_dir. Run 'make build' first."; \
+		echo "Missing $$site_dir. Run 'make site' first."; \
 		exit 1; \
 	fi; \
 	tmp_dir=$$(mktemp -d); \
@@ -38,14 +39,11 @@ serve: build
 	trap 'rm -rf "$$tmp_dir"' EXIT; \
 	$(PYTHON) -m http.server --directory "$$tmp_dir" $(PORT)
 
-serve-dev: generate
-	$(MKDOCS) serve
-
 smoke:
 	@set -e; \
 	site_dir="site"; \
 	if [ ! -d "$$site_dir" ]; then \
-		echo "Missing $$site_dir. Run 'make build' first."; \
+		echo "Missing $$site_dir. Run 'make site' first."; \
 		exit 1; \
 	fi; \
 	tmp_dir=$$(mktemp -d); \
@@ -87,16 +85,15 @@ clean:
 new:
 	@set -e; \
 	if [ -z "$(LANG)" ] || [ -z "$(TITLE)" ] || [ -z "$(SLUG)" ]; then \
-		echo "Usage: make new LANG=en TITLE='Post title' SLUG=post-title"; \
+		echo "Usage: make new LANG=en TITLE='Post title' SLUG=post-title [BLOCK=1]"; \
 		exit 1; \
 	fi; \
 	if [ "$(LANG)" != "en" ] && [ "$(LANG)" != "ru" ]; then \
 		echo "LANG must be 'en' or 'ru'"; \
 		exit 1; \
 	fi; \
-	date_stamp=$$(date +%Y-%m-%d); \
 	dir="docs/$(LANG)"; \
-	path="$$dir/$$date_stamp-$(SLUG).md"; \
+	path="$$dir/$(SLUG).md"; \
 	if [ ! -d "$$dir" ]; then \
 		echo "Missing directory: $$dir"; \
 		exit 1; \
@@ -106,5 +103,7 @@ new:
 		exit 1; \
 	fi; \
 	title_escaped=$$(printf "%s" "$(TITLE)" | sed 's/"/\\"/g'); \
-	printf -- "---\ntitle: \"%s\"\ndate: %s\ndescription: \"\"\ntags: []\n---\n\n# %s\n\n" "$$title_escaped" "$$date_stamp" "$$title_escaped" > "$$path"; \
+	block_value="$(BLOCK)"; \
+	if [ -z "$$block_value" ]; then block_value="0"; fi; \
+	printf -- "---\ntitle: \"%s\"\ndescription: \"\"\ntags: []\nblock: %s\n---\n\n# %s\n\n" "$$title_escaped" "$$block_value" "$$title_escaped" > "$$path"; \
 	echo "Created $$path"

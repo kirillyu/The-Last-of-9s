@@ -1,8 +1,8 @@
 ---
 title: "Typical web-application inner architecture"
-date: 2025-12-22
 description: "The First Nine Guide, блок 3: слои веб-приложения и внутренняя архитектура"
 tags: [first-nine, series, architecture, http]
+block: 3
 ---
 
 # Typical web-application inner architecture
@@ -11,7 +11,7 @@ tags: [first-nine, series, architecture, http]
 
 ***
 
-![Illustration](../assets/first-nine/ru/2025-12-22-inner-architecture_01.png)
+![Illustration](../assets/first-nine/ru/inner-architecture_01.png)
 
 **Дисклеймер** - в реальном мире архитектуры приложений крайне разнообразны, но есть универсальные слои, которые встречаются почти везде. О них и поговорим.
 
@@ -36,7 +36,7 @@ tags: [first-nine, series, architecture, http]
 
 **Суть:** превращает HTTP-запрос в структурированные данные для бизнес-логики.
 
-![Illustration](../assets/first-nine/ru/2025-12-22-inner-architecture_02.png)
+![Illustration](../assets/first-nine/ru/inner-architecture_02.png)
 
 **Что тут происходит:**
 
@@ -51,7 +51,7 @@ tags: [first-nine, series, architecture, http]
 
 **Суть:** превращает HTTP-запрос в вызов функции и маршрутизирует к нужному обработчику.
 
-![Illustration](../assets/first-nine/ru/2025-12-22-inner-architecture_03.png)
+![Illustration](../assets/first-nine/ru/inner-architecture_03.png)
 
 **Что тут происходит:**
 
@@ -66,7 +66,7 @@ tags: [first-nine, series, architecture, http]
 
 **Суть:** выполняет основную логику приложения - то, ради чего существует сервис.
 
-![Illustration](../assets/first-nine/ru/2025-12-22-inner-architecture_04.png)
+![Illustration](../assets/first-nine/ru/inner-architecture_04.png)
 
 **Что тут происходит:**
 
@@ -82,7 +82,7 @@ tags: [first-nine, series, architecture, http]
 
 **Суть:** упаковывает результат обратно в HTTP-ответ и отправляет клиенту.
 
-![Illustration](../assets/first-nine/ru/2025-12-22-inner-architecture_05.png)
+![Illustration](../assets/first-nine/ru/inner-architecture_05.png)
 
 **Что тут происходит:**
 
@@ -95,7 +95,7 @@ tags: [first-nine, series, architecture, http]
 
 ### Полная картина
 
-![Illustration](../assets/first-nine/ru/2025-12-22-inner-architecture_06.png)
+![Illustration](../assets/first-nine/ru/inner-architecture_06.png)
 
 ***
 
@@ -103,7 +103,7 @@ tags: [first-nine, series, architecture, http]
 
 Теперь, когда у нас есть представление о слоях, попробуем нарисовать это как абстрактную архитектуру, будто у нас микросервисы.
 
-![Illustration](../assets/first-nine/ru/2025-12-22-inner-architecture_07.png)
+![Illustration](../assets/first-nine/ru/inner-architecture_07.png)
 
 Знакомимся с объектами. Их может быть больше или меньше в реальности. Тут главное подход: выносим в отдельную сущность все, что имеет независимый пул воркеров или любую работу за пределами приложения.
 
@@ -142,6 +142,6 @@ tags: [first-nine, series, architecture, http]
 
 > В следующем выпуске мы закончим проектировать идеальное приложение и пойдем его деплоить.
 >
-> В предыдущей серии - **[разбирались с тем, какие есть модели рантайма](2025-12-21-runtime-models.md)**.
+> В предыдущей серии - **[разбирались с тем, какие есть модели рантайма](runtime-models.md)**.
 
 Подписывайся на канал [@r9yo11yp9e](https://t.me/r9yo11yp9e) - будем искать девятки вместе.

@@ -5,6 +5,4 @@ title: Дашборды
 
 # Дашборды
 
-Скоро здесь будут: дашборды, снапшоты и короткие runbook.
-
-Пока страница намеренно пустая.
+- **System Footprint (SFP)** — Grafana JSON: [system-footprint.json](../dashboards/system-footprint.json)

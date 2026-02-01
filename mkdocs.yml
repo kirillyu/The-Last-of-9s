@@ -58,7 +58,8 @@ markdown_extensions:
       line_spans: __span
       pygments_lang_class: true
   - pymdownx.inlinehilite
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      base_path: docs
   - pymdownx.superfences
   - admonition
   - pymdownx.details
@@ -74,9 +75,9 @@ markdown_extensions:
       toc_depth: 3
 
 nav:
-  - index.md
-  - blog.md
-  - about.md
+  - Home: index.md
+  - Blog: blog.md
+  - About: about.md
 
 
 plugins:
@@ -94,6 +95,23 @@ plugins:
         - locale: ru
           name: Русский
           build: true
+          nav_translations:
+            Home: Главная
+            Blog: Блог
+            About: Обо мне
+
+extra:
+  alternate:
+    - name: English
+      link: /The-Last-of-9s/
+      lang: en
+    - name: Русский
+      link: /The-Last-of-9s/ru/
+      lang: ru
+
+validation:
+  nav:
+    omitted_files: ignore
 
 
 extra_css:
@@ -106,3 +124,4 @@ extra_javascript:
   - assets/scripts/hero-bg.js
   - assets/scripts/brand-anim.js
   - assets/scripts/lang-setup.js
+  - assets/scripts/post-slider.js

@@ -1,0 +1,4985 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Goal: quickly separate OS issues (CPU/Disk/Memory/Network) from user-space and external dependencies.\n\nHow to read:\n- Start with System Footprint (SFP) and Time Budget.\n- Then confirm in the matching CPU/Disk/Memory/Network block.\n\nMetrics: node_exporter. `sfp_*` tune estimates (hidden by default). \"No data\" means missing metrics or filters.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": 0,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 60,
+      "panels": [],
+      "title": "Stats",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "uid": "$datasource"
+      },
+      "description": "Shows the minimum uptime (seconds since boot) in the selected time range. If there was a reboot, the value will be close to 0.",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 600
+              },
+              {
+                "color": "green",
+                "value": 3600
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 0,
+        "y": 1
+      },
+      "id": 41,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "min"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "expr": "node_time_seconds{instance=\"$node\",job=\"$job\"} - node_boot_time_seconds{instance=\"$node\",job=\"$job\"}",
+          "intervalFactor": 2,
+          "refId": "A",
+          "step": 240
+        }
+      ],
+      "title": "Uptime",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Shows the max Swap Used (bytes) in the selected time range. If swap is not configured (SwapTotal=0), shows `No swap`. If swap exists but is not used, shows `OK`.",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "text": "OK"
+                },
+                "-1": {
+                  "text": "No swap"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "gray",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "orange",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 3,
+        "y": 1
+      },
+      "id": 98,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "max"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "(\n  (\n    node_memory_SwapTotal_bytes{instance=\"$node\", job=\"$job\"}\n    -\n    (\n      node_memory_SwapFree_bytes{instance=\"$node\", job=\"$job\"}\n      or\n      (0 * node_memory_SwapTotal_bytes{instance=\"$node\", job=\"$job\"})\n    )\n  )\n  +\n  (-1 * (node_memory_SwapTotal_bytes{instance=\"$node\", job=\"$job\"} == 0))\n)",
+          "refId": "A"
+        }
+      ],
+      "title": "Swap",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Disk space (bytes): total `Used` and `Total` across filesystems on block devices (`device=~\"/dev/.+\"`). To avoid double counting bind mounts, we take `max` by `device`. The panel shows the worst case in the selected time range (max used).",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "gray",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 6,
+        "y": 1
+      },
+      "id": 99,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "max"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (instance) (\n  max by (instance, device) (\n    node_filesystem_size_bytes{instance=\"$node\", job=\"$job\", device=~\"/dev/.+\", fstype!~\"tmpfs|devtmpfs|squashfs|fuse.lxcfs|vfat\"}\n  )\n  -\n  max by (instance, device) (\n    node_filesystem_avail_bytes{instance=\"$node\", job=\"$job\", device=~\"/dev/.+\", fstype!~\"tmpfs|devtmpfs|squashfs|fuse.lxcfs|vfat\"}\n  )\n)",
+          "legendFormat": "Used",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (instance) (\n  max by (instance, device) (\n    node_filesystem_size_bytes{instance=\"$node\", job=\"$job\", device=~\"/dev/.+\", fstype!~\"tmpfs|devtmpfs|squashfs|fuse.lxcfs|vfat\"}\n  )\n)",
+          "legendFormat": "Total",
+          "refId": "B"
+        }
+      ],
+      "title": "Disk Used / Total",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "description": "Constants used in estimated formulas (time budget + network model).\n\nDefaults are conservative: RTT=20ms (between in-DC and cross-region), RTO=200ms (Linux lower bound).\nTune them in Dashboard settings → Variables → sfp_*.",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 9,
+        "y": 1
+      },
+      "id": 103,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "| Parameter | Value |\n|---|---:|\n| `sfp_tcp_rtt_s` (TCP RTT, s; fast retrans) | $sfp_tcp_rtt_s s |\n| `sfp_tcp_rto_s` (TCP RTO, s; timeout/RTO) | $sfp_tcp_rto_s s |\n| `sfp_mem_minor_pf_s` (minor page fault cost, s; estimate) | $sfp_mem_minor_pf_s s |\n| `sfp_net_fast_penalty` (impact: fast retrans, ×) | $sfp_net_fast_penalty |\n| `sfp_net_slow_penalty` (impact: slow/RTO retrans, ×) | $sfp_net_slow_penalty |\n",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "SFP parameters",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Host name (nodename) from `node_uname_info`.",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 15,
+        "y": 1
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^nodename$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_uname_info{instance=\"$node\", job=\"$job\"}",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "title": "Host",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "valueLabel": "nodename"
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Total RAM on the node: `node_memory_MemTotal_bytes`.",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 18,
+        "y": 1
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "max"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_MemTotal_bytes{instance=\"$node\", job=\"$job\"}",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Memory",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "**CPU core count**\n\nTrue parallelism of the system.",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "purple",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 21,
+        "y": 1
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "max"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "count by (instance) (node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"})",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "CPU Cores",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 1,
+      "panels": [],
+      "title": "SFP compass - where to start",
+      "type": "row"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 7
+      },
+      "id": 48,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "An application touches the OS via two interfaces: syscalls and virtual memory. \nWe read signals from these interfaces (PSI, CPU modes, D-state, swap, retrans) to find the problem layer. \nStart at the top (SFP score, Time Budget), then confirm the hypothesis in CPU/Disk/Memory/Network blocks below. <br>\nArticle: https://kirillyu.github.io/The-Last-of-9s/ru/application-footprint.html",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "Intro: how to read this dashboard",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "description": "",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 7,
+        "x": 0,
+        "y": 10
+      },
+      "id": 58,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "If PSI CPU/IO/Mem > 0 and stays up, threads already wait on the system. In this block we look for clear signs of resource shortage before diving deeper.",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "Is there pressure?",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "**Process States**\n\n**Running (R-state):** ready to run\n• If > CPU cores → CPU queue\n\n**Blocked (D-state):** uninterruptible sleep (I/O wait)\n• If > 0 → threads stuck in disk I/O\n\n**Note:** D-state is NOT visible in CPU usage!",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": 5,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Running (R-state)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Blocked (D-state - IO wait)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU Cores"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 10,
+        "x": 7,
+        "y": 10
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_procs_running{instance=\"$node\", job=\"$job\"}",
+          "legendFormat": "Running (R-state)",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_procs_blocked{instance=\"$node\", job=\"$job\"}",
+          "legendFormat": "Blocked (D-state - IO wait)",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "count by (instance) (node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "CPU Cores",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Process States: Running vs Blocked",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "description": "",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 7,
+        "x": 17,
+        "y": 10
+      },
+      "id": 59,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "If pressure is near zero, check resource usage.\n The panels on the right answer \"which resource spends more time in one second.\" Be careful, these calculations contain many assumptions.",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "Where does the second go?",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Percent signals per layer over time.\n\n- CPU/Disk/Memory: PSI some (% time tasks waited on that resource).\n- Network: fast retrans % + slow/RTO retrans % of TCP OutSegs.\n- Retrans can be caused by loss or a slow receiver not processing incoming traffic fast enough.\n\nNote: TCP netstat counters are host-wide (not per interface).\nIf PSI metrics are missing, Network is disabled (by design).\n\nUse this panel as a compass, then confirm in the detailed blocks below.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Disk"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Memory"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Network"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 7,
+        "x": 0,
+        "y": 13
+      },
+      "id": 49,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "max(\n  100 * rate(node_pressure_cpu_waiting_seconds_total{instance=\"$node\", job=\"$job\"}[1m])\n)",
+          "legendFormat": "CPU",
+          "refId": "CPU"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "max(\n  100 * rate(node_pressure_io_waiting_seconds_total{instance=\"$node\", job=\"$job\"}[1m])\n)",
+          "legendFormat": "Disk",
+          "refId": "Disk"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "max(\n  100 * rate(node_pressure_memory_waiting_seconds_total{instance=\"$node\", job=\"$job\"}[1m])\n)",
+          "legendFormat": "Memory",
+          "refId": "Memory"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "max(\n  (((100 * clamp_min(clamp_min((sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval]))) - ((sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval])) or (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval]))))), 0) / (clamp_min(sum by (instance)(rate(node_netstat_Tcp_OutSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])), 1)), 0)) + (100 * clamp_min(((sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval])) or (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval]))))) / (clamp_min(sum by (instance)(rate(node_netstat_Tcp_OutSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])), 1)), 0))) or vector(0)) * clamp_max(count(node_pressure_cpu_waiting_seconds_total{instance=\"$node\", job=\"$job\"}), 1)\n)",
+          "legendFormat": "Network",
+          "refId": "Network"
+        }
+      ],
+      "title": "System pressure + network degradation (history)",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Estimated Off-CPU time as a time series (ms/s/core). Same buckets as the pie chart on the left.\n\nFormulas (high level):\n- Disk stall (no swap): uses node_disk_io_time_seconds_total minus the swap part.\n- Swap stall: (pswpin + pswpout) × avg_disk_op_time.\n- Minor faults: (pgfault − pgmajfault) × sfp_mem_minor_pf_s.\n- Net fast: (RetransSegs − TCPTimeouts) × sfp_tcp_rtt_s.\n- Net slow: TCPTimeouts × sfp_tcp_rto_s.\n\nWhy this shape: we don’t have direct “wait time by cause” in node_exporter, so we convert counters/events into time via simple assumptions.\nTune constants in Variables: sfp_*.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "ms/s/core",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 7,
+        "x": 17,
+        "y": 13
+      },
+      "id": 50,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "1000 * (\nclamp_min(\n  (\n    sum by (instance)(\n      rate(node_disk_io_time_seconds_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval])\n    )\n    -\n    (\n      (\n        sum by (instance)(rate(node_vmstat_pswpin{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n        +\n        sum by (instance)(rate(node_vmstat_pswpout{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n      )\n      *\n      (\n        sum by (instance)(\n          rate(node_disk_io_time_seconds_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval])\n        )\n        /\n        clamp_min(\n          (\n            sum by (instance)(rate(node_disk_reads_completed_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval]))\n            +\n            sum by (instance)(rate(node_disk_writes_completed_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval]))\n          ),\n          0.000001\n        )\n      )\n    )\n  ),\n  0\n)\n/\nclamp_min(\n  count by (instance)(node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"}),\n  1\n)\n)",
+          "legendFormat": "Disk stall / core",
+          "refId": "Disk stall"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "1000 * (\n(\n  (\n    sum by (instance)(rate(node_vmstat_pswpin{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n    +\n    sum by (instance)(rate(node_vmstat_pswpout{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n  )\n  *\n  (\n    sum by (instance)(\n      rate(node_disk_io_time_seconds_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval])\n    )\n    /\n    clamp_min(\n      (\n        sum by (instance)(rate(node_disk_reads_completed_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval]))\n        +\n        sum by (instance)(rate(node_disk_writes_completed_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval]))\n      ),\n      0.000001\n    )\n  )\n)\n/\nclamp_min(\n  count by (instance)(node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"}),\n  1\n)\n)",
+          "legendFormat": "Swap stall / core",
+          "refId": "Swap stall"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "1000 * (\n(\n  clamp_min(\n    sum by (instance)(rate(node_vmstat_pgfault{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n    -\n    sum by (instance)(rate(node_vmstat_pgmajfault{instance=\"$node\", job=\"$job\"}[$__rate_interval])),\n    0\n  )\n  * $sfp_mem_minor_pf_s\n)\n/\nclamp_min(\n  count by (instance)(node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"}),\n  1\n)\n)",
+          "legendFormat": "RAM minor faults / core",
+          "refId": "RAM faults"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "1000 * (\n(\n  clamp_min(\n    sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n    -\n    (\n  sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n  or\n  (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])))\n),\n    0\n  )\n  * $sfp_tcp_rtt_s\n)\n/\nclamp_min(count by (instance)(node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"}), 1)\n\n)",
+          "legendFormat": "Network fast / core",
+          "refId": "Net fast"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "1000 * (\n(\n  (\n  sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n  or\n  (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])))\n)\n  * $sfp_tcp_rto_s\n)\n/\nclamp_min(count by (instance)(node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"}), 1)\n\n)",
+          "legendFormat": "Network slow / core",
+          "refId": "Net slow"
+        }
+      ],
+      "title": "Time budget (estimated Off-CPU, history)",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Worst-case (max) in the selected time range.\n\nCPU/Disk/Memory: PSI some (%).\nNetwork: fast retrans % + slow/RTO retrans % (of TCP OutSegs).\nOK = 100% - (CPU + Disk + Memory + Network).\n\nNote: TCP netstat counters are host-wide (not per interface).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "min": 0,
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Disk"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Memory"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Network"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "OK"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 5,
+        "x": 7,
+        "y": 17
+      },
+      "id": 3,
+      "options": {
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "max"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "max(\n  100 * rate(node_pressure_cpu_waiting_seconds_total{instance=\"$node\", job=\"$job\"}[1m])\n)",
+          "legendFormat": "CPU",
+          "refId": "CPU"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "max(\n  100 * rate(node_pressure_io_waiting_seconds_total{instance=\"$node\", job=\"$job\"}[1m])\n)",
+          "legendFormat": "Disk",
+          "refId": "Disk"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "max(\n  100 * rate(node_pressure_memory_waiting_seconds_total{instance=\"$node\", job=\"$job\"}[1m])\n)",
+          "legendFormat": "Memory",
+          "refId": "Memory"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "max(\n  (((100 * clamp_min(clamp_min((sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval]))) - ((sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval])) or (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval]))))), 0) / (clamp_min(sum by (instance)(rate(node_netstat_Tcp_OutSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])), 1)), 0)) + (100 * clamp_min(((sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval])) or (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval]))))) / (clamp_min(sum by (instance)(rate(node_netstat_Tcp_OutSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])), 1)), 0))) or vector(0)) * clamp_max(count(node_pressure_cpu_waiting_seconds_total{instance=\"$node\", job=\"$job\"}), 1)\n)",
+          "legendFormat": "Network",
+          "refId": "Network"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "100 - (\n  (max(100 * rate(node_pressure_cpu_waiting_seconds_total{instance=\"$node\", job=\"$job\"}[1m])))\n  +\n  (max(100 * rate(node_pressure_io_waiting_seconds_total{instance=\"$node\", job=\"$job\"}[1m])))\n  +\n  (max(100 * rate(node_pressure_memory_waiting_seconds_total{instance=\"$node\", job=\"$job\"}[1m])))\n  +\n  (max((((100 * clamp_min(clamp_min((sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval]))) - ((sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval])) or (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval]))))), 0) / (clamp_min(sum by (instance)(rate(node_netstat_Tcp_OutSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])), 1)), 0)) + (100 * clamp_min(((sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval])) or (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval]))))) / (clamp_min(sum by (instance)(rate(node_netstat_Tcp_OutSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])), 1)), 0))) or vector(0)) * clamp_max(count(node_pressure_cpu_waiting_seconds_total{instance=\"$node\", job=\"$job\"}), 1)))\n)",
+          "legendFormat": "OK",
+          "refId": "OK"
+        }
+      ],
+      "title": "System pressure + network degradation (worst-case)",
+      "transparent": true,
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Estimated Off-CPU time per second (worst-case in the selected range).\n\nGoal: convert “waiting signals” into an approximate time budget. Values are normalized per core.\n\nHow each slice is built (short):\n- Disk stall (no swap): disk_busy_time − swap_share (proxy).\n- Swap stall: (pswpin + pswpout) × avg_disk_op_time (proxy).\n- Minor faults: (pgfault − pgmajfault) × sfp_mem_minor_pf_s.\n- Network fast: fast_retrans × sfp_tcp_rtt_s.\n- Network slow: TCP timeouts × sfp_tcp_rto_s.\n\nTune constants in Variables: sfp_*.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "OK"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 5,
+        "x": 12,
+        "y": 17
+      },
+      "id": 34,
+      "options": {
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "clamp_min(\n  (\n    sum by (instance)(\n      rate(node_disk_io_time_seconds_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval])\n    )\n    -\n    (\n      (\n        sum by (instance)(rate(node_vmstat_pswpin{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n        +\n        sum by (instance)(rate(node_vmstat_pswpout{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n      )\n      *\n      (\n        sum by (instance)(\n          rate(node_disk_io_time_seconds_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval])\n        )\n        /\n        clamp_min(\n          (\n            sum by (instance)(rate(node_disk_reads_completed_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval]))\n            +\n            sum by (instance)(rate(node_disk_writes_completed_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval]))\n          ),\n          0.000001\n        )\n      )\n    )\n  ),\n  0\n)\n/\nclamp_min(\n  count by (instance)(node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"}),\n  1\n)",
+          "legendFormat": "Disk stall (no swap)",
+          "refId": "Disk"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(\n  (\n    sum by (instance)(rate(node_vmstat_pswpin{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n    +\n    sum by (instance)(rate(node_vmstat_pswpout{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n  )\n  *\n  (\n    sum by (instance)(\n      rate(node_disk_io_time_seconds_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval])\n    )\n    /\n    clamp_min(\n      (\n        sum by (instance)(rate(node_disk_reads_completed_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval]))\n        +\n        sum by (instance)(rate(node_disk_writes_completed_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval]))\n      ),\n      0.000001\n    )\n  )\n)\n/\nclamp_min(\n  count by (instance)(node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"}),\n  1\n)",
+          "legendFormat": "Swap stall",
+          "refId": "Swap"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(\n  clamp_min(\n    sum by (instance)(rate(node_vmstat_pgfault{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n    -\n    sum by (instance)(rate(node_vmstat_pgmajfault{instance=\"$node\", job=\"$job\"}[$__rate_interval])),\n    0\n  )\n  * $sfp_mem_minor_pf_s\n)\n/\nclamp_min(\n  count by (instance)(node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"}),\n  1\n)",
+          "legendFormat": "RAM minor faults",
+          "refId": "RAM"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(\n  clamp_min(\n    sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n    -\n    (\n  sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n  or\n  (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])))\n),\n    0\n  )\n  * $sfp_tcp_rtt_s\n)\n/\nclamp_min(count by (instance)(node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"}), 1)\n",
+          "legendFormat": "Network fast retrans",
+          "refId": "NetFast"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(\n  (\n  sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n  or\n  (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])))\n)\n  * $sfp_tcp_rto_s\n)\n/\nclamp_min(count by (instance)(node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"}), 1)\n",
+          "legendFormat": "Network slow retrans (RTO)",
+          "refId": "NetSlow"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "clamp_min(\n  1 - (\n    (clamp_min(\n  (\n    sum by (instance)(\n      rate(node_disk_io_time_seconds_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval])\n    )\n    -\n    (\n      (\n        sum by (instance)(rate(node_vmstat_pswpin{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n        +\n        sum by (instance)(rate(node_vmstat_pswpout{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n      )\n      *\n      (\n        sum by (instance)(\n          rate(node_disk_io_time_seconds_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval])\n        )\n        /\n        clamp_min(\n          (\n            sum by (instance)(rate(node_disk_reads_completed_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval]))\n            +\n            sum by (instance)(rate(node_disk_writes_completed_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval]))\n          ),\n          0.000001\n        )\n      )\n    )\n  ),\n  0\n)\n/\nclamp_min(\n  count by (instance)(node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"}),\n  1\n))\n    +\n    ((\n  (\n    sum by (instance)(rate(node_vmstat_pswpin{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n    +\n    sum by (instance)(rate(node_vmstat_pswpout{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n  )\n  *\n  (\n    sum by (instance)(\n      rate(node_disk_io_time_seconds_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval])\n    )\n    /\n    clamp_min(\n      (\n        sum by (instance)(rate(node_disk_reads_completed_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval]))\n        +\n        sum by (instance)(rate(node_disk_writes_completed_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval]))\n      ),\n      0.000001\n    )\n  )\n)\n/\nclamp_min(\n  count by (instance)(node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"}),\n  1\n))\n    +\n    ((\n  clamp_min(\n    sum by (instance)(rate(node_vmstat_pgfault{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n    -\n    sum by (instance)(rate(node_vmstat_pgmajfault{instance=\"$node\", job=\"$job\"}[$__rate_interval])),\n    0\n  )\n  * $sfp_mem_minor_pf_s\n)\n/\nclamp_min(\n  count by (instance)(node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"}),\n  1\n))\n    +\n    ((\n  clamp_min(\n    sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n    -\n    (\n  sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n  or\n  (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])))\n),\n    0\n  )\n  * $sfp_tcp_rtt_s\n)\n/\nclamp_min(count by (instance)(node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"}), 1))\n    +\n    ((\n  (\n  sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n  or\n  (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])))\n)\n  * $sfp_tcp_rto_s\n)\n/\nclamp_min(count by (instance)(node_cpu_seconds_total{instance=\"$node\", job=\"$job\", mode=\"user\"}), 1))\n  ),\n  0\n)",
+          "legendFormat": "OK",
+          "refId": "OK"
+        }
+      ],
+      "title": "Time budget (estimated Off-CPU, worst-case)",
+      "transparent": true,
+      "type": "piechart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
+      "id": 7,
+      "panels": [],
+      "title": "Node resources",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": true,
+            "tooltip": {
+              "placement": "top"
+            },
+            "wrapText": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 28
+      },
+      "id": 82,
+      "options": {
+        "cellHeight": "md",
+        "showHeader": false
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "label_set(vector(0),\"annotation\",\"Is there a queue for CPU cores?\\nPSI CPU.some shows the share of time when runnable tasks waited for CPU. Higher and longer = more likely a CPU bottleneck (single-threading, CPU quotas, long syscalls).\")",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "CPU · Pressure",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": true,
+            "tooltip": {
+              "placement": "top"
+            },
+            "wrapText": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 28
+      },
+      "id": 52,
+      "options": {
+        "cellHeight": "md",
+        "showHeader": false
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "label_set(vector(0),\"annotation\",\"Are we waiting for disk?\\nPSI IO.some and `node_procs_blocked` show threads in D-state. Growth → check latency next.\")",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Disk · Pressure",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": true,
+            "tooltip": {
+              "placement": "top"
+            },
+            "wrapText": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 28
+      },
+      "id": 87,
+      "options": {
+        "cellHeight": "md",
+        "showHeader": false
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "label_set(vector(0),\"annotation\",\"Is there memory pressure?\\nPSI memory shows allocator stalls: reclaim and swap. Growth → go deeper below.\")",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Memory · Pressure",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": true,
+            "tooltip": {
+              "placement": "top"
+            },
+            "wrapText": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 28
+      },
+      "id": 92,
+      "options": {
+        "cellHeight": "md",
+        "showHeader": false
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "label_set(vector(0),\"annotation\",\"Can we receive/send packets fast enough?\\nCheck NIC drops, softnet drops, and listen queue signals. Growth = losses → likely retransmits and lower throughput.\")",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Network · Drops",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "PSI CPU: % of time tasks waited for CPU.\n- some: at least 1 task waited\n- full: all runnable tasks waited (often ≈0 on host)\n\n1% ≈ 10ms/s delay. Treat as time lost.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU Pressure (some)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU Pressure (full)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 32
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "100 * rate(node_pressure_cpu_waiting_seconds_total{instance=\"$node\", job=\"$job\"}[1m])",
+          "legendFormat": "CPU Pressure (some)",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "100 * rate(node_pressure_cpu_stalled_seconds_total{instance=\"$node\", job=\"$job\"}[1m])",
+          "legendFormat": "CPU Pressure (full)",
+          "refId": "B"
+        }
+      ],
+      "title": "PSI CPU (some/full)",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "PSI IO: % of time tasks waited for I/O.\n- some: at least 1 task waited\n- full: all tasks waited\n\n1% ≈ 10ms/s delay. Confirm with D-state, latency/queue, util.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "IO Pressure (some)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "IO Pressure (full)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 32
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "100 * rate(node_pressure_io_waiting_seconds_total{instance=\"$node\", job=\"$job\"}[1m])",
+          "legendFormat": "IO Pressure (some)",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "100 * rate(node_pressure_io_stalled_seconds_total{instance=\"$node\", job=\"$job\"}[1m])",
+          "legendFormat": "IO Pressure (full)",
+          "refId": "B"
+        }
+      ],
+      "title": "PSI IO (some/full)",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "PSI Memory: % of time tasks waited due to reclaim/swap.\n- some: at least 1 task waited\n- full: all tasks waited\n\n1% ≈ 10ms/s delay. 0% is often normal. Check MemAvailable, swap, faults.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": 5,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Memory Pressure (some)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Memory Pressure (full)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 32
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "100 * rate(node_pressure_memory_waiting_seconds_total{instance=\"$node\", job=\"$job\"}[1m])",
+          "legendFormat": "Memory Pressure (some)",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "100 * rate(node_pressure_memory_stalled_seconds_total{instance=\"$node\", job=\"$job\"}[1m])",
+          "legendFormat": "Memory Pressure (full)",
+          "refId": "B"
+        }
+      ],
+      "title": "PSI Memory (some/full)",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Drops by layer (ops/s): NIC, softnet (per CPU), listen queue.\n\nHow to read:\n- Softnet drops on ONE CPU → poor IRQ/RSS distribution (one core overloaded).\n- Softnet drops on MANY CPUs → the host cannot drain RX/TX fast enough (queue backlog).\n- NIC-level drops → likely hitting NIC/VM limits (bandwidth/packets).\n- Drops on virtual interfaces (veth/cni) → often not enough CPU for packet processing; add CPU or fix pinning.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 32
+      },
+      "id": 51,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "expr": "sum(rate(node_network_receive_drop_total{instance=\"$node\",job=\"$job\",device!~\"lo|docker.*|cni.*|veth.*\"}[$__rate_interval]))",
+          "legendFormat": "RX drops",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(node_network_transmit_drop_total{instance=\"$node\",job=\"$job\",device!~\"lo|docker.*|cni.*|veth.*\"}[$__rate_interval]))",
+          "legendFormat": "TX drops",
+          "refId": "B"
+        },
+        {
+          "expr": "rate(node_softnet_dropped_total{instance=\"$node\", job=\"$job\"}[$__rate_interval])",
+          "legendFormat": "Softnet dropped cpu {{cpu}}",
+          "refId": "C"
+        },
+        {
+          "expr": "rate(node_netstat_TcpExt_ListenOverflows{instance=\"$node\", job=\"$job\"}[$__rate_interval])",
+          "legendFormat": "Listen overflow",
+          "refId": "D"
+        },
+        {
+          "expr": "rate(node_netstat_TcpExt_ListenDrops{instance=\"$node\", job=\"$job\"}[$__rate_interval])",
+          "legendFormat": "Listen drops",
+          "refId": "E"
+        }
+      ],
+      "title": "Network Drops",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 6,
+        "x": 0,
+        "y": 40
+      },
+      "id": 43,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "Where does CPU time go?",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 6,
+        "x": 6,
+        "y": 40
+      },
+      "id": 84,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "Is I/O latency growing?",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 6,
+        "x": 12,
+        "y": 40
+      },
+      "id": 88,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "How much MemAvailable headroom do we have?",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 6,
+        "x": 18,
+        "y": 40
+      },
+      "id": 44,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "Do losses reduce throughput?",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "CPU time split by mode (share).\n\nHow to read:\n- User: application code.\n- System: kernel work (syscalls, memory, filesystem, networking).\n- SoftIRQ/IRQ: interrupt processing (often network/disk).\n- IOwait: time waiting for disk I/O (can be storage, swap, or FS).\n- Steal: CPU taken by hypervisor (VM contention).\n- Idle: spare CPU.\n\nUse this to decide: CPU-bound vs kernel/IO/network work.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 40,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "percent"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Nice"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "SoftIRQ"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Steal"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "System"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "User"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5195CE",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "IOwait"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#890F02",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "IRQ"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Idle"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 6,
+        "x": 0,
+        "y": 41
+      },
+      "id": 35,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\", mode=\"system\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\"}[$__rate_interval])))",
+          "legendFormat": "System",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\", mode=\"user\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\"}[$__rate_interval])))",
+          "legendFormat": "User",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\", mode=\"iowait\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\"}[$__rate_interval])))",
+          "legendFormat": "IOwait",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\", mode=~\"softirq\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\"}[$__rate_interval])))",
+          "legendFormat": "SoftIRQ",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\", mode=~\"irq\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\"}[$__rate_interval])))",
+          "hide": false,
+          "legendFormat": "IRQ",
+          "range": true,
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\", mode=~\"steal\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\"}[$__rate_interval])))",
+          "hide": false,
+          "legendFormat": "Steal",
+          "range": true,
+          "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\", mode=\"idle\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\"}[$__rate_interval])))",
+          "legendFormat": "Idle",
+          "range": true,
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\", mode=~\"nice\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\"}[$__rate_interval])))",
+          "hide": false,
+          "legendFormat": "Nice",
+          "range": true,
+          "refId": "I"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\", mode!='idle',mode!='user',mode!='system',mode!='iowait',mode!='irq',mode!='softirq',mode!='steal',mode!='nice'}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\"}[$__rate_interval])))",
+          "legendFormat": "Other",
+          "range": true,
+          "refId": "E"
+        }
+      ],
+      "title": "CPU Usage Breakdown",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Key disk degradation signal: latency + queue.\n\nLatency (await) = queue time + service time.\nQueue depth rising usually means backlog (not enough IOPS/bandwidth) or a slow device.\n\nIf latency rises even when other panels are quiet, treat it as a strong lead and verify with PSI IO and utilization.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/^Queue depth/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "queue depth"
+              },
+              {
+                "id": "custom.axisSoftMax",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 6,
+        "x": 6,
+        "y": 41
+      },
+      "id": 94,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "expr": "topk(\n  $disk_topk,\n  (\n    rate(node_disk_read_time_seconds_total{instance=\"$node\",job=\"$job\",device=~\"sd[a-z]+|vd[a-z]+|nvme[0-9]+n[0-9]+|xvd[a-z]+\"}[$__rate_interval])\n    /\n    clamp_min(rate(node_disk_reads_completed_total{instance=\"$node\",job=\"$job\",device=~\"sd[a-z]+|vd[a-z]+|nvme[0-9]+n[0-9]+|xvd[a-z]+\"}[$__rate_interval]), 1e-6)\n  )\n  * 1000\n)",
+          "legendFormat": "Read latency {{device}}",
+          "refId": "A"
+        },
+        {
+          "expr": "topk(\n  $disk_topk,\n  (\n    rate(node_disk_write_time_seconds_total{instance=\"$node\",job=\"$job\",device=~\"sd[a-z]+|vd[a-z]+|nvme[0-9]+n[0-9]+|xvd[a-z]+\"}[$__rate_interval])\n    /\n    clamp_min(rate(node_disk_writes_completed_total{instance=\"$node\",job=\"$job\",device=~\"sd[a-z]+|vd[a-z]+|nvme[0-9]+n[0-9]+|xvd[a-z]+\"}[$__rate_interval]), 1e-6)\n  )\n  * 1000\n)",
+          "legendFormat": "Write latency {{device}}",
+          "refId": "B"
+        },
+        {
+          "expr": "topk(\n  $disk_topk,\n  rate(node_disk_io_time_weighted_seconds_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval])\n)",
+          "legendFormat": "Queue depth {{device}}",
+          "refId": "C"
+        }
+      ],
+      "title": "Disk Latency & Queue",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "MemAvailable % = MemAvailable / MemTotal.\n\nMemAvailable is a kernel estimate of memory that can be used without heavy swapping.\nIt includes reclaimable page cache and some reclaimable slab, so it is NOT RSS/working set.\n\nSharp drops mean less headroom for allocations and cache.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 10
+              },
+              {
+                "color": "green",
+                "value": 20
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 6,
+        "x": 12,
+        "y": 41
+      },
+      "id": 95,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "expr": "100 * (node_memory_MemAvailable_bytes{instance=\"$node\", job=\"$job\"} / node_memory_MemTotal_bytes{instance=\"$node\", job=\"$job\"})",
+          "legendFormat": "MemAvailable %",
+          "refId": "A"
+        }
+      ],
+      "title": "MemAvailable %",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "TX throughput vs loss signals (selected interface).\n\nWhat you see:\n- TX actual: real TX traffic on the selected interface.\n- TX without loss: a reference line (model of “ideal” TX if retrans were not needed).\n- Fast retrans % and Slow retrans (RTO) %: share of TCP OutSegs.\n\nModel math (per point, from rates):\n- fast% = (RetransSegs - TCPTimeouts) / OutSegs\n- slow% = TCPTimeouts / OutSegs\n- TX_without_loss = TX_actual * (1 + fast% * sfp_net_fast_penalty + slow% * sfp_net_slow_penalty)\n\nWhat to look for:\n- retrans % rising + TX actual below the reference line → throughput is impacted by loss/retrans.\n\nNotes:\n- Retrans can also be driven by a slow receiver that cannot drain incoming traffic fast enough.\n- Interface filter applies to TX traffic. TCP netstat counters are host-wide (not per interface).\n- Tune constants in Variables: sfp_*.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": true,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 3,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "TX actual"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#1f78c1",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "TX without loss"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#a142f4",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    8,
+                    4
+                  ],
+                  "type": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Fast retrans %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#EAB839",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Slow retrans (RTO) %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#E24D42",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 6,
+        "x": 18,
+        "y": 41
+      },
+      "id": 80,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (instance)(rate(node_network_transmit_bytes_total{instance=\"$node\", job=\"$job\", device=~\"$net_iface\"}[$__rate_interval])) * 8",
+          "legendFormat": "TX actual",
+          "refId": "ActualTx"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(sum by (instance)(rate(node_network_transmit_bytes_total{instance=\"$node\", job=\"$job\", device=~\"$net_iface\"}[$__rate_interval])) * 8)\n*\n(\n  1\n  + (clamp_min((clamp_min((sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])) - (\n  sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n  or\n  (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])))\n)), 0)) / clamp_min(sum by (instance)(rate(node_netstat_Tcp_OutSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])), 1), 0)) * $sfp_net_fast_penalty\n  + (clamp_min(((\n  sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n  or\n  (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])))\n)) / clamp_min(sum by (instance)(rate(node_netstat_Tcp_OutSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])), 1), 0)) * $sfp_net_slow_penalty\n)\n",
+          "legendFormat": "TX without loss",
+          "refId": "IdealTx"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "100 * clamp_min((clamp_min((sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])) - (\n  sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n  or\n  (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])))\n)), 0)) / clamp_min(sum by (instance)(rate(node_netstat_Tcp_OutSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])), 1), 0)",
+          "legendFormat": "Fast retrans %",
+          "refId": "FastPct"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "100 * clamp_min(((\n  sum by (instance)(rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n  or\n  (0 * sum by (instance)(rate(node_netstat_Tcp_RetransSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])))\n)) / clamp_min(sum by (instance)(rate(node_netstat_Tcp_OutSegs{instance=\"$node\", job=\"$job\"}[$__rate_interval])), 1), 0)",
+          "legendFormat": "Slow retrans (RTO) %",
+          "refId": "SlowPct"
+        }
+      ],
+      "title": "TX Throughput vs Loss",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 6,
+        "x": 0,
+        "y": 50
+      },
+      "id": 46,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "Is one core overloaded?",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 6,
+        "x": 6,
+        "y": 50
+      },
+      "id": 85,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "Is the disk fully busy?",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 6,
+        "x": 12,
+        "y": 50
+      },
+      "id": 89,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "Are pages going to swap?",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "RX throughput vs drops (selected interface).\n\nModel math (per point, from rates):\n- drop_ratio = Drops / Packets\n- RX_without_drops = RX_actual * (1 + drop_ratio)\n- Drops % = Drops / (Packets + Drops)\n\nWhat to look for:\n- Drops % > 0 together with lower RX actual → packet loss on receive path.\n- RX actual stable but Drops % grows → less headroom (bursts are being dropped).\n\nFilter the interface via the Dashboard variable “Network interface”.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": true,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 3,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RX actual"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#56A64B",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RX without drops"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#a142f4",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    8,
+                    4
+                  ],
+                  "type": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RX drops %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#E24D42",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 18,
+        "y": 50
+      },
+      "id": 102,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (instance)(rate(node_network_receive_bytes_total{instance=\"$node\", job=\"$job\", device=~\"$net_iface\"}[$__rate_interval])) * 8",
+          "legendFormat": "RX actual",
+          "refId": "ActualRx"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(sum by (instance)(rate(node_network_receive_bytes_total{instance=\"$node\", job=\"$job\", device=~\"$net_iface\"}[$__rate_interval])) * 8)\n*\n(\n  1\n  +\n  (\n    sum by (instance)(rate(node_network_receive_drop_total{instance=\"$node\", job=\"$job\", device=~\"$net_iface\"}[$__rate_interval]))\n    /\n    clamp_min(\n      sum by (instance)(rate(node_network_receive_packets_total{instance=\"$node\", job=\"$job\", device=~\"$net_iface\"}[$__rate_interval])),\n      1\n    )\n  )\n)\n",
+          "legendFormat": "RX without drops",
+          "refId": "IdealRx"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "100 * (\n  sum by (instance)(rate(node_network_receive_drop_total{instance=\"$node\", job=\"$job\", device=~\"$net_iface\"}[$__rate_interval]))\n  /\n  clamp_min(\n    (\n      sum by (instance)(rate(node_network_receive_packets_total{instance=\"$node\", job=\"$job\", device=~\"$net_iface\"}[$__rate_interval]))\n      +\n      sum by (instance)(rate(node_network_receive_drop_total{instance=\"$node\", job=\"$job\", device=~\"$net_iface\"}[$__rate_interval]))\n    ),\n    1\n  )\n)\n",
+          "legendFormat": "RX drops %",
+          "refId": "DropPct"
+        }
+      ],
+      "title": "RX Throughput vs Drops",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Per-CPU utilization (% non-idle). Helps spot imbalance.\n\nHow to read:\n- One CPU consistently higher → single-thread hot spot, pinned IRQ, or uneven work distribution.\n- All CPUs rise together → parallel load.\n\nNext checks:\n- Correlate with PSI CPU and Process States (run queue / blocked).\n- Find hot threads: `top -H`, `pidstat -t -p $PID 1`, `perf top`.\n- Check IRQ distribution: `/proc/interrupts` (NIC queues / irqbalance / RSS).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 51
+      },
+      "id": 37,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{mode=\"idle\", instance=\"$node\",job=\"$job\"}[$__rate_interval])) by (cpu))",
+          "hide": false,
+          "legendFormat": "CPU {{cpu}}",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "100 * (avg(rate(node_cpu_seconds_total{mode=\"softirq\", instance=\"$node\",job=\"$job\"}[$__rate_interval])) by (cpu, mode))",
+          "hide": true,
+          "legendFormat": "{{mode}}  CPU {{cpu}}",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "100 * (avg(rate(node_cpu_seconds_total{mode=\"iowait\", instance=\"$node\",job=\"$job\"}[$__rate_interval])) by (cpu, mode))",
+          "hide": true,
+          "legendFormat": "{{mode}} CPU {{cpu}}",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "CPU per Core",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Util = share of time when the disk is servicing I/O. On HDD, >90% often means a bottleneck; on SSD/NVMe, confirm with latency/queue.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 51
+      },
+      "id": 17,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "100 * rate(node_disk_io_time_seconds_total{instance=\"$node\", job=\"$job\", device=~\"sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+\"}[$__rate_interval])",
+          "legendFormat": "{{device}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Disk Utilization",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "uid": "$datasource"
+      },
+      "description": "Swap activity (pages/s): pswpin (in) and pswpout (out).\n\nNon-zero means the system moves pages between RAM and disk (swap).\nSustained swap often increases latency (memory access becomes slower).\n\nRead together with PSI Memory, MemAvailable, and major page faults.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "pages out (-) / in (+)",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*out/"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 51
+      },
+      "id": 55,
+      "options": {
+        "alertThreshold": true,
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max",
+            "min"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "expr": "rate(node_vmstat_pswpin{instance=\"$node\",job=\"$job\"}[$__rate_interval])",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "Pswpin - Pages swapped in",
+          "refId": "A",
+          "step": 240
+        },
+        {
+          "expr": "rate(node_vmstat_pswpout{instance=\"$node\",job=\"$job\"}[$__rate_interval])",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "Pswpout - Pages swapped out",
+          "refId": "B",
+          "step": 240
+        }
+      ],
+      "title": "Swap Activity",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 6,
+        "x": 0,
+        "y": 59
+      },
+      "id": 83,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "How much time does the kernel spend in softirq?",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 6,
+        "x": 6,
+        "y": 59
+      },
+      "id": 86,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "Do we have enough disk space?",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 6,
+        "x": 12,
+        "y": 59
+      },
+      "id": 90,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "Are major/minor faults growing?",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "SoftIRQ share per CPU (%). Softirq is kernel work for interrupt handling (often networking, sometimes storage).\n\nHow to read:\n- High on ONE CPU → IRQ/RSS imbalance (one core does most packet work).\n- High on MANY CPUs → packet processing is expensive; correlate with drops/retrans and throughput.\n\nNext checks:\n- `/proc/softirqs`, `/proc/interrupts`, `sar -I SUM 1`.\n- NIC queues/stats: `ethtool -l/-S <iface>`.\n- If needed: tune RSS/RPS/XPS or add CPU for packet processing.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 60
+      },
+      "id": 38,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{mode=\"idle\", instance=\"$node\",job=\"$job\"}[$__rate_interval])) by (cpu))",
+          "hide": true,
+          "legendFormat": "CPU {{cpu}}",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "100 * (avg(rate(node_cpu_seconds_total{mode=\"softirq\", instance=\"$node\",job=\"$job\"}[$__rate_interval])) by (cpu, mode))",
+          "hide": false,
+          "legendFormat": "{{mode}}  CPU {{cpu}}",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "100 * (avg(rate(node_cpu_seconds_total{mode=\"iowait\", instance=\"$node\",job=\"$job\"}[$__rate_interval])) by (cpu, mode))",
+          "hide": true,
+          "legendFormat": "{{mode}} CPU {{cpu}}",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "SoftIRQ per CPU",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Top-6 mountpoints by space used (%). High values increase the risk of allocation/metadata issues; see inodes in a separate panel.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 80
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 60
+      },
+      "id": 18,
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "max"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sort_desc(topk(6, 100 - ((node_filesystem_avail_bytes{instance=\"$node\", fstype!~\"tmpfs|fuse.lxcfs|squashfs|vfat\", job=\"$job\"} * 100) / node_filesystem_size_bytes{instance=\"$node\", fstype!~\"tmpfs|fuse.lxcfs|squashfs|vfat\", job=\"$job\"})))",
+          "legendFormat": "{{mountpoint}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Disk Space %",
+      "transparent": true,
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "uid": "$datasource"
+      },
+      "description": "Page faults (faults/s).\n\n- Major faults: a page had to be read from disk (swap/file) → can add latency.\n- Minor faults: mapping a page already in RAM (can still cost CPU if locality is poor).\n\nInterpretation is workload-dependent: compare with your baseline and correlate with swap and disk latency.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "faults/s",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 60
+      },
+      "id": 54,
+      "options": {
+        "alertThreshold": true,
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max",
+            "min"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "expr": "rate(node_vmstat_pgmajfault{instance=\"$node\", job=\"$job\"}[$__rate_interval])",
+          "legendFormat": "Major faults/s",
+          "refId": "A"
+        },
+        {
+          "expr": "clamp_min(rate(node_vmstat_pgfault{instance=\"$node\", job=\"$job\"}[$__rate_interval]) - rate(node_vmstat_pgmajfault{instance=\"$node\", job=\"$job\"}[$__rate_interval]), 0)",
+          "legendFormat": "Minor faults/s",
+          "refId": "B"
+        }
+      ],
+      "title": "Page Faults",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 6,
+        "x": 18,
+        "y": 60
+      },
+      "id": 93,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "Are we hitting system limits?",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Network limits: conntrack %, FD %, and TIME_WAIT.\n\nRead conntrack/FD as % of limit; TIME_WAIT is an absolute count (not %).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "TIME_WAIT sockets"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "sockets"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 61
+      },
+      "id": 96,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "expr": "100 * node_nf_conntrack_entries{instance=\"$node\", job=\"$job\"} / clamp_min(node_nf_conntrack_entries_limit{instance=\"$node\", job=\"$job\"}, 1)",
+          "legendFormat": "Conntrack %",
+          "refId": "A"
+        },
+        {
+          "expr": "100 * node_filefd_allocated{instance=\"$node\", job=\"$job\"} / clamp_min(node_filefd_maximum{instance=\"$node\", job=\"$job\"}, 1)",
+          "legendFormat": "FD usage %",
+          "refId": "B"
+        },
+        {
+          "expr": "node_sockstat_TCP_tw{instance=\"$node\", job=\"$job\"}",
+          "legendFormat": "TIME_WAIT sockets",
+          "refId": "C"
+        }
+      ],
+      "title": "Conntrack / FD / TIME_WAIT",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 6,
+        "x": 0,
+        "y": 68
+      },
+      "id": 45,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "Is the scheduler thrashing?",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Top-6 mountpoints by inode usage (%). When inodes run out, creating new files/directories (and e.g. Unix domain sockets with FS paths) can fail even if there is free space.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 80
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 6,
+        "x": 6,
+        "y": 68
+      },
+      "id": 100,
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "max"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sort_desc(topk(6, 100 - ((node_filesystem_files_free{instance=\"$node\", job=\"$job\", fstype!~\"tmpfs|fuse.lxcfs|squashfs|vfat\"} * 100) / node_filesystem_files{instance=\"$node\", job=\"$job\", fstype!~\"tmpfs|fuse.lxcfs|squashfs|vfat\"})))",
+          "legendFormat": "{{mountpoint}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Inodes %",
+      "transparent": true,
+      "type": "bargauge"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 12,
+        "y": 68
+      },
+      "id": 91,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "Is kswapd/OOM running?",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "uid": "$datasource"
+      },
+      "description": "Scheduler activity.\n\n- Context switches: how often the CPU switches between tasks.\n- Interrupts: hardware/software events that wake the kernel.\n\nHow to read:\n- Context switches rising together with worse latency can mean too many runnable threads, lock contention, or frequent wakeups.\n- Interrupts rising together with SoftIRQ can point to traffic bursts or IRQ imbalance.\n\nNext checks:\n- `pidstat -w 1`, `vmstat 1`, `perf sched`, `sar -w -I SUM 1`.\n- Inspect `/proc/interrupts` and top processes/threads around spikes.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 69
+      },
+      "id": 39,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "rate(node_context_switches_total{instance=\"$node\",job=\"$job\"}[$__rate_interval])",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "Context switches",
+          "range": true,
+          "refId": "A",
+          "step": 240
+        },
+        {
+          "expr": "rate(node_intr_total{instance=\"$node\",job=\"$job\"}[$__rate_interval])",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 2,
+          "legendFormat": "Interrupts",
+          "refId": "B",
+          "step": 240
+        }
+      ],
+      "title": "Context Switches & Interrupts",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Indicator of TCP handshake/connect issues: SYN retrans rate divided by active opens rate (ActiveOpens).\n\nFormula: `rate(TCPSynRetrans) / rate(ActiveOpens)`.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "SYN retrans /s"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ops"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 69
+      },
+      "id": 101,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "expr": "(\n  rate(node_netstat_TcpExt_TCPSynRetrans{instance=\"$node\", job=\"$job\"}[$__rate_interval])\n  or\n  (0 * rate(node_netstat_Tcp_ActiveOpens{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n)\n/\nclamp_min(\n  rate(node_netstat_Tcp_ActiveOpens{instance=\"$node\", job=\"$job\"}[$__rate_interval]),\n  1e-6\n)",
+          "legendFormat": "SYN retrans / ActiveOpens",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(node_netstat_TcpExt_TCPSynRetrans{instance=\"$node\", job=\"$job\"}[$__rate_interval])\nor\n(0 * rate(node_netstat_Tcp_ActiveOpens{instance=\"$node\", job=\"$job\"}[$__rate_interval]))",
+          "legendFormat": "SYN retrans /s",
+          "refId": "B"
+        }
+      ],
+      "title": "TCP SYN Retrans / ActiveOpens",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
+      "description": "Memory reclaim signals.\n\n- OOM kills: always a hard symptom of memory shortage.\n- pgscan (kswapd/direct): the kernel is scanning pages to reclaim memory.\n\nIf pgscan is sustained and performance degrades, confirm with MemAvailable, PSI Memory, swap activity, and faults.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "faults",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 12,
+        "y": 71
+      },
+      "id": 53,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max",
+            "min"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "width": 350
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "expr": "rate(node_vmstat_oom_kill{instance=\"$node\", job=\"$job\"}[$__rate_interval])",
+          "legendFormat": "OOM kills",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(node_vmstat_pgscan_kswapd{instance=\"$node\", job=\"$job\"}[$__rate_interval])",
+          "legendFormat": "pgscan kswapd",
+          "refId": "B"
+        },
+        {
+          "expr": "rate(node_vmstat_pgscan_direct{instance=\"$node\", job=\"$job\"}[$__rate_interval])",
+          "legendFormat": "pgscan direct",
+          "refId": "C"
+        }
+      ],
+      "title": "OOM & pgscan",
+      "transparent": true,
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "30s",
+  "schemaVersion": 42,
+  "tags": [
+    "system-footprint",
+    "performance",
+    "sfp"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "cluster-monitoring",
+          "value": "PE8D8DB4BEE4E4B22"
+        },
+        "includeAll": false,
+        "label": "Datasource",
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "text": "node-exporter-prometheus-node-exporter",
+          "value": "node-exporter-prometheus-node-exporter"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values(node_uname_info, job)",
+        "includeAll": false,
+        "label": "Job",
+        "name": "job",
+        "options": [],
+        "query": {
+          "query": "label_values(node_uname_info, job)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "10.142.0.100:9100",
+          "value": "10.142.0.100:9100"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values(node_uname_info{job=\"$job\"}, instance)",
+        "includeAll": false,
+        "label": "Node",
+        "name": "node",
+        "options": [],
+        "query": {
+          "query": "label_values(node_uname_info{job=\"$job\"}, instance)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "15",
+          "value": "15"
+        },
+        "label": "Disk top-k",
+        "name": "disk_topk",
+        "options": [
+          {
+            "selected": true,
+            "text": "15",
+            "value": "15"
+          }
+        ],
+        "query": "15",
+        "type": "textbox"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values(node_network_receive_bytes_total{job=\"$job\", instance=\"$node\"}, device)",
+        "includeAll": true,
+        "label": "Network interface",
+        "multi": true,
+        "name": "net_iface",
+        "options": [],
+        "query": {
+          "query": "label_values(node_network_receive_bytes_total{job=\"$job\", instance=\"$node\"}, device)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "0.02",
+          "value": "0.02"
+        },
+        "description": "Default: 20ms. Conservative middle between in-DC and cross-region RTT (closer to worse case, but not extreme). Used as time multiplier for fast retrans.",
+        "hide": 2,
+        "label": "TCP RTT, s — fast retrans",
+        "name": "sfp_tcp_rtt_s",
+        "query": "0.02",
+        "skipUrlSync": true,
+        "type": "constant"
+      },
+      {
+        "current": {
+          "text": "0.2",
+          "value": "0.2"
+        },
+        "description": "Assumption: 1 TCP timeout costs ~RTO (used as time multiplier).",
+        "hide": 2,
+        "label": "TCP RTO, s — timeout/RTO",
+        "name": "sfp_tcp_rto_s",
+        "query": "0.2",
+        "skipUrlSync": true,
+        "type": "constant"
+      },
+      {
+        "current": {
+          "text": "0.0000015",
+          "value": "0.0000015"
+        },
+        "description": "Assumption: cost of one minor page fault (used as time multiplier).",
+        "hide": 2,
+        "label": "Minor page fault cost, s — estimate",
+        "name": "sfp_mem_minor_pf_s",
+        "query": "0.0000015",
+        "skipUrlSync": true,
+        "type": "constant"
+      },
+      {
+        "current": {
+          "text": "1",
+          "value": "1"
+        },
+        "description": "Multiplier for the “TX without loss” reference line.",
+        "hide": 2,
+        "label": "Impact: fast retrans, ×",
+        "name": "sfp_net_fast_penalty",
+        "query": "1",
+        "skipUrlSync": true,
+        "type": "constant"
+      },
+      {
+        "current": {
+          "text": "10",
+          "value": "10"
+        },
+        "description": "Multiplier for the “TX without loss” reference line.",
+        "hide": 2,
+        "label": "Impact: slow/RTO retrans, ×",
+        "name": "sfp_net_slow_penalty",
+        "query": "10",
+        "skipUrlSync": true,
+        "type": "constant"
+      }
+    ]
+  },
+  "time": {
+    "from": "2025-11-15T13:58:31.135Z",
+    "to": "2025-11-15T14:43:50.178Z"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "System Footprint (SFP)",
+  "uid": "system-footprint",
+  "version": 2
+}

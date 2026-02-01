@@ -19,6 +19,7 @@ type FrontMatter struct {
 	Date        time.Time `yaml:"date"`
 	Description string    `yaml:"description"`
 	Tags        []string  `yaml:"tags"`
+	Block       int       `yaml:"block"`
 }
 
 type Article struct {
@@ -90,7 +91,13 @@ func estimateReadMinutes(content string) int {
 
 func readLabel(lang string, minutes int) string {
 	if lang == "ru" {
+		if minutes >= 20 {
+			return "20+ мин чтения"
+		}
 		return fmt.Sprintf("%d мин чтения", minutes)
+	}
+	if minutes >= 20 {
+		return "20+ min read"
 	}
 	if minutes == 1 {
 		return "1 min read"
@@ -118,7 +125,18 @@ func renderTags(tags []string) string {
 }
 
 func renderCard(a Article, prefix string) []string {
-	meta := fmt.Sprintf("%s · %s", a.Front.Date.Format("2006-01-02"), readLabel(a.Lang, a.ReadMinutes))
+	meta := ""
+	if a.Front.Block > 0 {
+		if a.Lang == "ru" {
+			meta = fmt.Sprintf("Блок %d · %s", a.Front.Block, readLabel(a.Lang, a.ReadMinutes))
+		} else {
+			meta = fmt.Sprintf("Block %d · %s", a.Front.Block, readLabel(a.Lang, a.ReadMinutes))
+		}
+	} else if !a.Front.Date.IsZero() {
+		meta = fmt.Sprintf("%s · %s", a.Front.Date.Format("2006-01-02"), readLabel(a.Lang, a.ReadMinutes))
+	} else {
+		meta = readLabel(a.Lang, a.ReadMinutes)
+	}
 	title := html.EscapeString(a.Front.Title)
 	description := html.EscapeString(a.Front.Description)
 	tags := renderTags(a.Front.Tags)
@@ -199,26 +217,46 @@ func renderIndex(lang string, articles []Article) []string {
 
 func renderLatest(lang string, articles []Article) []string {
 	var out []string
-	out = append(out, "<div class=\"post-grid post-grid--compact\">")
+
+	headerTitle := "Latest posts"
+	if lang == "ru" {
+		headerTitle = "Свежие записи"
+	}
+
+	out = append(out, "<div class=\"post-slider\">")
+	out = append(out, "  <div class=\"post-slider__header\">")
+	out = append(out, fmt.Sprintf("    <h3>%s</h3>", headerTitle))
+	out = append(out, "    <div class=\"post-slider__controls\">")
+	out = append(out, "      <button class=\"slider-btn\" aria-label=\"Previous\" data-post-slider-prev disabled>")
+	out = append(out, "        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\"><path d=\"M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z\"/></svg>")
+	out = append(out, "      </button>")
+	out = append(out, "      <button class=\"slider-btn\" aria-label=\"Next\" data-post-slider-next>")
+	out = append(out, "        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\"><path d=\"M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z\"/></svg>")
+	out = append(out, "      </button>")
+	out = append(out, "    </div>")
+	out = append(out, "  </div>")
+	out = append(out, "")
+	out = append(out, "  <div class=\"post-grid post-grid--slider\">")
 
 	if len(articles) == 0 {
 		if lang == "ru" {
-			out = append(out, "  <p class=\"post-desc\">Статьи скоро появятся.</p>")
+			out = append(out, "    <p class=\"post-desc\">Статьи скоро появятся.</p>")
 		} else {
-			out = append(out, "  <p class=\"post-desc\">Articles coming soon.</p>")
+			out = append(out, "    <p class=\"post-desc\">Articles coming soon.</p>")
 		}
-		out = append(out, "</div>")
-		return out
+	} else {
+		limit := 5
+		if len(articles) < limit {
+			limit = len(articles)
+		}
+		for _, article := range articles[:limit] {
+			out = append(out, renderCard(article, latestPrefix(lang))...)
+		}
 	}
 
-	limit := 3
-	if len(articles) < limit {
-		limit = len(articles)
-	}
-	for _, article := range articles[:limit] {
-		out = append(out, renderCard(article, latestPrefix(lang))...)
-	}
+	out = append(out, "  </div>")
 	out = append(out, "</div>")
+
 	return out
 }
 
@@ -350,9 +388,8 @@ func main() {
 			if err != nil {
 				return nil
 			}
-			if fm.Date.IsZero() {
-				return nil
-			}
+			// Include any markdown page with front matter, except explicit non-articles above.
+			// Ordering is handled later (block -> date -> stable by path).
 
 			// Относительный путь от языковой директории
 			relPath := strings.TrimPrefix(path, filepath.Join(base, lang)+"/")
@@ -370,10 +407,28 @@ func main() {
 	// Генерируем blog.md (листинг статей) для каждого языка.
 	for _, lang := range langs {
 		articles := articlesByLang[lang]
-		
-		// Сортируем по дате
+
+		// Сортируем: сначала по block (если задан), иначе по date, иначе стабильно по пути.
 		sort.Slice(articles, func(i, j int) bool {
-			return articles[i].Front.Date.After(articles[j].Front.Date)
+			ai, aj := articles[i], articles[j]
+			if ai.Front.Block > 0 || aj.Front.Block > 0 {
+				// Blocked posts go first, ordered ascending.
+				if ai.Front.Block == 0 {
+					return false
+				}
+				if aj.Front.Block == 0 {
+					return true
+				}
+				if ai.Front.Block != aj.Front.Block {
+					return ai.Front.Block < aj.Front.Block
+				}
+				// Tie-breaker: stable by path
+				return ai.Path < aj.Path
+			}
+			if !ai.Front.Date.IsZero() || !aj.Front.Date.IsZero() {
+				return ai.Front.Date.After(aj.Front.Date)
+			}
+			return ai.Path < aj.Path
 		})
 
 		out := renderIndex(lang, articles)

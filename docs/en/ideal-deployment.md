@@ -1,8 +1,8 @@
 ---
 title: "Ideal application deployment"
-date: 2025-12-23
 description: "The First Nine Guide, block 4: deploying without throttling surprises"
 tags: [first-nine, series, deployment, containers]
+block: 4
 ---
 
 # Ideal application deployment
@@ -11,7 +11,7 @@ tags: [first-nine, series, deployment, containers]
 
 ***
 
-![Illustration](../assets/first-nine/en/2025-12-23-ideal-deployment_01.png)
+![Illustration](../assets/first-nine/en/ideal-deployment_01.png)
 
 So, we finally built the ideal web application:
 
@@ -48,7 +48,7 @@ When CPU usage is uncontrolled and can eat the whole node. Limits are justified 
 
 I wrote about JVM tuning before; here is the short version.
 
-![Illustration](../assets/first-nine/en/2025-12-23-ideal-deployment_02.png)
+![Illustration](../assets/first-nine/en/ideal-deployment_02.png)
 
 **Naive deployment**
 
@@ -68,7 +68,7 @@ Remove limits, but tell JVM the real budget. Set -XX:ActiveProcessorCount=1 (equ
 
 Add a note on JVM with virtual threads.
 
-![Illustration](../assets/first-nine/en/2025-12-23-ideal-deployment_03.png)
+![Illustration](../assets/first-nine/en/ideal-deployment_03.png)
 
 **Naive deployment**
 
@@ -91,7 +91,7 @@ This aligns runtime parallelism with guaranteed resources.
 
 ## Golang 1.10+
 
-![Illustration](../assets/first-nine/en/2025-12-23-ideal-deployment_04.png)
+![Illustration](../assets/first-nine/en/ideal-deployment_04.png)
 
 **Naive deployment**
 
@@ -109,7 +109,7 @@ Set GOMAXPROCS=1 (from requests). Set GOMEMLIMIT to 70-90% of memory limit becau
 
 ## Node.js 18+/20+
 
-![Illustration](../assets/first-nine/en/2025-12-23-ideal-deployment_05.png)
+![Illustration](../assets/first-nine/en/ideal-deployment_05.png)
 
 **Naive deployment**
 
@@ -127,7 +127,7 @@ The right answer is scale-out. Keep process count aligned with requests. This yi
 
 ## Python 3.8+ (Gunicorn / Uvicorn)
 
-![Illustration](../assets/first-nine/en/2025-12-23-ideal-deployment_06.png)
+![Illustration](../assets/first-nine/en/ideal-deployment_06.png)
 
 **Naive deployment**
 
@@ -147,7 +147,7 @@ Remove limits. Trap: C libraries (NumPy, Pandas, OpenCV) may see 128 cores and p
 
 ## Ruby 3+
 
-![Illustration](../assets/first-nine/en/2025-12-23-ideal-deployment_07.png)
+![Illustration](../assets/first-nine/en/ideal-deployment_07.png)
 
 **Naive deployment**
 
@@ -169,7 +169,7 @@ Set it explicitly:
 
 ## PHP-FPM 7.4+
 
-![Illustration](../assets/first-nine/en/2025-12-23-ideal-deployment_08.png)
+![Illustration](../assets/first-nine/en/ideal-deployment_08.png)
 
 **Naive deployment**
 
@@ -190,7 +190,7 @@ This yields stable and predictable behavior. PHP-FPM is harder to instrument due
 
 ## .NET 6+
 
-![Illustration](../assets/first-nine/en/2025-12-23-ideal-deployment_09.png)
+![Illustration](../assets/first-nine/en/ideal-deployment_09.png)
 
 **Naive deployment**
 
@@ -217,6 +217,6 @@ I will keep updating this article as a living cheat sheet. If you spot issues or
 
 > Next: we finally define what a "heavy thread" is and how to live with it.
 >
-> Previous: **[web server internals](2025-12-22-inner-architecture.md)**.
+> Previous: **[web server internals](inner-architecture.md)**.
 
 Follow the channel [@r9yo11yp9e](https://t.me/r9yo11yp9e) - we will keep chasing the nines.

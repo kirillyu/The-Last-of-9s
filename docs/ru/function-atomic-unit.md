@@ -1,8 +1,8 @@
 ---
 title: "Function: the atomic unit of code"
-date: 2025-12-20
 description: "The First Nine Guide, блок 1: атом кода, сложность и ресурсы"
 tags: [first-nine, series, performance, functions]
+block: 1
 ---
 
 # Function: the atomic unit of code
@@ -11,7 +11,7 @@ tags: [first-nine, series, performance, functions]
 
 ***
 
-![Illustration](../assets/first-nine/ru/2025-12-20-function-atomic-unit_01.png)
+![Illustration](../assets/first-nine/ru/function-atomic-unit_01.png)
 
 Функции - важная штука внутри каждого приложения. Когда в сервис приходят запросы, они вызывают под собой функции. Какие-то работают медленно, какие-то быстро. Чтобы лучше понимать в чем их разница и какие они вообще бывают, я классифицирую их по нескольким признакам:
 
@@ -33,13 +33,13 @@ tags: [first-nine, series, performance, functions]
 - понимать, что O(n log n) - граница, за ней только вечная боль
 - замечать, когда алгоритм внезапно становится O(n!)
 
-![Illustration](../assets/first-nine/ru/2025-12-20-function-atomic-unit_02.png)
+![Illustration](../assets/first-nine/ru/function-atomic-unit_02.png)
 
 Выше желтой линии начинает деградировать производительность при росте объема данных.
 
 Вот примеры и пороги для n (для O(n!) реальных примеров придумать не смог):
 
-![Illustration](../assets/first-nine/ru/2025-12-20-function-atomic-unit_03.png)
+![Illustration](../assets/first-nine/ru/function-atomic-unit_03.png)
 
 ***
 
@@ -58,7 +58,7 @@ tags: [first-nine, series, performance, functions]
 
 Это важно, чтобы понимать, где может быть зарыт ботлнек: в ядре, памяти, сокете или в алгоритме.
 
-![Illustration](../assets/first-nine/ru/2025-12-20-function-atomic-unit_04.png)
+![Illustration](../assets/first-nine/ru/function-atomic-unit_04.png)
 
 ***
 
@@ -102,7 +102,7 @@ tags: [first-nine, series, performance, functions]
 
 Каждый новый вызов создает новый фрейм наверху стека. Когда функция выполнена, кадр удаляется. Даже int sum(int a, int b) создает 16-64 байта накладных расходов.
 
-![Illustration](../assets/first-nine/ru/2025-12-20-function-atomic-unit_05.png)
+![Illustration](../assets/first-nine/ru/function-atomic-unit_05.png)
 
 **Зачем это вообще знать?**
 
@@ -132,6 +132,6 @@ tags: [first-nine, series, performance, functions]
 
 - Blocking I/O в CPU функции сложно дебажить и скейлить, лучше избегать.
 
-> В следующем выпуске - разбор **[runtime моделей](2025-12-21-runtime-models.md)**.
+> В следующем выпуске - разбор **[runtime моделей](runtime-models.md)**.
 
 Подписывайся на канал [@r9yo11yp9e](https://t.me/r9yo11yp9e) - будем искать девятки вместе.

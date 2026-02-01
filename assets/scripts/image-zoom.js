@@ -180,4 +180,3 @@ window.addEventListener('pageshow', init);
 if (document.readyState !== 'loading') {
   init();
 }
-}) ();

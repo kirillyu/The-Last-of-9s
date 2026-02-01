@@ -29,8 +29,8 @@ title: Home
     </div>
 
     <figure class="tl9-cover tl9-cover--featured">
-      <img src="assets/first-nine/en/runtime-models_01.png" alt="Featured cover" width="1248" height="702" loading="eager" decoding="async" fetchpriority="high" />
-      <figcaption class="tl9-caption">The First Nine Guide — featured</figcaption>
+      <img src="assets/image.png" alt="Kirill Yurkov" width="512" height="512" loading="eager" decoding="async" fetchpriority="high" />
+      <figcaption class="tl9-caption">Kirill Yurkov</figcaption>
     </figure>
   </div>
 

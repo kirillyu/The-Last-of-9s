@@ -11,6 +11,7 @@ Longreads in English on performance, observability, and reliability engineering.
 
 <div class="post-grid">
   <article class="post-card">
+    <img class="post-card__cover" src="assets/first-nine/en/function-atomic-unit_01.png" alt="" loading="lazy" decoding="async" />
     <div class="post-meta">Block 1 · 3 min read</div>
     <h3><a href="function-atomic-unit.html">Function: the atomic unit of code</a></h3>
     <p class="post-desc">The First Nine Guide, block 1: complexity, resources, and concurrency safety</p>
@@ -18,6 +19,7 @@ Longreads in English on performance, observability, and reliability engineering.
     <a class="post-link" href="function-atomic-unit.html">Read -></a>
   </article>
   <article class="post-card">
+    <img class="post-card__cover" src="assets/first-nine/en/runtime-models_01.png" alt="" loading="lazy" decoding="async" />
     <div class="post-meta">Block 2 · 4 min read</div>
     <h3><a href="runtime-models.html">Runtime models: running thousands of functions at once</a></h3>
     <p class="post-desc">The First Nine Guide, block 2: execution models and their tradeoffs</p>
@@ -25,6 +27,7 @@ Longreads in English on performance, observability, and reliability engineering.
     <a class="post-link" href="runtime-models.html">Read -></a>
   </article>
   <article class="post-card">
+    <img class="post-card__cover" src="assets/first-nine/en/inner-architecture_01.png" alt="" loading="lazy" decoding="async" />
     <div class="post-meta">Block 3 · 3 min read</div>
     <h3><a href="inner-architecture.html">Typical web-application inner architecture</a></h3>
     <p class="post-desc">The First Nine Guide, block 3: request layers and internal service anatomy</p>
@@ -32,6 +35,7 @@ Longreads in English on performance, observability, and reliability engineering.
     <a class="post-link" href="inner-architecture.html">Read -></a>
   </article>
   <article class="post-card">
+    <img class="post-card__cover" src="assets/first-nine/en/ideal-deployment_01.png" alt="" loading="lazy" decoding="async" />
     <div class="post-meta">Block 4 · 5 min read</div>
     <h3><a href="ideal-deployment.html">Ideal application deployment</a></h3>
     <p class="post-desc">The First Nine Guide, block 4: deploying without throttling surprises</p>
@@ -39,6 +43,7 @@ Longreads in English on performance, observability, and reliability engineering.
     <a class="post-link" href="ideal-deployment.html">Read -></a>
   </article>
   <article class="post-card">
+    <img class="post-card__cover" src="assets/first-nine/en/application-footprint_01.png" alt="" loading="lazy" decoding="async" />
     <div class="post-meta">Block 5 · 20+ min read</div>
     <h3><a href="application-footprint.html">Application footprint in operating system</a></h3>
     <p class="post-desc">System Footprint: how to separate OS and app issues by metrics</p>

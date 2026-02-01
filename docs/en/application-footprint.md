@@ -9,6 +9,10 @@ block: 5
 
 **The First Nine Guide. Block 5**
 
+***
+
+![Illustration](../assets/first-nine/en/application-footprint_01.png)
+
 You come to an incident. They say the product became slow. You need to understand if the problem is in the system layer or in the software itself, who is responsible and who to call. For years I looked for the most universal way, and I think I found it. This way has many "buts", so it is universal only in theory for now.
 
 This is the last article where we look at the app through OS footprints. Next we dive into the OS itself.
@@ -19,7 +23,7 @@ This is the bridge between the app/runtime world and the OS world.
 
 Most people know that any code works in some thread/worker (often the same word). In the last article about ideal deployment I marked how runtime thread models map to OS threads. This mapping became my research area. When we ask "app vs OS", it is really a choice between user space and kernel space.
 
-![Illustration](../assets/first-nine/en/application-footprint_01.png)
+![Illustration](../assets/first-nine/en/application-footprint_02.png)
 
 Any code slowdown is first of all a slowdown of "work". Work is very different. But almost always, when our app needs something from the OS, it makes a syscall (system call). There are many of them: reading disk is `read()`, opening a file is `open()`. A syscall is done only by an OS thread. As an analogy, the OS is like a web server with a thread pool, and syscalls are API calls. But to be honest, the OS has another "interface" too: virtual memory. It is harder. We write to memory directly, without syscalls. But if we touch a virtual address that has no physical RAM page yet (or it was swapped out), a CPU block called [MMU](https://docs.kernel.org/admin-guide/mm/concepts.html) triggers a hardware interrupt ([Page Fault](https://docs.oracle.com/cd/E19504-01/802-5880/tif-21/index.html)). Control goes to the kernel, it brings the page, and returns control to the program. For code it is transparent, but for latency it is a real stop of the thread.
 

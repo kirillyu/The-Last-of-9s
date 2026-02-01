@@ -146,9 +146,16 @@ func renderCard(a Article, prefix string) []string {
 
 	out := []string{
 		"  <article class=\"post-card\">",
+	}
+
+	if cover := coverURL(a); cover != "" {
+		out = append(out, fmt.Sprintf("    <img class=\"post-card__cover\" src=\"%s\" alt=\"\" loading=\"lazy\" decoding=\"async\" />", cover))
+	}
+
+	out = append(out,
 		fmt.Sprintf("    <div class=\"post-meta\">%s</div>", meta),
 		fmt.Sprintf("    <h3><a href=\"%s\">%s</a></h3>", link, title),
-	}
+	)
 
 	if description != "" {
 		out = append(out, fmt.Sprintf("    <p class=\"post-desc\">%s</p>", description))
@@ -162,6 +169,22 @@ func renderCard(a Article, prefix string) []string {
 	out = append(out, "  </article>")
 
 	return out
+}
+
+func coverURL(a Article) string {
+	slug := strings.TrimSuffix(filepath.Base(a.Path), ".md")
+	if slug == "" {
+		return ""
+	}
+	rel := fmt.Sprintf("assets/first-nine/%s/%s_01.png", a.Lang, slug)
+	if a.Lang == "ru" {
+		rel = "../" + rel
+	}
+	fsPath := filepath.Join("..", "..", "docs", "assets", "first-nine", a.Lang, slug+"_01.png")
+	if _, err := os.Stat(fsPath); err != nil {
+		return ""
+	}
+	return rel
 }
 
 func renderIndex(lang string, articles []Article) []string {

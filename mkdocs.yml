@@ -125,3 +125,4 @@ extra_javascript:
   - assets/scripts/brand-anim.js
   - assets/scripts/lang-setup.js
   - assets/scripts/post-slider.js
+  - assets/scripts/image-zoom.js

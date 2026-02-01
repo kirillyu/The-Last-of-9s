@@ -423,6 +423,22 @@
   color: var(--tl9-green);
 }
 
+.post-card__cover {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.24);
+  background: rgba(0, 0, 0, 0.2);
+  margin-bottom: 0.8rem;
+}
+
+[data-md-color-scheme="default"] .post-card__cover {
+  border-color: rgba(25, 35, 45, 0.16);
+  box-shadow: 0 12px 26px rgba(20, 25, 32, 0.16);
+  background: rgba(255, 255, 255, 0.7);
+}
+
 .signal {
   display: inline-flex;
   align-items: center;
@@ -512,6 +528,70 @@
 .tl9-header-social .tl9-social-btn svg {
   width: 1.1rem;
   height: 1.1rem;
+}
+
+/* ------------------------------------------------------------
+   TL9: Image zoom
+   ------------------------------------------------------------ */
+.tl9-img-zoomable {
+  cursor: zoom-in;
+}
+
+.tl9-img-zoom {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 12, 16, 0.88);
+  z-index: 9999;
+  padding: 2.5rem 1.5rem;
+}
+
+.tl9-img-zoom.is-open {
+  display: flex;
+}
+
+.tl9-img-zoom__img {
+  max-width: min(96vw, 1400px);
+  max-height: 90vh;
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.5);
+  cursor: grab;
+  background: rgba(0, 0, 0, 0.2);
+  touch-action: none;
+}
+
+.tl9-img-zoom__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  background: rgba(10, 14, 18, 0.8);
+  color: rgba(230, 236, 244, 0.9);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+[data-md-color-scheme="default"] .tl9-img-zoom {
+  background: rgba(245, 240, 232, 0.92);
+}
+
+[data-md-color-scheme="default"] .tl9-img-zoom__img {
+  border-color: rgba(25, 35, 45, 0.2);
+  box-shadow: 0 24px 60px rgba(20, 25, 32, 0.2);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+[data-md-color-scheme="default"] .tl9-img-zoom__close {
+  border-color: rgba(25, 35, 45, 0.2);
+  background: rgba(255, 255, 255, 0.9);
+  color: rgba(25, 35, 45, 0.9);
 }
 
 

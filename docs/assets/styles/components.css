@@ -66,7 +66,7 @@
   background: rgba(25, 35, 45, 0.06);
 }
 
-.tl9-series-bar > span {
+.tl9-series-bar>span {
   display: block;
   height: 100%;
   width: var(--tl9-series-progress, 0%);
@@ -462,6 +462,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .tl9-spotlight,
   .tl9-title-base,
   .tl9-title-hot,
@@ -487,18 +488,23 @@
   background: rgba(255, 255, 255, 0.7);
 }
 
+/* Fix search results layering */
+.md-search__output {
+  z-index: 100 !important;
+}
+
 @media screen and (max-width: 768px) {
   .md-overlay {
-    z-index: 20;
+    z-index: 400;
   }
 
   .md-sidebar--primary {
-    z-index: 30;
+    z-index: 500;
   }
 }
 
 /* Allow long inline code spans to wrap instead of overflowing layout */
-.md-typeset :not(pre) > code {
+.md-typeset :not(pre)>code {
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -699,17 +705,23 @@
   gap: 1.5rem;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  padding-bottom: 1.5rem; /* Space for scrollbar if visible, layout breathing */
-  margin: 0 -1rem; /* Negative internal margin to allow cards to touch edges visually */
-  padding: 0 1rem 1.5rem; /* Padding to compensate for negative margin */
-  
+  padding-bottom: 1.5rem;
+  /* Space for scrollbar if visible, layout breathing */
+  margin: 0 -1rem;
+  /* Negative internal margin to allow cards to touch edges visually */
+  padding: 0 1rem 1.5rem;
+  /* Padding to compensate for negative margin */
+
   /* Hide scrollbar for cleaner look */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
 }
 
 .post-grid--slider::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none;
+  /* Chrome/Safari */
 }
 
 .post-grid--slider .post-card {

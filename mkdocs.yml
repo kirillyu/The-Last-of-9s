@@ -77,6 +77,7 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Blog: blog.md
+  - Dashboards: dashboards.md
   - About: about.md
 
 
@@ -98,6 +99,7 @@ plugins:
           nav_translations:
             Home: Главная
             Blog: Блог
+            Dashboards: Дашборды
             About: Обо мне
 
 extra:

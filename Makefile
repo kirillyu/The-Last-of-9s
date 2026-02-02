@@ -25,6 +25,7 @@ generate build-fast serve-dev:
 
 PORT ?= 8001
 BASE_PATH ?= The-Last-of-9s
+SERVE_ROOT ?= dev/serve-root
 
 serve: build
 	@set -e; \
@@ -33,11 +34,11 @@ serve: build
 		echo "Missing $$site_dir. Run 'make site' first."; \
 		exit 1; \
 	fi; \
-	tmp_dir=$$(mktemp -d); \
-	ln -s "$$PWD/$$site_dir" "$$tmp_dir/$(BASE_PATH)"; \
+	serve_root="$(SERVE_ROOT)"; \
+	mkdir -p "$$serve_root"; \
+	ln -sfn "$$PWD/$$site_dir" "$$serve_root/$(BASE_PATH)"; \
 	echo "Serving http://127.0.0.1:$(PORT)/$(BASE_PATH)/index.html"; \
-	trap 'rm -rf "$$tmp_dir"' EXIT; \
-	$(PYTHON) -m http.server --directory "$$tmp_dir" $(PORT)
+	$(PYTHON) -m http.server --directory "$$serve_root" $(PORT)
 
 smoke:
 	@set -e; \

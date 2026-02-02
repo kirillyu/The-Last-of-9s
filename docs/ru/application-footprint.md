@@ -289,6 +289,7 @@ On-CPU время делится на знакомые 8 вариантов ра
 ### 5. Memory: давление и fault'ы
 
 Начинаем с острых проблем.
+
 * **Есть ли OOM?** - на ноде смотрим `node_vmstat_oom_kill`. На уровне контейнера OOM‑события можно увидеть в cAdvisor по `container_oom_events_total`. Если OOM есть, дальше это уже не “диагностика по отпечаткам”, а разбор лимитов/requests и поведения приложения по памяти.
 * **Упираемся ли в memory limit контейнера?** - в cgroup v1 cAdvisor экспортирует `container_memory_failcnt` (из `memory.failcnt`): это число отклонённых аллокаций из-за достижения лимита памяти. Рост failcnt без OOM kill означает работу впритык к лимиту с постоянным reclaim. Для контекста лимита рядом смотрим `container_memory_usage_bytes` и `container_spec_memory_limit_bytes`. Здесь же проверяем container awareness (видит ли рантайм cgroup лимиты) и корректность детекта лимитов памяти (см. **[Ideal application deployment](ideal-deployment.md)**, блок 4).
 * **Есть ли запас памяти “прямо сейчас”?** - смотрим долю `node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes` и её динамику: резкие просадки часто совпадают с деградацией latency. Отдельно проверяем что не упёрлись в какой-то трешхолд визуально - это может быть из-за работы лимитов (например cgroup limits/requests).

@@ -281,6 +281,7 @@ With retrans/drops first check network/stack (losses, queue overflow), then app.
 ### 5. Memory: pressure and faults
 
 Start with sharp problems.
+
 * **Is there OOM?** - on node check `node_vmstat_oom_kill`. At container level OOM events are in cAdvisor `container_oom_events_total`. If OOM exists, it is no longer "footprint diagnosis", but a limits/requests and app behavior review.
 * **Do we hit container memory limit?** - in cgroup v1 cAdvisor exports `container_memory_failcnt` (from `memory.failcnt`): number of failed allocations due to limit. Growing failcnt without OOM means working at the limit with constant reclaim. For limit context check `container_memory_usage_bytes` and `container_spec_memory_limit_bytes`. Here also check container awareness (does runtime see cgroup limits) and correct limit detection (see **[Ideal application deployment](ideal-deployment.md)**, block 4).
 * **Is there free memory right now?** - check `node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes` and its dynamics: sharp drops often match latency degradation. Also check if you hit a threshold visually - it can be due to limits (cgroup limits/requests).

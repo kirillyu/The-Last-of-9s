@@ -11,7 +11,7 @@ block: 2
 
 ***
 
-![Illustration](../assets/first-nine/en/runtime-models_01.png)
+![Illustration](../assets/first-nine/heroes/v3/02-runtime.webp)
 
 **Disclaimer:** real systems blend multiple models. Pure versions are rare.
 
@@ -38,9 +38,9 @@ One of the oldest models:
 
 **Who owns it:** application code creates heavy threads and forgets them
 
-**Weight:** 1-8 MB per stack; creation ~100 microseconds
+**Weight:** 1-8 MB of address space per stack, but usually only a few KB or tens of KB in RAM; creation ~100 microseconds
 
-**If it blocks:** hardware sits idle
+**If it blocks:** the thread sleeps and holds its memory, other threads keep working
 
 ![Illustration](../assets/first-nine/en/runtime-models_02.png)
 
@@ -98,7 +98,7 @@ Not a separate model but an approach that upgrades the event loop (and beyond), 
 
 ## 5. Green threads
 
-An older model and the ancestor of many new ones. Many lightweight threads live inside one heavy thread. The runtime switches them on a timer.
+An older model and the ancestor of many new ones. Many lightweight threads live inside one heavy thread. The runtime decides when to switch them: on I/O, on an explicit yield, or on a timer.
 
 **Who owns it:** the runtime; everyone lives on one heavy thread
 
@@ -118,7 +118,7 @@ A game changer. The evolution of green threads. Millions of lightweight threads 
 
 **If it blocks:** when a lightweight thread initiates I/O, the scheduler parks it and runs another. Heavy threads do not idle.
 
-*With blocking I/O (e.g., Thread.sleep() or File.read() on a regular socket) pinning may occur and reduce efficiency.*
+*Not every blocking call releases the heavy thread. Thread.sleep() and network waits release it. But synchronized (before JDK 24) and native code pin the lightweight thread to the heavy one: the heavy thread is stuck together with it. Reading a file also holds the heavy thread. In JDK 21 and 22 the runtime adds a spare heavy thread for that time, but from JDK 23 it does not.*
 
 ![Illustration](../assets/first-nine/en/runtime-models_07.png)
 
@@ -139,7 +139,7 @@ Principles:
 
 **Who owns it:** the actor runtime; an actor handles one message at a time
 
-**If it blocks:** it blocks only itself; others keep working
+**If it blocks:** it blocks itself and the worker thread under it. If there are more such actors than threads in the pool, the whole pool stops
 
 ![Illustration](../assets/first-nine/en/runtime-models_08.png)
 

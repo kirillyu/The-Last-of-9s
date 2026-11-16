@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -27,6 +28,7 @@ type Article struct {
 	Path        string
 	Front       FrontMatter
 	ReadMinutes int
+	Cover       string // the first picture of the article, as written in the markdown
 }
 
 type ExternalCard struct {
@@ -225,18 +227,35 @@ func renderCard(a Article, prefix string) []string {
 	return out
 }
 
+// imageRe matches a markdown picture: ![alt](path)
+var imageRe = regexp.MustCompile(`!\[[^\]]*\]\(([^)\s]+)\)`)
+
+// firstImage returns the path of the first picture in the article body, or "".
+func firstImage(body string) string {
+	if m := imageRe.FindStringSubmatch(body); m != nil {
+		return m[1]
+	}
+	return ""
+}
+
+// coverURL is the card picture: the first picture of the article (its cover),
+// else the old <slug>_01.png next to the article pictures.
 func coverURL(a Article) string {
-	slug := strings.TrimSuffix(filepath.Base(a.Path), ".md")
-	if slug == "" {
+	rel := ""
+	if strings.HasPrefix(a.Cover, "../assets/") {
+		rel = strings.TrimPrefix(a.Cover, "../")
+	} else {
+		slug := strings.TrimSuffix(filepath.Base(a.Path), ".md")
+		if slug == "" {
+			return ""
+		}
+		rel = fmt.Sprintf("assets/first-nine/%s/%s_01.png", a.Lang, slug)
+	}
+	if _, err := os.Stat(filepath.Join("..", "..", "docs", filepath.FromSlash(rel))); err != nil {
 		return ""
 	}
-	rel := fmt.Sprintf("assets/first-nine/%s/%s_01.png", a.Lang, slug)
 	if a.Lang == "ru" {
 		rel = "../" + rel
-	}
-	fsPath := filepath.Join("..", "..", "docs", "assets", "first-nine", a.Lang, slug+"_01.png")
-	if _, err := os.Stat(fsPath); err != nil {
-		return ""
 	}
 	return rel
 }
@@ -686,6 +705,7 @@ func main() {
 				Path:        relPath,
 				Front:       *fm,
 				ReadMinutes: estimateReadMinutes(body),
+				Cover:       firstImage(body),
 			})
 			return nil
 		})

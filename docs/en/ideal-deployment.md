@@ -11,7 +11,7 @@ block: 4
 
 ***
 
-![Illustration](../assets/first-nine/en/ideal-deployment_01.png)
+![Illustration](../assets/first-nine/heroes/v3/04-deployment.webp)
 
 So, we finally built the ideal web application:
 
@@ -25,7 +25,7 @@ Now it's time to ship to production. And of course, into a container. Let's see 
 
 1) Naive - run as-is, no tuning. Typical problems show up.
 
-2) Tuned - remove CPU limits (quota=0) and keep base resources: no CFS throttling, less jitter.
+2) Tuned - remove CPU limits (no quota: cpu.max = max) and keep base resources: no CFS throttling, less jitter.
 
 3) Ideal - aligned requests/parallelism with memory limits.
 
@@ -46,17 +46,17 @@ When CPU usage is uncontrolled and can eat the whole node. Limits are justified 
 
 ## Java Virtual Machine 11+
 
-I wrote about JVM tuning before; here is the short version.
+I wrote a [post](https://t.me/r9yo11yp9e/14) (in Russian) about JVM tuning before; here is the short version.
 
 ![Illustration](../assets/first-nine/en/ideal-deployment_02.png)
 
 **Naive deployment**
 
-JVM sees a 2 CPU limit and sizes its parallelism accordingly: GC, ForkJoinPool, and web server pools (Tomcat). The problem may look like this: throttling during warm-up, latency spikes, off-heap leaks.
+JVM sees a 2 CPU limit and sizes its parallelism accordingly: GC and ForkJoinPool. The Tomcat pool does not depend on CPU, it has 200 threads by default. The problem may look like this: throttling during warm-up, latency spikes, off-heap leaks.
 
 **Remove throttling**
 
-In container B we remove limits. Trap: without limits JVM assumes the whole node. availableProcessors() becomes 128 and the runtime spawns a massive number of threads. Context switching explodes and performance degrades. The app tries to use 128 cores with a 1 CPU guarantee.
+In container B we remove limits. Trap: without limits JVM assumes the whole node. availableProcessors() becomes 128 and the runtime spawns a massive number of threads. (On JDK 8, and on 11 and 17 before the October 2022 updates, JVM without a limit counted CPUs from requests and would return 1.) Context switching explodes and performance degrades. The app tries to use 128 cores with a 1 CPU guarantee.
 
 **Ideal deployment**
 
@@ -76,30 +76,30 @@ Same as JVM 11+: requests/limits and throttling. The virtual thread scheduler al
 
 **Remove throttling**
 
-Without limits the scheduler spawns too many heavy threads; virtual threads pile up.
+Without limits the scheduler takes as many heavy threads as the node has cores, for example 128, with a 1 CPU guarantee. They fight for CPU, like the pools in JVM 11+.
 
 **Ideal deployment**
 
-Remove limits and do what we do in JVM 11+, plus one more flag:
+Remove limits and do what we do in JVM 11+:
 
-1. -XX:ActiveProcessorCount=1 - controls GC and ForkJoinPool parallelism.
-2. -Djdk.virtualThreadScheduler.parallelism=1 - sizes the heavy thread pool for virtual threads.
+1. -XX:ActiveProcessorCount=1 - controls parallelism of GC, ForkJoinPool and the heavy thread pool for virtual threads.
+2. -Djdk.virtualThreadScheduler.parallelism - needed only if you want a different number for virtual threads than in ActiveProcessorCount.
 
 This aligns runtime parallelism with guaranteed resources.
 
 ***
 
-## Golang 1.10+
+## Go
 
 ![Illustration](../assets/first-nine/en/ideal-deployment_04.png)
 
 **Naive deployment**
 
-Run with requests and limits. Go sees limits and runtime.NumCPU() returns 2. Issues: CPU throttling and GC not respecting container boundaries (OOMKill risk).
+Run with requests and limits. Before Go 1.25 the runtime does not see limits: GOMAXPROCS equals the number of node cores, for example 128, and Go hits the quota. Since Go 1.25 (if go.mod says go 1.25 or newer) GOMAXPROCS defaults to the CPU limit, here it is 2. runtime.NumCPU() does not see the quota in any version. Issues: CPU throttling and GC not respecting container boundaries (OOMKill risk).
 
 **Remove throttling**
 
-Remove limits. Trap: Go now sees the whole machine, runtime.NumCPU() returns 128. The scheduler spawns 128 system threads. Performance degrades.
+Remove limits. Trap: without limits GOMAXPROCS equals the number of node cores, 128, on any Go version. Go can use up to 128 system threads at the same time with a 1 CPU guarantee. Performance degrades.
 
 **Ideal deployment**
 
@@ -131,7 +131,7 @@ The right answer is scale-out. Keep process count aligned with requests. This yi
 
 **Naive deployment**
 
-Python has the GIL, so execution is single-threaded. You can use multi-process pseudo-parallelism. Naive deployment is usually fine, but throttling can happen.
+The standard Python build has the GIL: only one thread runs bytecode at a time. The build without the GIL is officially supported since Python 3.14, but it is not the default. You can use multi-process pseudo-parallelism. Naive deployment is usually fine, but throttling can happen.
 
 **Remove throttling**
 
@@ -151,18 +151,18 @@ Remove limits. Trap: C libraries (NumPy, Pandas, OpenCV) may see 128 cores and p
 
 **Naive deployment**
 
-Single-threaded MRI. Same throttling risks, but usually acceptable.
+Single-threaded MRI runtime: even if there are several threads, only one of them runs Ruby code at any moment, and the runtime switches between them. Same throttling risks, but usually acceptable.
 
 **Remove throttling**
 
-Remove limits. Trap: Puma uses Etc.nprocessors. Without limits it sees all cores and may spawn too many processes or threads.
+Remove limits. Puma itself does not count cores: by default it runs one process. The trap is in auto-tuning: WEB_CONCURRENCY=auto takes the worker count from Concurrent.available_processor_count. With a limit this is the quota, without a limit it is all node cores, and Puma will spawn too many processes.
 
 **Ideal deployment**
 
 Set it explicitly:
 
 - WEB_CONCURRENCY=1 (from requests) - worker processes.
-- RAILS_MAX_THREADS=5 - thread pool size per worker (depends on workload).
+- RAILS_MAX_THREADS=5 - thread pool size per worker: more for I/O-bound, fewer for CPU-bound.
 - For Unicorn and Sidekiq, set worker/worker concurrency explicitly as well.
 
 ***
@@ -205,7 +205,7 @@ Remove limits. Trap: .NET sees all host cores and inflates ThreadPool. You get a
 Tune runtime to requests:
 
 - DOTNET_PROCESSOR_COUNT=1 - inherited by all pools.
-- DOTNET_GCServer=true - server GC for predictable throughput (not always required, but reduces uncertainty).
+- DOTNET_gcServer=1 - server GC for predictable throughput (not always required, but reduces uncertainty).
 
 ***
 

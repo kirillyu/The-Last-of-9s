@@ -11,7 +11,7 @@ block: 1
 
 ***
 
-![Illustration](../assets/first-nine/en/function-atomic-unit_01.png)
+![Illustration](../assets/first-nine/heroes/v3/01-function.webp)
 
 Functions are the basic unit of every application. Requests call functions; some are fast, some are slow. To reason about performance, I classify functions by a few traits:
 
@@ -53,7 +53,7 @@ Classify functions early (ideally while writing them):
 
 - IO-bound - waits on network, disk, or DB
 - CPU-bound - parses and computes
-- Memory-bound - pulls data from RAM without heavy CPU
+- Memory-bound - limited by RAM speed. CPU metrics show 100% busy, but most of that time the CPU waits for data from memory
 - GPU-bound - obviously, uses GPU
 
 This tells you where the bottleneck hides: CPU, memory, socket, or the algorithm itself.
@@ -100,7 +100,7 @@ Three categories:
 
 Every function call allocates its own memory region called a stack frame.
 
-Each call creates a new frame at the top of the stack; when the function completes, the frame is removed. Even int sum(int a, int b) costs 16-64 bytes of overhead.
+Each call creates a new frame at the top of the stack; when the function completes, the frame is removed. Frame size depends on local variables: from zero bytes to kilobytes. A small function like int sum(int a, int b) is usually inlined by the compiler, so there is no frame at all.
 
 ![Illustration](../assets/first-nine/en/function-atomic-unit_05.png)
 
@@ -108,11 +108,11 @@ Each call creates a new frame at the top of the stack; when the function complet
 
 Simple:
 
-- Creating a stack frame takes 10-50 CPU cycles (fast, but it hurts in tight loops).
+- Creating a stack frame takes a few CPU cycles, sometimes tens (fast, but it hurts in tight loops).
 
-The deeper a function sits in a call chain, the more expensive it becomes (hello, stack overflow). Lambdas and anonymous functions are even pricier.
+The longer the call chain, the more overhead adds up and the more stack it takes (hello, stack overflow). Lambdas that capture variables can cost more: they add a closure object and an indirect call.
 
-Dirty hack: inline functions. They remove the frame cost, but try/catch/finally breaks inlining.
+Dirty hack: inline functions. They remove the frame cost. But the compiler does not inline everything: for example, Go does not inline functions with defer, while the JVM does inline methods with try/catch. Check it on your runtime.
 
 ***
 
@@ -125,8 +125,8 @@ Dirty hack: inline functions. They remove the frame cost, but try/catch/finally 
 
 **Stack overflow risk:**
 
-- Each call creates a stack frame (~100-1000 bytes).
-- Deep recursion will exhaust the stack (~1 MB by default).
+- Each call creates a stack frame: from zero bytes to kilobytes, depending on local variables.
+- Deep recursion will exhaust the stack: a JVM thread gets 1-2 MB by default, the main thread on Linux usually gets 8 MB.
 
 **Hybrid-bound functions:**
 

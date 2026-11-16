@@ -13,7 +13,7 @@ Longreads in English on performance, observability, and reliability engineering.
 
 <div class="post-grid">
   <article class="post-card">
-    <img class="post-card__cover" src="assets/first-nine/en/function-atomic-unit_01.png" alt="" loading="lazy" decoding="async" />
+    <img class="post-card__cover" src="assets/first-nine/heroes/v3/01-function.webp" alt="" loading="lazy" decoding="async" />
     <div class="post-meta">Block 1 · 3 min read</div>
     <h3><a href="function-atomic-unit.html">Function: the atomic unit of code</a></h3>
     <p class="post-desc">The First Nine Guide, block 1: complexity, resources, and concurrency safety</p>
@@ -21,24 +21,24 @@ Longreads in English on performance, observability, and reliability engineering.
     <a class="post-link" href="function-atomic-unit.html">Read -></a>
   </article>
   <article class="post-card">
-    <img class="post-card__cover" src="assets/first-nine/en/runtime-models_01.png" alt="" loading="lazy" decoding="async" />
-    <div class="post-meta">Block 2 · 4 min read</div>
+    <img class="post-card__cover" src="assets/first-nine/heroes/v3/02-runtime.webp" alt="" loading="lazy" decoding="async" />
+    <div class="post-meta">Block 2 · 5 min read</div>
     <h3><a href="runtime-models.html">Runtime models: running thousands of functions at once</a></h3>
     <p class="post-desc">The First Nine Guide, block 2: execution models and their tradeoffs</p>
     <div class="post-tags"><span class="tag">first-nine</span><span class="tag">series</span><span class="tag">runtime</span><span class="tag">concurrency</span></div>
     <a class="post-link" href="runtime-models.html">Read -></a>
   </article>
   <article class="post-card">
-    <img class="post-card__cover" src="assets/first-nine/en/inner-architecture_01.png" alt="" loading="lazy" decoding="async" />
-    <div class="post-meta">Block 3 · 3 min read</div>
+    <img class="post-card__cover" src="assets/first-nine/heroes/v3/03-architecture.webp" alt="" loading="lazy" decoding="async" />
+    <div class="post-meta">Block 3 · 4 min read</div>
     <h3><a href="inner-architecture.html">Typical web-application inner architecture</a></h3>
     <p class="post-desc">The First Nine Guide, block 3: request layers and internal service anatomy</p>
     <div class="post-tags"><span class="tag">first-nine</span><span class="tag">series</span><span class="tag">architecture</span><span class="tag">http</span></div>
     <a class="post-link" href="inner-architecture.html">Read -></a>
   </article>
   <article class="post-card">
-    <img class="post-card__cover" src="assets/first-nine/en/ideal-deployment_01.png" alt="" loading="lazy" decoding="async" />
-    <div class="post-meta">Block 4 · 5 min read</div>
+    <img class="post-card__cover" src="assets/first-nine/heroes/v3/04-deployment.webp" alt="" loading="lazy" decoding="async" />
+    <div class="post-meta">Block 4 · 6 min read</div>
     <h3><a href="ideal-deployment.html">Ideal application deployment</a></h3>
     <p class="post-desc">The First Nine Guide, block 4: deploying without throttling surprises</p>
     <div class="post-tags"><span class="tag">first-nine</span><span class="tag">series</span><span class="tag">deployment</span><span class="tag">containers</span></div>

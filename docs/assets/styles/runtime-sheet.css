@@ -1,0 +1,158 @@
+/* runtime-sheet.css - styles for the runtime cheat sheet scenes (block 4). */
+
+.md-typeset .rt-sheet,
+.rt-sheet {
+  margin: 1.6em 0;
+  padding: 14px 14px 10px;
+  border: 1px dashed var(--md-default-fg-color--lighter, #b8c0c8);
+  border-radius: 10px;
+  font-size: 0.78rem;
+}
+
+.rt-sheet__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-bottom: 10px;
+}
+
+.rt-sheet__radio {
+  display: inline-flex;
+  border: 1px solid var(--md-default-fg-color--lightest, #d0d7de);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.rt-sheet__radio label {
+  position: relative;
+  padding: 4px 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.rt-sheet__radio input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.rt-sheet__radio label:has(input:checked) {
+  background: var(--md-accent-fg-color--transparent, rgba(61, 127, 214, 0.15));
+  font-weight: 600;
+}
+
+.rt-sheet__radio label:has(input:focus-visible) {
+  outline: 2px solid #3d7fd6;
+  outline-offset: -2px;
+}
+
+.rt-sheet__save {
+  margin-left: auto;
+  padding: 4px 10px;
+  border: 1px solid var(--md-default-fg-color--lightest, #d0d7de);
+  border-radius: 8px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.rt-sheet__save:hover,
+.rt-sheet__save:focus-visible {
+  border-color: #3d7fd6;
+}
+
+.rt-sheet__chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* the live line repeats the verdict for screen readers only */
+.rt-sheet__live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .rt-sheet__save {
+    margin-left: 0;
+  }
+}
+
+/* hover or focus on a container dims the other two */
+.rt-sheet__chart .rt-c {
+  transition: opacity 0.2s ease;
+  outline: none;
+  cursor: default;
+}
+
+.rt-sheet__chart.rt-focus .rt-c:not(.is-on) {
+  opacity: 0.3;
+}
+
+.rt-sheet__chart .rt-c:focus-visible > g:first-child {
+  filter: drop-shadow(0 0 3px #3d7fd6);
+}
+
+/* arrows appear container by container the first time the sheet is on screen */
+.rt-sheet__chart .rt-arrows {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  transition-delay: calc(var(--i, 0) * 0.45s + 0.2s);
+}
+
+.rt-sheet__chart.rt-in .rt-arrows {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rt-sheet__chart .rt-arrows {
+    transition: none;
+  }
+}
+
+/* full size view */
+.rt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: auto;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.rt-overlay__inner {
+  width: max-content;
+  max-width: none;
+  margin: 24px auto;
+  padding: 12px 16px 16px;
+  border-radius: 12px;
+  background: var(--md-default-bg-color, #fff);
+}
+
+.rt-overlay__inner svg {
+  display: block;
+}
+
+.rt-overlay__close {
+  display: block;
+  margin: 0 0 8px auto;
+  padding: 4px 12px;
+  border: 1px solid var(--md-default-fg-color--lightest, #d0d7de);
+  border-radius: 8px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.rt-sheet__png {
+  margin-left: 0;
+}

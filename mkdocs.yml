@@ -121,6 +121,8 @@ extra_css:
   - assets/styles/brand.css
   - assets/styles/layout.css
   - assets/styles/components.css
+  - assets/styles/excalidraw-scene.css
+  - assets/styles/runtime-sheet.css
 
 extra_javascript:
   - assets/scripts/hero-bg.js
@@ -128,3 +130,6 @@ extra_javascript:
   - assets/scripts/lang-setup.js
   - assets/scripts/post-slider.js
   - assets/scripts/image-zoom.js
+  - assets/scripts/excalidraw-scenes.js
+  - assets/scripts/excalidraw-scene.js
+  - assets/scripts/runtime-sheet.js

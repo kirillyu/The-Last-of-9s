@@ -11,7 +11,7 @@ block: 3
 
 ***
 
-![Illustration](../assets/first-nine/en/inner-architecture_01.png)
+![Illustration](../assets/first-nine/heroes/v3/03-architecture.webp)
 
 **Disclaimer:** real-world application architectures vary, but there are common layers that show up almost everywhere. That's what we'll cover.
 
@@ -42,10 +42,10 @@ Start with the layers a request passes through. We'll separate four internal lay
 
 - socket listen (ports 8080, 443)
 - accept connections
-- TLS handshake - decrypt HTTPS traffic
+- TLS handshake - set up a secure connection: key exchange and signature. This is the most CPU-heavy part, encrypting the data itself later is much cheaper
 - HTTP parsing - headers and body
 
-Many assume this is IO-only. With large HTTPS bodies it can become CPU-bound.
+Many assume this is IO-only. With many new HTTPS connections it can become CPU-bound.
 
 ### REQUEST PROCESSING
 
@@ -74,7 +74,7 @@ Rate limits are usually memory-bound if local. Distributed limits live in Redis 
 - calculations - compute, transform
 - external API calls
 - database queries - PostgreSQL/MySQL/MongoDB
-- cache operations - Redis/Memcached
+- cache operations - local in-memory cache or Redis/Memcached over the network
 
 This is the SRE favorite for incidents. Slow SQL, locks, external APIs without timeouts, and heavy O(n!) compute all live here.
 
@@ -120,7 +120,7 @@ List:
 
 Why does this matter? A simple timeout example:
 
-- Business logic issues an SQL query. The DB has its own pool (e.g., Hikari).
+- Business logic issues an SQL query. The application has its own DB connection pool (e.g., HikariCP).
 - The pool is exhausted. A worker thread waits for a connection.
 - Goroutines accumulate or the worker pool stalls.
 

@@ -25,13 +25,13 @@ Most people know that any code works in some thread/worker (often the same word)
 
 ![Illustration](../assets/first-nine/en/application-footprint_02.png)
 
-Any code slowdown is first of all a slowdown of "work". Work is very different. But almost always, when our app needs something from the OS, it makes a syscall (system call). There are many of them: reading disk is `read()`, opening a file is `open()`. A syscall is done only by an OS thread. As an analogy, the OS is like a web server with a thread pool, and syscalls are API calls. But to be honest, the OS has another "interface" too: virtual memory. It is harder. We write to memory directly, without syscalls. But if we touch a virtual address that has no physical RAM page yet (or it was swapped out), a CPU block called [MMU](https://docs.kernel.org/admin-guide/mm/concepts.html) triggers a hardware interrupt ([Page Fault](https://docs.oracle.com/cd/E19504-01/802-5880/tif-21/index.html)). Control goes to the kernel, it brings the page, and returns control to the program. For code it is transparent, but for latency it is a real stop of the thread.
+Any code slowdown is first of all a slowdown of "work". Work is very different. But almost always, when our app needs something from the OS, it makes a syscall (system call). There are many of them: reading disk is `read()`, opening a file is `open()`. A syscall is done only by an OS thread. As an analogy, the OS is like a web server with a thread pool, and syscalls are API calls. But to be honest, the OS has another "interface" too: virtual memory. It is harder. We write to memory directly, without syscalls. But if we touch a virtual address that has no physical RAM page yet (or it was swapped out), a CPU block called [MMU](https://docs.kernel.org/admin-guide/mm/concepts.html) raises a CPU exception ([Page Fault](https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html)). Control goes to the kernel, it brings the page, and returns control to the program. For code it is transparent, but for latency it is a real stop of the thread.
 
 So, to understand what can slow our "work", we need to understand what this work can be. The OS is well covered by metrics, so by them we can guess what work was done quite well.
 
 ## Anatomy of work: On-CPU and Off-CPU
 
-Work can run on CPU, or without CPU (waiting is also work, because a thread waits too, so it is busy). Work can wait inside the app or inside the system. For system waits there is **Wait Channel (WCHAN)**, which sleeps a thread with a specific reason.
+Work can run on CPU, or without CPU (waiting is also work, because a thread waits too, so it is busy). Work can wait inside the app or inside the system. For system waits the kernel shows **Wait Channel (WCHAN)**: the name of the kernel function where the thread went to sleep. It shows the reason for the wait.
 
 WCHAN appears only if the kernel puts the thread to sleep. Work can be slow because a resource is missing, and then we often see **PSI** metrics (described [here](https://docs.kernel.org/accounting/psi.html)). PSI shows the share of time tasks were forced to wait for a resource. WCHAN is weakly covered by profilers. It is useful to know, but in practice it is rarely in metrics. Another plane of thread state is their [state](https://www.baeldung.com/linux/process-states): R, D, S, etc. We will use it.
 
@@ -49,7 +49,7 @@ The thread runs kernel code by its request (via syscall).
 
 * **Examples:** `getpid()`, `fstat()`, `open()`, `read()`.
 * **Meaning:** It goes to kernel space. Some syscalls like `getpid()` are instant, but many (`open()`, `read()`, `connect()`) can block on a resource and move the thread to wait.
-* **Metrics:** `system time` grows. When blocked, WCHAN and PSI IO appear.
+* **Metrics:** `system time` grows. When blocked, WCHAN appears, and if the thread waits for disk, PSI IO appears too.
 
 #### 1.2. Pure User-space (Useful work)
 
@@ -69,17 +69,17 @@ The code is logically waiting or in an endless loop, but it burns CPU.
 
 We separate: what a thread does (R/S/D state), what type of CPU consumption, and is there any resource wait (PSI). These are three different layers. We must not mix them. We glue them into a set of signals to understand the delay nature.
 
-On-CPU time has 8 common modes. Here is a table with mapping to thread state and PSI:
+CPU time is split into common modes. Only user, nice, system, irq and softirq of them are On-CPU. idle and iowait mean the CPU was idle, and steal means the hypervisor took the CPU. Here is a table with mapping to thread state and PSI:
 
 | **CPU type**  | **Thread State**    | **probable PSI**        | **Meaning**                             |
 | ------------- | ------------------- | ----------------------- | --------------------------------------- |
 | user          | R (Runnable)        | `psi.cpu.some`*         | App code (useful or Busy Wait)          |
 | system        | R (Runnable)        | -                       | Kernel work (syscalls)                  |
 | iowait        | D (Uninterruptible) | `psi.io.some` / `full`  | CPU idle, thread waits I/O              |
-| irq / softirq | -                   | -                       | Interrupts (network, timer)             |
+| irq / softirq | -                   | `psi.irq.full` (kernel 6.1+) | Interrupts (network, timer)             |
 | idle          | S (Interruptible)   | -                       | CPU idle, thread sleeps                 |
-| steal         | R / -               | `psi.cpu.some` / `full` | Hypervisor took CPU from VM             |
-| nice          | S / R               | `psi.cpu.full`          | Low priority processes                  |
+| steal         | R / -               | `psi.cpu.some`          | Hypervisor took CPU from VM             |
+| nice          | S / R               | `psi.cpu.some`*         | Low priority processes                  |
 
 > *A running thread does not create PSI for itself, but it creates a queue for others.*
 
@@ -101,7 +101,7 @@ Below I want to show how this work is covered by metrics and at what level. Here
 | user     | `node_cpu_seconds_total{mode="user"}`    | `node_pressure_cpu_waiting_seconds_total`                                       | `node_procs_running` |
 | system   | `node_cpu_seconds_total{mode="system"}`  | -                                                                               | `node_procs_running` |
 | iowait   | `node_cpu_seconds_total{mode="iowait"}`  | `node_pressure_io_waiting_seconds_total` | `node_procs_blocked` |
-| irq      | `node_cpu_seconds_total{mode="irq"}`     | -                                                                               | `node_intr_total`    |
+| irq      | `node_cpu_seconds_total{mode="irq"}`     | `node_pressure_irq_stalled_seconds_total` (kernel 6.1+, node_exporter 1.9+)                                                                               | `node_intr_total`    |
 | softirq  | `node_cpu_seconds_total{mode="softirq"}` | -                                                                               | -                    |
 | idle     | `node_cpu_seconds_total{mode="idle"}`    | -                                                                               | -                    |
 | steal    | `node_cpu_seconds_total{mode="steal"}`   | `node_pressure_cpu_waiting_seconds_total`                                       | -                    |
@@ -118,13 +118,15 @@ Here are container metrics from `cAdvisor`:
 | ---------- | -------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------- |
 | user       | `container_cpu_user_seconds_total`           | `running`               | `container_pressure_cpu_waiting_seconds_total`                                            |
 | system     | `container_cpu_system_seconds_total`         | `running`               | `container_pressure_cpu_waiting_seconds_total`                                            |
-| iowait     | -                                            | `iowait`                | `container_pressure_io_waiting_seconds_total` |
+| iowait     | -                                            | `iowaiting`             | `container_pressure_io_waiting_seconds_total` |
 | throttled  | `container_cpu_cfs_throttled_seconds_total`  | `running`*              | `container_pressure_cpu_stalled_seconds_total`                                            |
 | steal      | -                                            | -                       | `container_pressure_cpu_waiting_seconds_total`                                            |
 | irq / soft | -                                            | -                       | -                                                                                         |
 | idle       | -                                            | `sleeping`              | -                                                                                         |
 
 > Throttled processes are formally `running` (ready to run), but the kernel does not give them CPU because the quota is spent (CFS bandwidth control). This is unique because they wait for cgroup permission while in R state. It is correct to count them as Off-CPU.
+
+> container_tasks_state has a catch: by default it is 0. Values appear only with the cAdvisor flag --enable_load_reader and only on cgroup v1: on cgroup v2 the kernel does not support this request. kubelet up to 1.36 also accepted this flag as deprecated, in 1.37 it was removed.[^1]
 
 Metrics are few (for me, always). PSI metrics are great. CPU work types are often underrated, but useful. Very few people look at process states (`running`/`blocked`); they are not super useful, but can help to separate problems when there are many processes.
 
@@ -142,25 +144,27 @@ We ask the kernel to wait (network, timer, lock).
 
 * **Examples:** `futex()`, `epoll_wait()`.
 * **Meaning:** The kernel puts the thread to sleep (S or D), into a wait queue.
-* **Metrics:** PSI appears if we wait for an overloaded resource. WCHAN is always there (kernel sleeps the thread at a specific point), but in common metrics (node_exporter/cAdvisor) it is missing — you can see the reason only on the node itself.
+* **Metrics:** PSI appears if we wait for an overloaded resource. WCHAN is always there (kernel sleeps the thread at a specific point), but in common metrics (node_exporter/cAdvisor) it is missing. You can see the reason only on the node itself.
 
 #### 2.2. Page Faults (Implicit wait)
 
 We just touched memory.
 
 * **Examples:** page faults are inevitable when we work with memory; it happens when we access addresses with no RAM pages.
-* **Meaning:** MMU triggers an interrupt, kernel stops us and goes to disk/swap.
-* **Metrics:** WCHAN (`do_page_fault`) and maybe PSI Memory.
+* **Meaning:** MMU raises a page fault exception. On a minor fault the kernel just allocates a page, on a major fault it reads the page from disk or swap.
+* **Metrics:** WCHAN (`folio_wait_bit_common`), PSI IO and maybe PSI Memory.
 
 The table below shows how many waits, even system ones, we do not see in metrics, not to mention waits inside the app.
 
-| **Wait type** | **How to detect (WCHAN)**                    | **Node Exporter (PSI)**     | **CAdvisor (PSI)**          |
-| ------------ | --------------------------------------------- | --------------------------- | --------------------------- |
-| Timer / sleep | `nanosleep`, `hrtimer_sleep`, `pause`         | -                           | -                           |
-| Locks (app)   | `futex_wait_queue_me`, `pthread_cond_wait`    | -                           | -                           |
-| Events / network | `ep_poll`, `poll_schedule_timeout`        | -                           | -                           |
-| I/O wait      | `io_schedule`                                 | `io_waiting` / `io_stalled` | `io_waiting` / `io_stalled` |
-| Page Fault    | `do_page_fault`, `swap_readpage`              | `memory_stalled`            | `memory_stalled`            |
+| **Wait type**    | **How to detect (WCHAN)**          | **Node Exporter (PSI)**                         | **CAdvisor (PSI)**                              |
+| ---------------- | ---------------------------------- | ----------------------------------------------- | ----------------------------------------------- |
+| Timer / sleep    | `hrtimer_nanosleep`                | -                                               | -                                               |
+| Locks (app)      | `futex_wait`, `futex_do_wait`      | -                                               | -                                               |
+| Events / network | `ep_poll`, `wait_woken`            | -                                               | -                                               |
+| I/O wait         | `folio_wait_bit_common` and others | `io_waiting` / `io_stalled`                     | `io_waiting` / `io_stalled`                     |
+| Major page fault | `folio_wait_bit_common`            | `io_waiting`, during thrashing `memory_stalled` | `io_waiting`, during thrashing `memory_stalled` |
+
+WCHAN names depend on kernel version, architecture and build. For example, on arm64 you often see the syscall name (`__arm64_sys_epoll_pwait`) instead of `ep_poll`. You can check your own on the node: `ps -eLo pid,tid,stat,wchan:32,comm`.
 
 So, there is no universal metric or simple way to quickly show what causes delays in the app. Below I try to squeeze maximum from the metrics we usually have.
 
@@ -172,8 +176,8 @@ A metaphor: we know the state of the Black Box because it is inside a Glass Box 
 
 Let us take a more practical scale:
 
-* **Cheap** - nanoseconds: registers/L1/L2 cache.
-* **Moderate** - microseconds: syscalls, context switch, RAM access, NVMe I/O (~30-40 µs). With millions per second it becomes visible.
+* **Cheap** - nanoseconds: registers/L1/L2 cache, RAM access (~100 ns).
+* **Moderate** - microseconds: syscalls, context switch, NVMe I/O (~30-40 µs). With millions per second it becomes visible.
 * **Expensive** - milliseconds: network inside DC, short disk queues, HDD sequential.
 * **Very expensive** - tens of milliseconds and more: HDD random, swap/major faults, RTO/many retransmits, long disk queues.
 
@@ -192,7 +196,7 @@ Below is the analysis sequence and how to read metrics.
 First, inspired by the picture above (app on top, threads go down to kernel), it is useful to check threads: metrics exist for two states - Running (R) and Blocked (D). Understand the scale: these are workers that do your app work. Metrics can show two states:
 
 * **Running (R)** - if the number of OS threads in state *R* is much higher than CPU cores, a CPU queue forms (threads wait for a core). This is a CPU overload sign: more compute tasks than capacity. Even if the runtime hides waits inside (e.g., JVM web pool), R-state shows heavy threads do not get their time slice. In node metrics it is usually `node_procs_running` (count of OS threads, including kernel threads).
-* **Blocked (D)** - if there are OS threads in *D* state (especially spikes), threads are stuck waiting for I/O. Each blocked D-thread means the system waits for disk, and useful work is idle. D spikes come with higher request latency and performance drop. In general many D means waiting for hardware, mostly disk. D threads do not use CPU and are not visible in CPU load. In node metrics this is usually `node_procs_blocked` (also includes kernel threads).
+* **Blocked (D)** - if there are OS threads in *D* state (especially spikes), threads are stuck waiting for I/O. Each blocked D-thread means the system waits for disk, and useful work is idle. D spikes come with higher request latency and performance drop. In general many D means waiting for hardware, mostly disk. D threads do not use CPU and are not visible in CPU load. In node metrics this is `node_procs_blocked` (also includes kernel threads), but it counts only threads that wait for I/O. D-threads that wait, for example, for a lock in the kernel are not counted there.
 
 Important: metrics usually give only R and D (node_exporter, cAdvisor). S/Z and their variants are not visible or only partially in aggregated counters. The picture is incomplete, and that is ok.
 
@@ -204,7 +208,7 @@ Then step by step: first PSI (is there pressure?), then blocks by resource - CPU
 
 The simplest and most useful thing to look at (if this metric exists) is PSI. It is available on [host](https://github.com/prometheus/node_exporter/pull/1325), in containers [inside k8s](https://kubernetes.io/docs/reference/instrumentation/understand-psi-metrics), and [outside k8s](https://github.com/google/cadvisor/pull/3649).
 
-**Pressure Stall Information** shows the share of time when tasks were forced to wait because of lack of CPU, IO, or memory. It is not load, but the percent of "lost" time. `some` means at least one thread was delayed; `full` means all runnable tasks were delayed (on host cpu.full is almost always 0, in cgroup it appears when CFS quotas are hit). We care about size and duration, not only "> 0". Load Average is useful as a trend, but it mixes runnable and D-state and is not normalized by cores; PSI is more precise for wait time.
+**Pressure Stall Information** shows the share of time when tasks were forced to wait because of lack of CPU, IO, or memory. It is not load, but the percent of "lost" time. `some` means at least one thread was delayed; `full` means all active tasks were waiting at that moment and nobody did useful work (on host cpu.full is always 0, in cgroup it appears when CFS quotas are hit or when neighbors took the CPU). We care about size and duration, not only "> 0". Load Average is useful as a trend, but it mixes runnable and D-state and is not normalized by cores; PSI is more precise for wait time.
 
 How to read:
 
@@ -224,7 +228,7 @@ The view is simple: first pressure (PSI), then by resources - CPU, disk, network
 This is about On-CPU part (user/system/softirq/steal), together with PSI CPU and R-state from the start.
 
 * **Where does CPU go?** - look at user/system/softirq/steal split. High `system` means time in kernel (syscalls, drivers). High `softirq` means kernel is busy with network/disk in software interrupts. `steal` means hypervisor takes time from VM. Reaction: spread IRQ, limit heavy threads, profile code/GC.
-* **Is there CPU contention?** - read PSI CPU with context switches. Node Exporter gives total context switches (`node_context_switches_total`), without voluntary/involuntary split; cAdvisor usually has none. A high counter alone (or growth) without normalization by cores is not a signal, but with performance drop it can hint too many threads or lock contention. High PSI with low switches can mean cgroup quotas or single-thread.
+* **Is there CPU contention?** - read PSI CPU with context switches. Node Exporter gives total context switches (`node_context_switches_total`), without voluntary/involuntary split; cAdvisor usually has none. A high counter alone (or growth) without normalization by cores is not a signal, but with performance drop it can hint too many threads or lock contention. High PSI with low switches can mean cgroup quotas.
 * **Is there imbalance per core?** - per-core load shows hot cores. One CPU is busy, others idle: hot thread or IRQ pinned to one core. On VMs and without RSS/irqbalance this is common: all network/disk traffic can stick to one CPU. Fix with IRQ/RPS and correct worker count (separate topic).
 
 About load average: it is an average of runnable + D-state over 1/5/15 min, not normalized by cores, and includes blocking (D) tasks. On multi-core systems LA can be high with even load, or low with one hot core. Research (e.g., man proc(5), LWN articles) says LA is a symptom, not truth. Use it as a trend and always confirm with PSI, R-state, and per-CPU load.
@@ -240,7 +244,7 @@ These are Off-CPU waits from our model: growth of PSI IO and D-state shows threa
   * **Queue depth** - `rate(node_disk_io_time_weighted_seconds_total)`. If queue grows, requests pile up faster than disk serves them (Little's law: Queue ≈ IOPS × Latency).
   * **Utilization** - `rate(node_disk_io_time_seconds_total)`. High util means "disk always busy", but alone it does not prove a bottleneck (especially on SSD/NVMe). Confirm with latency/queue.
 * **Where is iowait?** - iowait in CPU row means CPU is idle while waiting disk. It can match util/latency/PSI IO. User/system and iowait are mutually exclusive on a core, but app impact adds up - we wait disk and do no useful work.
-* **iowait trap** ([details](https://lwn.net/Articles/551284/)) - iowait is CPU state (idle), not thread state. A thread calls `read()` → goes to D-state off-CPU → CPU becomes free. When CPU is idle and there is pending I/O, it is counted as iowait. If new work arrives, CPU switches to it, iowait drops, but the thread still waits disk in D. Nuance: iowait shows "CPU idle with I/O", not "how long we wait disk". Waiting is tracked in `procs_blocked` and PSI IO. So with 100% disk util and busy CPU, iowait can be 0%, but threads still wait in D. Trap: you see low iowait and think disk is not a problem, but threads are waiting and work stops. Look at disk util, D-state and PSI IO together, not only iowait.
+* **iowait trap** ([details](https://docs.kernel.org/filesystems/proc.html#miscellaneous-kernel-statistics-in-proc-stat)) - iowait is CPU state (idle), not thread state. A thread calls `read()`, goes to D-state off-CPU, CPU becomes free. When CPU is idle and there is pending I/O, it is counted as iowait. If new work arrives, CPU switches to it, iowait drops, but the thread still waits disk in D. Nuance: iowait shows "CPU idle with I/O", not "how long we wait disk". Waiting is tracked in `procs_blocked` and PSI IO. So with 100% disk util and busy CPU, iowait can be 0%, but threads still wait in D. Trap: you see low iowait and think disk is not a problem, but threads are waiting and work stops. Look at disk util, D-state and PSI IO together, not only iowait.
 * **Swap stall** - any swap I/O (page-in/page-out) almost always means memory pressure: system does disk I/O to free RAM, and this hurts disk latency even if the disk as a device is ok.
 * **Errors/retries** - if you have error/retry metrics on disk/RAID/NVMe (or at least dmesg/SMART), check them. Retries and device degradation almost always show higher latency. Node_exporter has no clear disk error counters; then rely on SMART/dmesg/vendor metrics.
 
@@ -248,7 +252,7 @@ Reaction depends: faster disk (NVMe, more IOPS), change I/O pattern (batching, l
 
 ### 4. Network: losses and queues (my favorite block)
 
-Network waits are Off-CPU: when a thread waits on socket/epoll, it is in S-state (WCHAN: `ep_poll` / `tcp_recvmsg`) and does not show in PSI.
+Network waits are Off-CPU: when a thread waits on socket/epoll, it is in S-state (WCHAN: `ep_poll` / `wait_woken`) and does not show in PSI.
 
 * **Do we receive traffic fast enough?** - drops and queues on our node answer this:
   * **Drops / backlog** - first locate the **layer** where packets are lost:
@@ -259,7 +263,7 @@ Network waits are Off-CPU: when a thread waits on socket/epoll, it is in S-state
     Drops on receive cause losses; then sender retransmits and client latency grows. This lets us connect cause and effect with only network metrics.
 * **Is the remote side (or the network between) too slow to receive?** - retransmissions answer this:
   * **Retransmissions** - re-sending lost packets. Metrics: on **node** `node_netstat_Tcp_RetransSegs` (node_exporter), in **container** similar TCP metrics exist in cAdvisor with advanced TCP stats, in **k8s** (limited cAdvisor) there are no TCP metrics. Also check SYN retries: `node_netstat_TcpExt_TCPSynRetrans` (SYN retrans on handshake; affects connect latency and errors, especially for short connections).
-    Retransmits are **fast** (fast retransmit: 3 dupACK → resend without timeout) and **timeout** (RTO/backoff: 200 → 400 → 800 → 1600 → 3200 ms … up to tens of seconds).
+    Retransmits are **fast** (fast retransmit: after 3 dupACK, resend without timeout) and **timeout** (RTO/backoff: 200 → 400 → 800 → 1600 → 3200 ms … up to tens of seconds).
     In node_exporter we have a size issue: `node_netstat_Tcp_RetransSegs` counts segments, and `node_netstat_TcpExt_TCPTimeouts` counts timeout events (RTO). So we cannot precisely split fast vs RTO without extra TcpExt fields, but we can make an optimistic lower bound for heavy losses.
     Retransmits are normal: they can happen even in good times (also because of out-of-order packets, see [RFC 4653](https://datatracker.ietf.org/doc/html/rfc4653)). For diagnosis, look at **share of traffic** and **trend**.
     Causes are two groups: (1) loss/errors in network (link/port/overload), (2) remote side is too slow to receive/process (queues, slow server/DB and drops).
@@ -267,11 +271,11 @@ Network waits are Off-CPU: when a thread waits on socket/epoll, it is in S-state
     To interpret retransmits, check percent in total traffic:
     - retrans share in TCP traffic: `rate(node_netstat_Tcp_RetransSegs) / rate(node_netstat_Tcp_OutSegs)`
     - RTO lower bound: `rate(node_netstat_TcpExt_TCPTimeouts) / rate(node_netstat_Tcp_OutSegs)`. 1 RTO timeout means at least 1 retransmitted segment.
-    - fast retrans lower bound: `(rate(node_netstat_Tcp_RetransSegs) - rate(node_netstat_TcpExt_TCPTimeouts)) / rate(node_netstat_Tcp_OutSegs)`
-    Then you can estimate useful traffic share: `(rate(node_netstat_Tcp_OutSegs) - rate(node_netstat_Tcp_RetransSegs)) / rate(node_netstat_Tcp_OutSegs)` - retransmits push out useful data.
+    - fast retrans upper bound (after one RTO the kernel usually resends several segments): `(rate(node_netstat_Tcp_RetransSegs) - rate(node_netstat_TcpExt_TCPTimeouts)) / rate(node_netstat_Tcp_OutSegs)`
+    Then you can estimate useful traffic share: `rate(node_netstat_Tcp_OutSegs) / (rate(node_netstat_Tcp_OutSegs) + rate(node_netstat_Tcp_RetransSegs))` - retransmits push out useful data.
     The bigger the share of RTO retransmits, the worse. Even 1% is already a lot. If there are no RTO, then fast retrans needs ~10-20% to really hurt. Thresholds from tests and prod can vary.
 * **Do we hit system network limits?** - another class of issues, partly same as disk, but grouped here:
-  * **Conntrack / TIME_WAIT** - **Conntrack** (`nf_conntrack`) is a kernel table that tracks active TCP/UDP connections for NAT, firewall (iptables/nftables) and stateful filtering. Each new connection adds a record. Near the limit (`node_nf_conntrack_entries` → `node_nf_conntrack_entries_limit`) new connects are dropped - it looks like "pings work, but new DB connections hang". **TIME_WAIT** is a TCP state after close (lives ~60 seconds by default). It stays on the side that closed first (often server in HTTP/1.1; in HTTP/2/gRPC this is softer due to persistent channels). Many TIME_WAIT on clients can hit ephemeral port limits and block outgoing connections; in practice it depends on `net.ipv4.ip_local_port_range` + number of TIME_WAIT sockets.
+  * **Conntrack / TIME_WAIT** - **Conntrack** (`nf_conntrack`) is a kernel table that tracks active TCP/UDP connections for NAT, firewall (iptables/nftables) and stateful filtering. Each new connection adds a record. Near the limit (compare `node_nf_conntrack_entries` with `node_nf_conntrack_entries_limit`) new connects are dropped - it looks like "pings work, but new DB connections hang". **TIME_WAIT** is a TCP state after close (lives ~60 seconds by default). It stays on the side that closed first (often server in HTTP/1.1; in HTTP/2/gRPC this is softer due to persistent channels). Many TIME_WAIT on clients can hit ephemeral port limits and block outgoing connections; in practice it depends on `net.ipv4.ip_local_port_range` + number of TIME_WAIT sockets.
   * **Backlog / somaxconn / SYN backlog** - limits of incoming queues. When they hit, it looks like "new connects are slow/fail", while traffic/pings are fine. In metrics it shows as `node_netstat_TcpExt_ListenOverflows`/`node_netstat_TcpExt_ListenDrops` (listen/accept queues), and for SYN phase - growth of `node_netstat_TcpExt_TCPSynRetrans` on clients. Limits live at several levels: app backlog (`listen()`), `net.core.somaxconn`, `net.ipv4.tcp_max_syn_backlog`.
   * **File descriptors (FD)** - each TCP connection/socket uses an FD. When you hit FD, new accept/connect fails (often in logs as "too many open files"). At node level check `node_filefd_allocated` and `node_filefd_maximum`; also process limits (ulimit/systemd LimitNOFILE) and system limits (`fs.file-max`/`fs.nr_open`).
   * **Inodes** - inodes limit number of files/dirs. When inodes are exhausted, creating files/dirs (and Unix sockets with FS paths) fails even if disk space is free. At node level check `node_filesystem_files_free` / `node_filesystem_files`.
@@ -283,16 +287,16 @@ With retrans/drops first check network/stack (losses, queue overflow), then app.
 Start with sharp problems.
 
 * **Is there OOM?** - on node check `node_vmstat_oom_kill`. At container level OOM events are in cAdvisor `container_oom_events_total`. If OOM exists, it is no longer "footprint diagnosis", but a limits/requests and app behavior review.
-* **Do we hit container memory limit?** - in cgroup v1 cAdvisor exports `container_memory_failcnt` (from `memory.failcnt`): number of failed allocations due to limit. Growing failcnt without OOM means working at the limit with constant reclaim. For limit context check `container_memory_usage_bytes` and `container_spec_memory_limit_bytes`. Here also check container awareness (does runtime see cgroup limits) and correct limit detection (see **[Ideal application deployment](ideal-deployment.md)**, block 4).
+* **Do we hit container memory limit?** - in cgroup v1 cAdvisor exports `container_memory_failcnt` (from `memory.failcnt`): how many times usage hit the limit. The allocation usually still goes through: the kernel does reclaim first. Growing failcnt without OOM means working at the limit with constant reclaim. For limit context check `container_memory_usage_bytes` and `container_spec_memory_limit_bytes`. Here also check container awareness (does runtime see cgroup limits) and correct limit detection (see **[Ideal application deployment](ideal-deployment.md)**, block 4).
 * **Is there free memory right now?** - check `node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes` and its dynamics: sharp drops often match latency degradation. Also check if you hit a threshold visually - it can be due to limits (cgroup limits/requests).
 * **Is swap present and used?** - two different questions:
   * **swap enabled**: `node_memory_SwapTotal_bytes > 0` - swap exists (not yet a problem, it may be empty, but it is a flag to check more).
-  * **swap used**: `node_memory_SwapTotal_bytes - node_memory_SwapFree_bytes` (plus `node_memory_SwapCached_bytes`) - how much data is already swapped out. "Swap used" does not mean disk is busy now, but it is a risk: access will need disk page-in and is much slower than RAM.
+  * **swap used**: `node_memory_SwapTotal_bytes - node_memory_SwapFree_bytes` (SwapCached is already included) - how much data is already swapped out. "Swap used" does not mean disk is busy now, but it is a risk: access will need disk page-in and is much slower than RAM.
   * **swap actively used**: `node_vmstat_pswpin` / `node_vmstat_pswpout` (use rate) - pages move between RAM and swap right now. This is where disk affects latency: swap-in blocks threads on memory access path.
 * **Do we read pages from disk due to major faults?** - `node_vmstat_pgmajfault`: growth means page faults became "major", kernel had to read a page from disk before continuing. The disk can be (1) swap (swap-in), (2) file-backed pages (page cache miss / mmap). `node_vmstat_pswpin`/`node_vmstat_pswpout` count pages that went through swap: if `pgmajfault` grows with `pswpin`, then major faults are swap; if `pgmajfault` grows but `pswpin/pswpout` do not, it is more often file-backed pages.
 * **Minor faults: do they matter?** - minor faults are normal (first touch, COW, etc.). They matter when they grow by orders and become notable CPU/latency cost. At node level a rough estimate is `node_vmstat_pgfault - node_vmstat_pgmajfault`, but interpret only in workload context and dynamics.
 
-Next actions depend on load: add memory, adjust limits/requests, reduce caches/heap, set GOMEMLIMIT/ActiveProcessorCount, etc. In containers it is important to separate working set from page cache (e.g., `container_memory_working_set_bytes` vs usage).
+Next actions depend on load: add memory, adjust limits/requests, reduce caches/heap, set GOMEMLIMIT/MaxRAMPercentage, etc. In containers it is important to separate working set from page cache (e.g., `container_memory_working_set_bytes` vs usage).
 
 ### 6. If there are no footprints
 
@@ -321,13 +325,19 @@ System Footprint Method gives direction, not a solution. Next actions depend on 
 
 **If the problem is in host resources** (PSI high, util 100%, latency grows):
 * **Tune the system**: scheduler (CFS/nice), I/O scheduler (mq-deadline/kyber), network parameters (RSS/RPS, ring buffers), memory (vm.swappiness, THP).
-* **Add resources**: add CPU/RAM, move to faster disks (NVMe), improve network (10G → 25G, lower RTT).
+* **Add resources**: add CPU/RAM, move to faster disks (NVMe), improve network (from 10G to 25G, lower RTT).
 * **Move load**: horizontal scaling, move services to other nodes.
 
 System Footprint Method is a checklist for fast diagnosis, not a replacement for profilers. It shows where to start digging.
 
 ***
 
-> In the previous series — **[we talked about deploying the app without throttling](ideal-deployment.md)**.
+> In the previous series - **[we talked about deploying the app without throttling](ideal-deployment.md)**.
 >
 > Next I will talk about parallelism and concurrency at CPU level.
+
+***
+
+### UPD 2026-11-15
+
+[^1]: Since Kubernetes 1.37 (August 2026) kubelet no longer exports container_tasks_state in /metrics/cadvisor. [Commit in Kubernetes](https://github.com/kubernetes/kubernetes/commit/f451aa0762be2e28792fa4908d3909136bb61964).

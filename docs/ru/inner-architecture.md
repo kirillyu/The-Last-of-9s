@@ -11,7 +11,7 @@ block: 3
 
 ***
 
-![Illustration](../assets/first-nine/ru/inner-architecture_01.png)
+![Illustration](../assets/first-nine/heroes/v3/03-architecture.webp)
 
 **Дисклеймер** - в реальном мире архитектуры приложений крайне разнообразны, но есть универсальные слои, которые встречаются почти везде. О них и поговорим.
 
@@ -36,22 +36,22 @@ block: 3
 
 **Суть:** превращает HTTP-запрос в структурированные данные для бизнес-логики.
 
-![Illustration](../assets/first-nine/ru/inner-architecture_02.png)
+<div class="exc-scene" data-scene="inner-architecture_02"><noscript>Схема. Для просмотра нужен JavaScript.</noscript></div>
 
 **Что тут происходит:**
 
 - socket listen на порту (8080, 443)
 - accept connections - принимаем новые подключения
-- TLS handshake - расшифровка HTTPS трафика
+- TLS handshake - установка защищенного соединения: обмен ключами и подпись. Это самая дорогая по CPU часть, шифрование самих данных потом стоит намного дешевле
 - HTTP parsing - разбор заголовков и тела запроса
 
-Часто тут думают, что это только IO-bound. На больших телах с HTTPS CPU тоже начинает болеть.
+Часто тут думают, что это только IO-bound. При большом числе новых HTTPS-соединений CPU тоже начинает болеть.
 
 ### REQUEST PROCESSING
 
 **Суть:** превращает HTTP-запрос в вызов функции и маршрутизирует к нужному обработчику.
 
-![Illustration](../assets/first-nine/ru/inner-architecture_03.png)
+<div class="exc-scene" data-scene="inner-architecture_03"><noscript>Схема. Для просмотра нужен JavaScript.</noscript></div>
 
 **Что тут происходит:**
 
@@ -66,7 +66,7 @@ block: 3
 
 **Суть:** выполняет основную логику приложения - то, ради чего существует сервис.
 
-![Illustration](../assets/first-nine/ru/inner-architecture_04.png)
+<div class="exc-scene" data-scene="inner-architecture_04"><noscript>Схема. Для просмотра нужен JavaScript.</noscript></div>
 
 **Что тут происходит:**
 
@@ -74,7 +74,7 @@ block: 3
 - calculations - вычисления и обработка данных
 - external API calls - обращения к сторонним сервисам
 - database queries - запросы к PostgreSQL/MySQL/MongoDB
-- cache operations - чтение/запись Redis/Memcached
+- cache operations - локальный кеш в памяти или Redis/Memcached по сети
 
 Этот слой получает приз SRE симпатий как самый проблемный. Тут и медленные SQL, и блокировки, и внешние API без таймаутов, и тяжелые вычисления O(n!).
 
@@ -82,7 +82,7 @@ block: 3
 
 **Суть:** упаковывает результат обратно в HTTP-ответ и отправляет клиенту.
 
-![Illustration](../assets/first-nine/ru/inner-architecture_05.png)
+<div class="exc-scene" data-scene="inner-architecture_05"><noscript>Схема. Для просмотра нужен JavaScript.</noscript></div>
 
 **Что тут происходит:**
 
@@ -95,7 +95,7 @@ block: 3
 
 ### Полная картина
 
-![Illustration](../assets/first-nine/ru/inner-architecture_06.png)
+<div class="exc-scene" data-scene="inner-architecture_06"><noscript>Схема. Для просмотра нужен JavaScript.</noscript></div>
 
 ***
 
@@ -103,7 +103,7 @@ block: 3
 
 Теперь, когда у нас есть представление о слоях, попробуем нарисовать это как абстрактную архитектуру, будто у нас микросервисы.
 
-![Illustration](../assets/first-nine/ru/inner-architecture_07.png)
+<div class="exc-scene" data-scene="inner-architecture_07"><noscript>Схема. Для просмотра нужен JavaScript.</noscript></div>
 
 Знакомимся с объектами. Их может быть больше или меньше в реальности. Тут главное подход: выносим в отдельную сущность все, что имеет независимый пул воркеров или любую работу за пределами приложения.
 
@@ -120,7 +120,7 @@ block: 3
 
 Почему это важно? Простой пример с таймаутами:
 
-- В бизнес-логике делаем SQL-запрос в БД. У базы свой пул, например Hikari.
+- В бизнес-логике делаем SQL-запрос в БД. У приложения свой пул соединений к базе, например HikariCP.
 - Пулы к БД заняты, воркер висит и ждет, когда освободится подключение.
 - В итоге копятся горутины или забивается пул воркеров.
 

@@ -1,0 +1,32 @@
+/* excalidraw-scene.css - схемы статей на движке сайта (excalidraw-scene.js) */
+.exc-scene { position: relative; margin: 1.2em 0; }
+.exc-scene__chart { margin: 0 auto; }
+.exc-scene__chart svg { display: block; width: 100%; height: auto; }
+.exc-el { transition: opacity .35s ease; }
+.exc-el.exc-off { opacity: 0; }
+.exc-el.exc-pop { animation: exc-pop .45s ease-out; transform-box: fill-box; transform-origin: center; }
+@keyframes exc-pop { from { opacity: 0; } to { opacity: 1; } }
+.exc-focusing .exc-el:not(.exc-hl):not(.exc-off) { opacity: .22; }
+.exc-el.exc-pulse > g { animation: exc-pulse .7s ease-in-out; transform-box: fill-box; transform-origin: center; }
+@keyframes exc-pulse { 0%, 100% { filter: none; } 45% { filter: drop-shadow(0 0 var(--exc-glow, 6px) rgba(240, 140, 0, .95)); } }
+.exc-token { pointer-events: none; }
+.exc-el text { transition: opacity .25s ease; }
+
+.exc-scene__full {
+  position: absolute; top: 4px; right: 4px; font: inherit; font-size: .62rem; padding: .25em .7em; cursor: pointer;
+  border: 1px solid var(--md-default-fg-color--lighter, #ccc); border-radius: 6px;
+  background: var(--md-default-bg-color, #fff); color: var(--md-default-fg-color, #222); opacity: .85;
+}
+.exc-scene__full:hover, .exc-scene__full:focus-visible { opacity: 1; }
+
+.exc-overlay { position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, .72); overflow: auto; padding: 48px 16px 16px; }
+.exc-overlay__chart { margin: 0; }
+.exc-overlay__chart svg { width: auto; max-width: none; }
+.exc-overlay__close {
+  position: fixed; top: 10px; right: 16px; z-index: 1001; font: inherit; font-size: .75rem; padding: .3em .9em; cursor: pointer;
+  border-radius: 6px; border: 0; background: #fff; color: #222;
+}
+
+/* dark theme: the same trick as Excalidraw's own dark mode */
+[data-md-color-scheme="slate"] .exc-scene__chart svg { filter: invert(93%) hue-rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .exc-el, .exc-el.exc-pop, .exc-el.exc-pulse > g { animation: none; transition: none; } }

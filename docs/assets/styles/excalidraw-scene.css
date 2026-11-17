@@ -1,6 +1,7 @@
 /* excalidraw-scene.css - схемы статей на движке сайта (excalidraw-scene.js) */
 .exc-scene { position: relative; margin: 1.2em 0; }
 .exc-scene__chart { margin: 0 auto; }
+.exc-scene__scroll { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
 .exc-scene__chart svg { display: block; width: 100%; height: auto; }
 .exc-el { transition: opacity .35s ease; }
 .exc-el.exc-off { opacity: 0; }

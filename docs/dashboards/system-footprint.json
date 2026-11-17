@@ -753,7 +753,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Percent signals per layer over time.\n\n- CPU/Disk/Memory: PSI some (% time tasks waited on that resource).\n- Network: fast retrans % + slow/RTO retrans % of TCP OutSegs.\n- Retrans can be caused by loss or a slow receiver not processing incoming traffic fast enough.\n\nNote: TCP netstat counters are host-wide (not per interface).\nIf PSI metrics are missing, Network is disabled (by design).\n\nUse this panel as a compass, then confirm in the detailed blocks below.",
+      "description": "Percent signals per layer over time.\n\n- CPU/Disk/Memory: PSI some (% time tasks waited on that resource).\n- Network: fast retrans % + slow/RTO retrans % of TCP OutSegs.\n- Retrans can be caused by loss or a slow receiver not processing incoming traffic fast enough.\n\nNote: TCP netstat counters cover only the node's own network (not per interface): pods with their own network are not counted here.\nIf PSI metrics are missing, Network is disabled (by design).\n\nUse this panel as a compass, then confirm in the detailed blocks below.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1079,7 +1079,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Worst-case (max) in the selected time range.\n\nCPU/Disk/Memory: PSI some (%).\nNetwork: fast retrans % + slow/RTO retrans % (of TCP OutSegs).\nOK = 100% - (CPU + Disk + Memory + Network).\n\nNote: TCP netstat counters are host-wide (not per interface).",
+      "description": "Worst-case (max) in the selected time range.\n\nCPU/Disk/Memory: PSI some (%).\nNetwork: fast retrans % + slow/RTO retrans % (of TCP OutSegs).\nOK = 100% - (CPU + Disk + Memory + Network).\n\nNote: TCP netstat counters cover only the node's own network (not per interface): pods with their own network are not counted here.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1753,7 +1753,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "PSI CPU: % of time tasks waited for CPU.\n- some: at least 1 task waited\n- full: all runnable tasks waited (often ≈0 on host)\n\n1% ≈ 10ms/s delay. Treat as time lost.",
+      "description": "PSI CPU: % of time tasks waited for CPU.\n- some: at least 1 task waited\n\n1% ≈ 10ms/s delay. Treat as time lost.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1821,21 +1821,6 @@
                 }
               }
             ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "CPU Pressure (full)"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
           }
         ]
       },
@@ -1873,18 +1858,9 @@
           "expr": "100 * rate(node_pressure_cpu_waiting_seconds_total{instance=\"$node\", job=\"$job\"}[1m])",
           "legendFormat": "CPU Pressure (some)",
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "100 * rate(node_pressure_cpu_stalled_seconds_total{instance=\"$node\", job=\"$job\"}[1m])",
-          "legendFormat": "CPU Pressure (full)",
-          "refId": "B"
         }
       ],
-      "title": "PSI CPU (some/full)",
+      "title": "PSI CPU (some)",
       "transparent": true,
       "type": "timeseries"
     },
@@ -2942,7 +2918,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "TX throughput vs loss signals (selected interface).\n\nWhat you see:\n- TX actual: real TX traffic on the selected interface.\n- TX without loss: a reference line (model of “ideal” TX if retrans were not needed).\n- Fast retrans % and Slow retrans (RTO) %: share of TCP OutSegs.\n\nModel math (per point, from rates):\n- fast% = (RetransSegs - TCPTimeouts) / OutSegs\n- slow% = TCPTimeouts / OutSegs\n- TX_without_loss = TX_actual * (1 + fast% * sfp_net_fast_penalty + slow% * sfp_net_slow_penalty)\n\nWhat to look for:\n- retrans % rising + TX actual below the reference line → throughput is impacted by loss/retrans.\n\nNotes:\n- Retrans can also be driven by a slow receiver that cannot drain incoming traffic fast enough.\n- Interface filter applies to TX traffic. TCP netstat counters are host-wide (not per interface).\n- Tune constants in Variables: sfp_*.",
+      "description": "TX throughput vs loss signals (selected interface).\n\nWhat you see:\n- TX actual: real TX traffic on the selected interface.\n- TX without loss: a reference line (model of “ideal” TX if retrans were not needed).\n- Fast retrans % and Slow retrans (RTO) %: share of TCP OutSegs.\n\nModel math (per point, from rates):\n- fast% = (RetransSegs - TCPTimeouts) / OutSegs\n- slow% = TCPTimeouts / OutSegs\n- TX_without_loss = TX_actual * (1 + fast% * sfp_net_fast_penalty + slow% * sfp_net_slow_penalty)\n\nWhat to look for:\n- retrans % rising + TX actual below the reference line → throughput is impacted by loss/retrans.\n\nNotes:\n- Retrans can also be driven by a slow receiver that cannot drain incoming traffic fast enough.\n- Interface filter applies to TX traffic. TCP netstat counters cover only the node's own network (not per interface): pods with their own network are not counted here.\n- Tune constants in Variables: sfp_*.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -4568,7 +4544,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Indicator of TCP handshake/connect issues: SYN retrans rate divided by active opens rate (ActiveOpens).\n\nFormula: `rate(TCPSynRetrans) / rate(ActiveOpens)`.",
+      "description": "Indicator of TCP handshake problems. TCPSynRetrans counts retransmits of both SYN (outgoing connects) and SYN/ACK (incoming connects), so it is divided by all new connections: ActiveOpens + PassiveOpens.\n\nFormula: `rate(TCPSynRetrans) / (rate(ActiveOpens) + rate(PassiveOpens))`.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -4670,17 +4646,17 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "(\n  rate(node_netstat_TcpExt_TCPSynRetrans{instance=\"$node\", job=\"$job\"}[$__rate_interval])\n  or\n  (0 * rate(node_netstat_Tcp_ActiveOpens{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n)\n/\nclamp_min(\n  rate(node_netstat_Tcp_ActiveOpens{instance=\"$node\", job=\"$job\"}[$__rate_interval]),\n  1e-6\n)",
-          "legendFormat": "SYN retrans / ActiveOpens",
+          "expr": "(\n  rate(node_netstat_TcpExt_TCPSynRetrans{instance=\"$node\", job=\"$job\"}[$__rate_interval])\n  or\n  (0 * rate(node_netstat_Tcp_ActiveOpens{instance=\"$node\", job=\"$job\"}[$__rate_interval]))\n)\n/\nclamp_min(\n  rate(node_netstat_Tcp_ActiveOpens{instance=\"$node\", job=\"$job\"}[$__rate_interval])\n  + rate(node_netstat_Tcp_PassiveOpens{instance=\"$node\", job=\"$job\"}[$__rate_interval]),\n  1e-6\n)",
+          "legendFormat": "SYN + SYN/ACK retrans / (ActiveOpens + PassiveOpens)",
           "refId": "A"
         },
         {
           "expr": "rate(node_netstat_TcpExt_TCPSynRetrans{instance=\"$node\", job=\"$job\"}[$__rate_interval])\nor\n(0 * rate(node_netstat_Tcp_ActiveOpens{instance=\"$node\", job=\"$job\"}[$__rate_interval]))",
-          "legendFormat": "SYN retrans /s",
+          "legendFormat": "SYN and SYN/ACK retrans /s",
           "refId": "B"
         }
       ],
-      "title": "TCP SYN Retrans / ActiveOpens",
+      "title": "TCP SYN and SYN/ACK retrans per new connection",
       "transparent": true,
       "type": "timeseries"
     },

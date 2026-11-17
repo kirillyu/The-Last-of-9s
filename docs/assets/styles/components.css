@@ -722,9 +722,10 @@
   scroll-snap-type: x mandatory;
   padding-bottom: 1.5rem;
   /* Space for scrollbar if visible, layout breathing */
-  margin: 0 -1rem;
-  /* Negative internal margin to allow cards to touch edges visually */
-  padding: 0 1rem 1.5rem;
+  margin: 0 -.8rem;
+  /* Negative internal margin to allow cards to touch edges visually.
+     .8rem is the side margin of .md-content__inner in Material: with 1rem the slider stuck out by 4px */
+  padding: 0 .8rem 1.5rem;
   /* Padding to compensate for negative margin */
 
   /* Hide scrollbar for cleaner look */

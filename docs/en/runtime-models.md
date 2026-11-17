@@ -118,7 +118,7 @@ A game changer. The evolution of green threads. Millions of lightweight threads 
 
 **If it blocks:** when a lightweight thread initiates I/O, the scheduler parks it and runs another. Heavy threads do not idle.
 
-*Not every blocking call releases the heavy thread. Thread.sleep() and network waits release it. But synchronized (before JDK 24) and native code pin the lightweight thread to the heavy one: the heavy thread is stuck together with it. Reading a file also holds the heavy thread. In JDK 21 and 22 the runtime adds a spare heavy thread for that time, but from JDK 23 it does not.*
+Not every blocking call releases the heavy thread: native code and reading a file hold it.
 
 ![Illustration](../assets/first-nine/en/runtime-models_07.png)
 

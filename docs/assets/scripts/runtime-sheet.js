@@ -163,7 +163,7 @@
         return [
           { name: 'container A', mode: 'наивный', app: 'Application A (Node.js)',
             values: [{ t: 'event loop: 1 поток' }, { t: 'libuv pool: 4 потока (по умолчанию)', dim: true },
-              { t: 'os.cpus().length = 128 (ядра ноды)', dim: true }, { t: 'os.availableParallelism() = 2', to: 'a-cpu-limit' }],
+              { t: 'os.cpus().length = 128 (ядра ноды)', dim: true }, { t: 'os.availableParallelism() = 2 (Node 22.17+)', to: 'a-cpu-limit' }],
             spec: [{ t: 'cpu:', head: true }, { t: 'requests: 1' }, { t: 'limits: 2', id: 'a-cpu-limit' },
               { t: 'memory:', head: true }, { t: 'requests: 1Gi' }, { t: 'limits: 1Gi' }] },
           { name: 'container B', mode: 'без лимитов', app: 'Application B (Node.js)',

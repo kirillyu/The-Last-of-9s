@@ -80,12 +80,12 @@ Three categories:
 1. Works with immutable data.
 2. Has no shared mutable state.
 3. Synchronizes access to shared data (locks).
-4. Uses atomic operations.
+4. Changes shared state with one atomic operation.
 
 **Thread-unsafe:**
 
-1. Mutates global state.
-2. Uses static mutable variables.
+1. Mutates global state without synchronization.
+2. Uses static mutable variables without synchronization.
 3. Does non-atomic read-modify-write.
 4. Examples: strtok() in C, SimpleDateFormat in Java.
 
@@ -98,9 +98,9 @@ Three categories:
 
 ## Call overhead
 
-Every function call allocates its own memory region called a stack frame.
+Every function call, if the compiler did not inline the function, allocates its own memory region called a stack frame.
 
-Each call creates a new frame at the top of the stack; when the function completes, the frame is removed. Frame size depends on local variables: from zero bytes to kilobytes. A small function like int sum(int a, int b) is usually inlined by the compiler, so there is no frame at all.
+Each call creates a new frame at the top of the stack; when the function completes, the frame is removed. Frame size depends on local variables: from zero bytes to kilobytes.
 
 ![Illustration](../assets/first-nine/en/function-atomic-unit_05.png)
 
@@ -110,9 +110,9 @@ Simple:
 
 - Creating a stack frame takes a few CPU cycles, sometimes tens (fast, but it hurts in tight loops).
 
-The longer the call chain, the more overhead adds up and the more stack it takes (hello, stack overflow). Lambdas that capture variables can cost more: they add a closure object and an indirect call.
+The longer the call chain, the more overhead adds up and the more stack it takes (hello, stack overflow). Lambdas that capture variables cost even more: they add a closure object and an indirect call.
 
-Dirty hack: inline functions. They remove the frame cost. But the compiler does not inline everything: for example, Go does not inline functions with defer, while the JVM does inline methods with try/catch. Check it on your runtime.
+Dirty hack: inline functions. They remove the frame cost.
 
 ***
 

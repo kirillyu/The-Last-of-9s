@@ -81,7 +81,7 @@ CPU time is split into common modes. Only user, nice, system, irq and softirq of
 | steal         | R / -               | `psi.cpu.some`          | Hypervisor took CPU from VM             |
 | nice          | S / R               | `psi.cpu.some`*         | Low priority processes                  |
 
-> *A running thread does not create PSI for itself, but it creates a queue for others.*
+> A running thread does not create PSI for itself, but it creates a queue for others.
 
 A small Linux dictionary (more in links above):
 
@@ -109,7 +109,7 @@ Below I want to show how this work is covered by metrics and at what level. Here
 
 `cpu_seconds` shows **consumption** (who owns the resource now), and PSI shows **shortage** (who waits in the queue).
 
-* **User/Nice:** They do not create PSI for the same thread, but their active work creates `cpu_waiting` for *other* processes.
+* **User/Nice:** They do not create PSI for the same thread, but their active work creates `cpu_waiting` for other processes.
 * **IO:** `waiting` (Some) - disk slows a process, but others can run. `stalled` (Full) - disk fully blocks the system (critical!).
 
 Here are container metrics from `cAdvisor`:
@@ -126,7 +126,7 @@ Here are container metrics from `cAdvisor`:
 
 > Throttled processes are formally `running` (ready to run), but the kernel does not give them CPU because the quota is spent (CFS bandwidth control). This is unique because they wait for cgroup permission while in R state. It is correct to count them as Off-CPU.
 
-> container_tasks_state has a catch: by default it is 0. Values appear only with the cAdvisor flag --enable_load_reader and only on cgroup v1: on cgroup v2 the kernel does not support this request. kubelet up to 1.36 also accepted this flag as deprecated, in 1.37 it was removed.[^1]
+> container_tasks_state is 0 by default: values appear only with the cAdvisor flag --enable_load_reader and only on cgroup v1.[^1]
 
 Metrics are few (for me, always). PSI metrics are great. CPU work types are often underrated, but useful. Very few people look at process states (`running`/`blocked`); they are not super useful, but can help to separate problems when there are many processes.
 
@@ -134,7 +134,7 @@ Metrics are few (for me, always). PSI metrics are great. CPU work types are ofte
 
 ### 2. Off-CPU
 
-Here the thread is not running, CPU is idle.
+Here the thread is not running, CPU is free for other tasks.
 
 I made a classification for Off-CPU waits based on their properties and how they look in the system.
 
@@ -152,7 +152,7 @@ We just touched memory.
 
 * **Examples:** page faults are inevitable when we work with memory; it happens when we access addresses with no RAM pages.
 * **Meaning:** MMU raises a page fault exception. On a minor fault the kernel just allocates a page, on a major fault it reads the page from disk or swap.
-* **Metrics:** WCHAN (`folio_wait_bit_common`), PSI IO and maybe PSI Memory.
+* **Metrics:** the kernel handles a minor fault right on the CPU, the thread does not sleep. A major fault waits for disk, and then you see WCHAN (`folio_wait_bit_common`), PSI IO and maybe PSI Memory.
 
 The table below shows how many waits, even system ones, we do not see in metrics, not to mention waits inside the app.
 
@@ -164,7 +164,7 @@ The table below shows how many waits, even system ones, we do not see in metrics
 | I/O wait         | `folio_wait_bit_common` and others | `io_waiting` / `io_stalled`                     | `io_waiting` / `io_stalled`                     |
 | Major page fault | `folio_wait_bit_common`            | `io_waiting`, during thrashing `memory_stalled` | `io_waiting`, during thrashing `memory_stalled` |
 
-WCHAN names depend on kernel version, architecture and build. For example, on arm64 you often see the syscall name (`__arm64_sys_epoll_pwait`) instead of `ep_poll`. You can check your own on the node: `ps -eLo pid,tid,stat,wchan:32,comm`.
+You can check your own WCHAN on the node: `ps -eLo pid,tid,stat,wchan:32,comm`.
 
 So, there is no universal metric or simple way to quickly show what causes delays in the app. Below I try to squeeze maximum from the metrics we usually have.
 
@@ -181,8 +181,6 @@ Let us take a more practical scale:
 * **Expensive** - milliseconds: network inside DC, short disk queues, HDD sequential.
 * **Very expensive** - tens of milliseconds and more: HDD random, swap/major faults, RTO/many retransmits, long disk queues.
 
-Ranges depend on hardware and workload. It is a guide, not hard thresholds.
-
 ## System Footprint Method
 
 **System Footprint Method** is a performance analysis method based on [USE method](https://www.brendangregg.com/usemethod.html) by Brendan Gregg and extended with a view through "footprints" of load in key system metrics. It is a forensic idea: find where CPU and app time goes by looking at signs (footprints) of load or waiting at each system level. We check process states, CPU time split, PSI, and main subsystems (CPU, disk, network, memory) to find the bottleneck. If a subsystem has abnormal metrics, there are "footprints", so we dig there. If graphs show **no** signs (no footprints), we assume the system is idle or waits for external resources (locks, network calls), i.e. the reason is outside CPU/disk/memory.
@@ -195,10 +193,8 @@ Below is the analysis sequence and how to read metrics.
 
 First, inspired by the picture above (app on top, threads go down to kernel), it is useful to check threads: metrics exist for two states - Running (R) and Blocked (D). Understand the scale: these are workers that do your app work. Metrics can show two states:
 
-* **Running (R)** - if the number of OS threads in state *R* is much higher than CPU cores, a CPU queue forms (threads wait for a core). This is a CPU overload sign: more compute tasks than capacity. Even if the runtime hides waits inside (e.g., JVM web pool), R-state shows heavy threads do not get their time slice. In node metrics it is usually `node_procs_running` (count of OS threads, including kernel threads).
-* **Blocked (D)** - if there are OS threads in *D* state (especially spikes), threads are stuck waiting for I/O. Each blocked D-thread means the system waits for disk, and useful work is idle. D spikes come with higher request latency and performance drop. In general many D means waiting for hardware, mostly disk. D threads do not use CPU and are not visible in CPU load. In node metrics this is `node_procs_blocked` (also includes kernel threads), but it counts only threads that wait for I/O. D-threads that wait, for example, for a lock in the kernel are not counted there.
-
-Important: metrics usually give only R and D (node_exporter, cAdvisor). S/Z and their variants are not visible or only partially in aggregated counters. The picture is incomplete, and that is ok.
+* **Running (R)** - if the number of OS threads in state R is much higher than CPU cores, a CPU queue forms (threads wait for a core). This is a CPU overload sign: more compute tasks than capacity. Even if the runtime hides waits inside (e.g., JVM web pool), R-state shows heavy threads do not get their time slice. In node metrics it is usually `node_procs_running` (count of OS threads, including kernel threads).
+* **Blocked (D)** - if there are OS threads in D state (especially spikes), threads are stuck waiting for I/O. Each blocked D-thread means the system waits for disk, and useful work is idle. D spikes come with higher request latency and performance drop. In general many D means waiting for hardware, mostly disk. D threads do not use CPU and are not visible in CPU load. In node metrics this is `node_procs_blocked`.
 
 I recommend to compare these thread counts with what your app should do and how many threads it should create (of course if your node does not run 100 apps). If threads are much more than you expected, your runtime probably hides something or you have a config issue.
 
@@ -206,14 +202,14 @@ Then step by step: first PSI (is there pressure?), then blocks by resource - CPU
 
 ### 1. PSI Overview
 
-The simplest and most useful thing to look at (if this metric exists) is PSI. It is available on [host](https://github.com/prometheus/node_exporter/pull/1325), in containers [inside k8s](https://kubernetes.io/docs/reference/instrumentation/understand-psi-metrics), and [outside k8s](https://github.com/google/cadvisor/pull/3649).
+The simplest and most useful thing to always look at is PSI. It is available on [host](https://github.com/prometheus/node_exporter/pull/1325), in containers [inside k8s](https://kubernetes.io/docs/reference/instrumentation/understand-psi-metrics), and [outside k8s](https://github.com/google/cadvisor/pull/3649).
 
 **Pressure Stall Information** shows the share of time when tasks were forced to wait because of lack of CPU, IO, or memory. It is not load, but the percent of "lost" time. `some` means at least one thread was delayed; `full` means all active tasks were waiting at that moment and nobody did useful work (on host cpu.full is always 0, in cgroup it appears when CFS quotas are hit or when neighbors took the CPU). We care about size and duration, not only "> 0". Load Average is useful as a trend, but it mixes runnable and D-state and is not normalized by cores; PSI is more precise for wait time.
 
 How to read:
 
 * **PSI CPU.some** - signal of CPU contention. Then check: is `user/system` high, is there single-thread or busy-wait (PSI low, `user` high).
-* **PSI IO.some** - disk delays. Check util/latency/queue and D-state count. Reaction depends on disk type and I/O pattern.
+* **PSI IO.some** - disk delays. Check util/latency/queue and D-state count.
 * **PSI Memory.some** - share of time tasks could not get memory and waited while kernel freed RAM, evicted pages (from cache or to swap) and/or read them back from disk.
 * **All PSI near zero, but service is slow** - delay can be in network or inside the app (external API, locks). Then use app metrics or profilers.
 
@@ -228,7 +224,7 @@ The view is simple: first pressure (PSI), then by resources - CPU, disk, network
 This is about On-CPU part (user/system/softirq/steal), together with PSI CPU and R-state from the start.
 
 * **Where does CPU go?** - look at user/system/softirq/steal split. High `system` means time in kernel (syscalls, drivers). High `softirq` means kernel is busy with network/disk in software interrupts. `steal` means hypervisor takes time from VM. Reaction: spread IRQ, limit heavy threads, profile code/GC.
-* **Is there CPU contention?** - read PSI CPU with context switches. Node Exporter gives total context switches (`node_context_switches_total`), without voluntary/involuntary split; cAdvisor usually has none. A high counter alone (or growth) without normalization by cores is not a signal, but with performance drop it can hint too many threads or lock contention. High PSI with low switches can mean cgroup quotas.
+* **Is there CPU contention?** - read PSI CPU with context switches. Node Exporter gives total context switches (`node_context_switches_total`). Their growth together with a performance drop hints at too many threads or lock contention. High PSI with low switches can mean cgroup quotas.
 * **Is there imbalance per core?** - per-core load shows hot cores. One CPU is busy, others idle: hot thread or IRQ pinned to one core. On VMs and without RSS/irqbalance this is common: all network/disk traffic can stick to one CPU. Fix with IRQ/RPS and correct worker count (separate topic).
 
 About load average: it is an average of runnable + D-state over 1/5/15 min, not normalized by cores, and includes blocking (D) tasks. On multi-core systems LA can be high with even load, or low with one hot core. Research (e.g., man proc(5), LWN articles) says LA is a symptom, not truth. Use it as a trend and always confirm with PSI, R-state, and per-CPU load.
@@ -262,20 +258,20 @@ Network waits are Off-CPU: when a thread waits on socket/epoll, it is in S-state
     * **Receive errors** - `node_netstat_Tcp_InErrs`: how many incoming TCP segments were accepted with error. Any growth is a signal of problems on receive path (bad segments, checksum/offload/driver/port).
     Drops on receive cause losses; then sender retransmits and client latency grows. This lets us connect cause and effect with only network metrics.
 * **Is the remote side (or the network between) too slow to receive?** - retransmissions answer this:
-  * **Retransmissions** - re-sending lost packets. Metrics: on **node** `node_netstat_Tcp_RetransSegs` (node_exporter), in **container** similar TCP metrics exist in cAdvisor with advanced TCP stats, in **k8s** (limited cAdvisor) there are no TCP metrics. Also check SYN retries: `node_netstat_TcpExt_TCPSynRetrans` (SYN retrans on handshake; affects connect latency and errors, especially for short connections).
+  * **Retransmissions** - re-sending lost packets. Metrics: on **node** `node_netstat_Tcp_RetransSegs` (node_exporter), in **container** similar TCP metrics exist in cAdvisor with advanced TCP stats, in **k8s** (limited cAdvisor) there are no TCP metrics. Also check SYN retries: `node_netstat_TcpExt_TCPSynRetrans` (SYN and SYN/ACK retransmits on handshake; affects connect latency and errors, especially for short connections).
     Retransmits are **fast** (fast retransmit: after 3 dupACK, resend without timeout) and **timeout** (RTO/backoff: 200 → 400 → 800 → 1600 → 3200 ms … up to tens of seconds).
     In node_exporter we have a size issue: `node_netstat_Tcp_RetransSegs` counts segments, and `node_netstat_TcpExt_TCPTimeouts` counts timeout events (RTO). So we cannot precisely split fast vs RTO without extra TcpExt fields, but we can make an optimistic lower bound for heavy losses.
     Retransmits are normal: they can happen even in good times (also because of out-of-order packets, see [RFC 4653](https://datatracker.ietf.org/doc/html/rfc4653)). For diagnosis, look at **share of traffic** and **trend**.
     Causes are two groups: (1) loss/errors in network (link/port/overload), (2) remote side is too slow to receive/process (queues, slow server/DB and drops).
-    For scale: a Linux test with CUBIC (default [congestion control](https://www.rfc-editor.org/rfc/rfc5681)) on 10G bulk traffic with controlled loss: loss 1% → throughput ~2.36 Gbit/s, loss 5% → ~0.512 Gbit/s, loss 10% → ~0.028 Gbit/s, loss 15% → ~0.002 Gbit/s. For rough loss impact there is [Mathis formula](https://en.wikipedia.org/wiki/TCP_congestion_control#Rate_equation) and it is even worse. Real numbers depend on congestion control and network conditions - use it as a guide. Test method: [TCP Congestion Control in Action](https://alebsys.github.io/posts/cwnd-retransmit/).
+    For scale: a Linux test with CUBIC (default [congestion control](https://www.rfc-editor.org/rfc/rfc5681)) on 10G bulk traffic with controlled loss: loss 1% → throughput ~2.36 Gbit/s, loss 5% → ~0.512 Gbit/s, loss 10% → ~0.028 Gbit/s, loss 15% → ~0.002 Gbit/s. For rough loss impact there is [Mathis formula](https://en.wikipedia.org/wiki/TCP_congestion_control#Rate_equation) and it is even worse. Use it as a guide. Test method: [TCP Congestion Control in Action](https://alebsys.github.io/posts/cwnd-retransmit/).
     To interpret retransmits, check percent in total traffic:
     - retrans share in TCP traffic: `rate(node_netstat_Tcp_RetransSegs) / rate(node_netstat_Tcp_OutSegs)`
     - RTO lower bound: `rate(node_netstat_TcpExt_TCPTimeouts) / rate(node_netstat_Tcp_OutSegs)`. 1 RTO timeout means at least 1 retransmitted segment.
-    - fast retrans upper bound (after one RTO the kernel usually resends several segments): `(rate(node_netstat_Tcp_RetransSegs) - rate(node_netstat_TcpExt_TCPTimeouts)) / rate(node_netstat_Tcp_OutSegs)`
+    - fast retrans upper bound: `(rate(node_netstat_Tcp_RetransSegs) - rate(node_netstat_TcpExt_TCPTimeouts)) / rate(node_netstat_Tcp_OutSegs)`
     Then you can estimate useful traffic share: `rate(node_netstat_Tcp_OutSegs) / (rate(node_netstat_Tcp_OutSegs) + rate(node_netstat_Tcp_RetransSegs))` - retransmits push out useful data.
-    The bigger the share of RTO retransmits, the worse. Even 1% is already a lot. If there are no RTO, then fast retrans needs ~10-20% to really hurt. Thresholds from tests and prod can vary.
+    The bigger the share of RTO retransmits, the worse. Even 1% is already a lot. If there are no RTO, then fast retrans needs ~10-20% to really hurt. Thresholds are from tests and from what I saw in prod.
 * **Do we hit system network limits?** - another class of issues, partly same as disk, but grouped here:
-  * **Conntrack / TIME_WAIT** - **Conntrack** (`nf_conntrack`) is a kernel table that tracks active TCP/UDP connections for NAT, firewall (iptables/nftables) and stateful filtering. Each new connection adds a record. Near the limit (compare `node_nf_conntrack_entries` with `node_nf_conntrack_entries_limit`) new connects are dropped - it looks like "pings work, but new DB connections hang". **TIME_WAIT** is a TCP state after close (lives ~60 seconds by default). It stays on the side that closed first (often server in HTTP/1.1; in HTTP/2/gRPC this is softer due to persistent channels). Many TIME_WAIT on clients can hit ephemeral port limits and block outgoing connections; in practice it depends on `net.ipv4.ip_local_port_range` + number of TIME_WAIT sockets.
+  * **Conntrack / TIME_WAIT** - **Conntrack** (`nf_conntrack`) is a kernel table that tracks active TCP/UDP connections for NAT, firewall (iptables/nftables) and stateful filtering. Each new connection adds a record. Near the limit (compare `node_nf_conntrack_entries` with `node_nf_conntrack_entries_limit`) new connects are dropped - it looks like "pings work, but new DB connections hang". **TIME_WAIT** is a TCP state after close (lives ~60 seconds by default). It stays on the side that closed first. Many TIME_WAIT on clients can hit ephemeral port limits and block outgoing connections; in practice it depends on `net.ipv4.ip_local_port_range` + number of TIME_WAIT sockets.
   * **Backlog / somaxconn / SYN backlog** - limits of incoming queues. When they hit, it looks like "new connects are slow/fail", while traffic/pings are fine. In metrics it shows as `node_netstat_TcpExt_ListenOverflows`/`node_netstat_TcpExt_ListenDrops` (listen/accept queues), and for SYN phase - growth of `node_netstat_TcpExt_TCPSynRetrans` on clients. Limits live at several levels: app backlog (`listen()`), `net.core.somaxconn`, `net.ipv4.tcp_max_syn_backlog`.
   * **File descriptors (FD)** - each TCP connection/socket uses an FD. When you hit FD, new accept/connect fails (often in logs as "too many open files"). At node level check `node_filefd_allocated` and `node_filefd_maximum`; also process limits (ulimit/systemd LimitNOFILE) and system limits (`fs.file-max`/`fs.nr_open`).
   * **Inodes** - inodes limit number of files/dirs. When inodes are exhausted, creating files/dirs (and Unix sockets with FS paths) fails even if disk space is free. At node level check `node_filesystem_files_free` / `node_filesystem_files`.
@@ -291,7 +287,7 @@ Start with sharp problems.
 * **Is there free memory right now?** - check `node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes` and its dynamics: sharp drops often match latency degradation. Also check if you hit a threshold visually - it can be due to limits (cgroup limits/requests).
 * **Is swap present and used?** - two different questions:
   * **swap enabled**: `node_memory_SwapTotal_bytes > 0` - swap exists (not yet a problem, it may be empty, but it is a flag to check more).
-  * **swap used**: `node_memory_SwapTotal_bytes - node_memory_SwapFree_bytes` (SwapCached is already included) - how much data is already swapped out. "Swap used" does not mean disk is busy now, but it is a risk: access will need disk page-in and is much slower than RAM.
+  * **swap used**: `node_memory_SwapTotal_bytes - node_memory_SwapFree_bytes` (SwapCached is already included) - how much data is already swapped out. "Swap used" does not mean disk is busy now, but it is a risk: access to the pages that are not in RAM will need disk page-in and is much slower than RAM.
   * **swap actively used**: `node_vmstat_pswpin` / `node_vmstat_pswpout` (use rate) - pages move between RAM and swap right now. This is where disk affects latency: swap-in blocks threads on memory access path.
 * **Do we read pages from disk due to major faults?** - `node_vmstat_pgmajfault`: growth means page faults became "major", kernel had to read a page from disk before continuing. The disk can be (1) swap (swap-in), (2) file-backed pages (page cache miss / mmap). `node_vmstat_pswpin`/`node_vmstat_pswpout` count pages that went through swap: if `pgmajfault` grows with `pswpin`, then major faults are swap; if `pgmajfault` grows but `pswpin/pswpout` do not, it is more often file-backed pages.
 * **Minor faults: do they matter?** - minor faults are normal (first touch, COW, etc.). They matter when they grow by orders and become notable CPU/latency cost. At node level a rough estimate is `node_vmstat_pgfault - node_vmstat_pgmajfault`, but interpret only in workload context and dynamics.

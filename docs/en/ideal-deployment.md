@@ -52,11 +52,11 @@ I wrote a [post](https://t.me/r9yo11yp9e/14) (in Russian) about JVM tuning befor
 
 **Naive deployment**
 
-JVM sees a 2 CPU limit and sizes its parallelism accordingly: GC and ForkJoinPool. The Tomcat pool does not depend on CPU, it has 200 threads by default. The problem may look like this: throttling during warm-up, latency spikes, off-heap leaks.
+JVM sees a 2 CPU limit and sizes its parallelism accordingly: GC and ForkJoinPool. The problem may look like this: throttling during warm-up, latency spikes, off-heap leaks.
 
 **Remove throttling**
 
-In container B we remove limits. Trap: without limits JVM assumes the whole node. availableProcessors() becomes 128 and the runtime spawns a massive number of threads. (On JDK 8, and on 11 and 17 before the October 2022 updates, JVM without a limit counted CPUs from requests and would return 1.) Context switching explodes and performance degrades. The app tries to use 128 cores with a 1 CPU guarantee.
+In container B we remove limits. Trap: without limits JVM assumes the whole node. availableProcessors() becomes 128 and the runtime spawns a massive number of threads. Context switching explodes and performance degrades. The app tries to use 128 cores with a 1 CPU guarantee.
 
 **Ideal deployment**
 
@@ -83,7 +83,6 @@ Without limits the scheduler takes as many heavy threads as the node has cores, 
 Remove limits and do what we do in JVM 11+:
 
 1. -XX:ActiveProcessorCount=1 - controls parallelism of GC, ForkJoinPool and the heavy thread pool for virtual threads.
-2. -Djdk.virtualThreadScheduler.parallelism - needed only if you want a different number for virtual threads than in ActiveProcessorCount.
 
 This aligns runtime parallelism with guaranteed resources.
 
@@ -95,7 +94,7 @@ This aligns runtime parallelism with guaranteed resources.
 
 **Naive deployment**
 
-Run with requests and limits. Before Go 1.25 the runtime does not see limits: GOMAXPROCS equals the number of node cores, for example 128, and Go hits the quota. Since Go 1.25 (if go.mod says go 1.25 or newer) GOMAXPROCS defaults to the CPU limit, here it is 2. runtime.NumCPU() does not see the quota in any version. Issues: CPU throttling and GC not respecting container boundaries (OOMKill risk).
+Run with requests and limits. Before Go 1.25 the runtime does not see limits: GOMAXPROCS equals the number of node cores, for example 128, and Go hits the quota. Since Go 1.25 GOMAXPROCS defaults to the CPU limit, here it is 2. Issues: CPU throttling and GC not respecting container boundaries (OOMKill risk).
 
 **Remove throttling**
 
@@ -103,7 +102,7 @@ Remove limits. Trap: without limits GOMAXPROCS equals the number of node cores, 
 
 **Ideal deployment**
 
-Set GOMAXPROCS=1 (from requests). Set GOMEMLIMIT to 70-90% of memory limit because Go ignores memory.limit. For automation, use automemlimit. The runtime respects container boundaries and behaves predictably.
+Set GOMAXPROCS=1 (from requests). Set GOMEMLIMIT to 70-90% of memory limit because Go ignores memory.limit. It is a soft limit, it does not protect from OOM. For automation, use automemlimit. The runtime respects container boundaries and behaves predictably.
 
 ***
 
@@ -131,7 +130,7 @@ The right answer is scale-out. Keep process count aligned with requests. This yi
 
 **Naive deployment**
 
-The standard Python build has the GIL: only one thread runs bytecode at a time. The build without the GIL is officially supported since Python 3.14, but it is not the default. You can use multi-process pseudo-parallelism. Naive deployment is usually fine, but throttling can happen.
+Python has the GIL: only one thread runs bytecode at a time. You can use multi-process pseudo-parallelism. Naive deployment is usually fine, but throttling can happen.
 
 **Remove throttling**
 
@@ -155,7 +154,7 @@ Single-threaded MRI runtime: even if there are several threads, only one of them
 
 **Remove throttling**
 
-Remove limits. Puma itself does not count cores: by default it runs one process. The trap is in auto-tuning: WEB_CONCURRENCY=auto takes the worker count from Concurrent.available_processor_count. With a limit this is the quota, without a limit it is all node cores, and Puma will spawn too many processes.
+Remove limits. The trap is in auto-tuning: WEB_CONCURRENCY=auto without a limit takes the worker count from all node cores, and Puma will spawn too many processes.
 
 **Ideal deployment**
 

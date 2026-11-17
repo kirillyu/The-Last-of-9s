@@ -465,6 +465,9 @@
     document.addEventListener('visibilitychange', function () { self.wake(); });
   };
 
+  // the smallest text of a scheme on a phone, CSS px (the block 6-9 engine keeps about the same)
+  var MIN_TEXT_PX = 10;
+
   // ------------------------------------------------------------------ full size view for big schemes
   function openFull(data) {
     var ov = document.createElement('div'); ov.className = 'exc-overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
@@ -487,10 +490,22 @@
     root.__exc = true;
     var ns = root.querySelector('noscript'); if (ns) ns.remove();
     var host = document.createElement('div'); host.className = 'exc-scene__chart';
-    host.style.maxWidth = Math.round(data.w * (data.maxScale || 0.75)) + 'px';
-    root.appendChild(host);
+    var natural = Math.round(data.w * (data.maxScale || 0.75));
+    host.style.maxWidth = natural + 'px';
+    // on a phone a wide scheme shrinks its text to 3-5 px; there it keeps the smallest text at MIN_TEXT_PX
+    // and scrolls sideways inside its own frame, the page itself does not move
+    var scroller = document.createElement('div'); scroller.className = 'exc-scene__scroll';
+    scroller.appendChild(host); root.appendChild(scroller);
+    var minFs = data.els.reduce(function (m, e) { return e.type === 'text' ? Math.min(m, e.fontSize) : m; }, 1e9);
+    var narrow = window.matchMedia ? window.matchMedia('(max-width: 767px)') : { matches: false };
+    function fit() {
+      var need = Math.min(natural, Math.round(data.w * MIN_TEXT_PX / minFs));
+      host.style.minWidth = narrow.matches ? need + 'px' : '';
+    }
+    fit();
+    if (narrow.addEventListener) narrow.addEventListener('change', fit);
     var s = new Scene(host, data);
-    if (data.w > 1400) {
+    if (data.w > 1400 || narrow.matches) {
       var big = document.createElement('button'); big.type = 'button'; big.className = 'exc-scene__full'; big.textContent = 'развернуть';
       big.addEventListener('click', function () { openFull(data); });
       root.appendChild(big);

@@ -42,7 +42,7 @@ Start with the layers a request passes through. We'll separate four internal lay
 
 - socket listen (ports 8080, 443)
 - accept connections
-- TLS handshake - set up a secure connection: key exchange and signature. This is the most CPU-heavy part, encrypting the data itself later is much cheaper
+- TLS handshake - set up a secure connection: key exchange and signature. On short connections this is the most CPU-heavy part: encrypting the data itself is much cheaper
 - HTTP parsing - headers and body
 
 Many assume this is IO-only. With many new HTTPS connections it can become CPU-bound.

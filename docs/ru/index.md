@@ -1,5 +1,6 @@
 ---
 hide:
+  - navigation
   - toc
   - title
 title: Главная
@@ -8,7 +9,8 @@ title: Главная
 <div class="tl9-mock">
   <div class="tl9-featured">
     <div class="tl9-featured-copy" markdown>
-      <div class="hero-eyebrow">The Last of 9s</div>
+      <img class="tl9-hero-logo tl9-hero-logo--light" src="../assets/brand/logo-light.svg" alt="The Last of 9s" width="244" height="244">
+      <img class="tl9-hero-logo tl9-hero-logo--dark" src="../assets/brand/logo-dark.svg" alt="The Last of 9s" width="244" height="244">
       <h1 class="hero-title">Последний оплот хардкорного SRE.</h1>
       <p class="hero-lede">
         Никакого маркетинга, только суровая инженерия. Кулстори, хаки и техгайды про наблюдаемость, перформанс, устойчивость и траблшутинг. Здесь мы боремся за девятки после запятой.

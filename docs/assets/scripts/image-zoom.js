@@ -5,6 +5,7 @@ const MIN_WIDTH = 120;
 const isDecorative = (img) => {
   if (!img) return true;
   if (img.closest('a.md-logo')) return true;
+  if (img.classList.contains('tl9-hero-logo')) return true;
   if (img.classList.contains('tl9-bg')) return true;
   if (img.closest('figure')?.classList.contains('tl9-cover')) return false;
   return false;
@@ -63,7 +64,7 @@ const onClick = (event) => {
 
 const bindImages = () => {
   document.querySelectorAll(selector).forEach((img) => {
-    if (img.dataset.tl9ZoomBound) return;
+    if (img.dataset.tl9ZoomBound || isDecorative(img)) return;
     img.dataset.tl9ZoomBound = 'true';
     img.classList.add('tl9-img-zoomable');
     img.addEventListener('click', onClick);

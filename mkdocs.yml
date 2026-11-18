@@ -36,7 +36,8 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to auto theme
-  logo: assets/logo-optimized.png
+  logo: assets/brand/logo-header.svg
+  favicon: assets/brand/favicon.svg
   features:
     - navigation.tracking
     - navigation.tabs
@@ -117,6 +118,7 @@ validation:
 
 
 extra_css:
+  - assets/styles/sketch.css
   - assets/styles/fonts.css
   - assets/styles/brand.css
   - assets/styles/layout.css
@@ -133,3 +135,4 @@ extra_javascript:
   - assets/scripts/excalidraw-scenes.js
   - assets/scripts/excalidraw-scene.js
   - assets/scripts/runtime-sheet.js
+  - assets/scripts/sketch.js

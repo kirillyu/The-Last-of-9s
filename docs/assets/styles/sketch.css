@@ -1,0 +1,130 @@
+/* sketch.css - the site design system: one size scale, two weights,
+   one hand-written title, and Excalidraw-style frames drawn by sketch.js. The fonts are in fonts.css.
+   The rules start with html:root on purpose: the file loads before brand.css and the other styles, and this
+   weight (one class, one element) is what lets them win, exactly as in the reviewed preview. */
+
+/* ---------------------------------------------------------------- tokens */
+html {
+  --tl9-hand: "TL9 Hand", Excalifont, "Comic Sans MS", cursive;
+  /* the size scale, rem of Material (1rem = 20px) */
+  --tl9-fs-caption: .64rem;   /* 12.8 px: tags, captions, scheme buttons */
+  --tl9-fs-small: .7rem;      /* 14 px: card text, navigation, buttons */
+  --tl9-fs-body: .8rem;       /* 16 px: article text */
+  --tl9-fs-lead: 1rem;        /* 20 px: h3, lead paragraph */
+  --tl9-fs-h2: 1.25rem;       /* 25 px */
+  --tl9-fs-h1: 1.6rem;        /* 32 px */
+  --tl9-fs-display: 2.2rem;   /* 44 px: one hero title per page, hand font */
+  /* drawn lines */
+  --sk-ink: rgba(30, 30, 30, .62);
+  --sk-ink-soft: rgba(30, 30, 30, .34);
+  /* hachure color: graphite from the Excalidraw palette, an rgb triplet for the light (l) and the dark (d) theme */
+  --pal-l: 73, 80, 87;
+  --pal-d: 173, 181, 189;
+  --sk-hatch: rgba(var(--pal-l), .55);
+  --sk-hatch-soft: rgba(var(--pal-l), .28);
+  --sk-paper: rgba(255, 255, 255, .72);
+  --sk-hatch-faint: rgba(var(--pal-l), .2);
+}
+[data-md-color-scheme="slate"] {
+  --sk-ink: rgba(233, 237, 242, .62);
+  --sk-ink-soft: rgba(233, 237, 242, .3);
+  --sk-hatch: rgba(var(--pal-d), .6);
+  --sk-hatch-soft: rgba(var(--pal-d), .3);
+  --sk-paper: rgba(15, 20, 26, .55);
+  --sk-hatch-faint: rgba(var(--pal-d), .16);
+}
+/* the header is dark in both themes */
+.md-header { --sk-ink: rgba(233, 237, 242, .55); --sk-ink-soft: rgba(233, 237, 242, .28); --sk-hatch: rgba(var(--pal-d), .6); --sk-hatch-soft: rgba(var(--pal-d), .32); }
+
+/* ---------------------------------------------------------------- one size scale, two weights */
+html:root .md-typeset { font-size: var(--tl9-fs-body); }
+html:root .md-typeset h1 { font-size: var(--tl9-fs-h1); font-weight: 600; letter-spacing: 0; line-height: 1.25; }
+html:root .md-typeset h2 { font-size: var(--tl9-fs-h2); font-weight: 600; letter-spacing: 0; line-height: 1.3; }
+html:root .md-typeset h3 { font-size: var(--tl9-fs-lead); font-weight: 600; letter-spacing: 0; }
+html:root .md-typeset h4, html:root .md-typeset h5, html:root .md-typeset h6 { font-size: var(--tl9-fs-body); font-weight: 600; }
+html:root .md-typeset strong, html:root .md-typeset b, html:root .md-typeset th { font-weight: 600; }
+html:root .md-typeset sup { font-size: var(--tl9-fs-caption); }
+html:root .md-header__title { font-size: var(--tl9-fs-body); font-weight: 600; }
+html:root .md-nav__title { font-weight: 600; }
+html:root .post-meta, html:root .post-desc,
+html:root .rt-sheet label, html:root .rt-sheet button { font-size: var(--tl9-fs-small); }
+html:root .tag, html:root .exc-scene__full { font-size: var(--tl9-fs-caption); font-weight: 400; }
+html:root .post-link { font-size: var(--tl9-fs-lead); font-weight: 600; }
+html:root .tl9-lang-toggle { font-size: var(--tl9-fs-caption); font-weight: 600; }
+
+/* ---------------------------------------------------------------- the one hand-written title */
+html:root .md-typeset .hero-title { font-family: var(--tl9-hand); font-size: var(--tl9-fs-display); font-weight: 400; line-height: 1.15; letter-spacing: 0; }
+@media screen and (max-width: 768px) { html:root .md-typeset .hero-title { font-size: var(--tl9-fs-h1); } }
+
+/* ---------------------------------------------------------------- the logo in the header and the drawer */
+html:root .md-header__button.md-logo img, html:root .md-nav__title .md-logo img { filter: none; }
+html:root .md-header__button.md-logo img { height: 2.3rem; }
+/* phone: the header has no room, the logo lives at the top of the drawer, where Material keeps a place for it */
+html:root .md-nav__title .md-logo, html:root .md-nav__button.md-logo { display: block; }
+html:root .md-nav--primary > .md-nav__title .md-nav__button.md-logo img { height: 3.2rem; width: auto; }
+
+/* ---------------------------------------------------------------- the big logo on the home page, one picture per theme */
+html:root .md-typeset .tl9-hero-logo { display: block; height: 7.5rem; width: auto; margin: 0 0 .6rem -.4rem; padding: 0; border: 0 !important; background: none !important; border-radius: 0 !important; box-shadow: none !important; }
+html:root [data-md-color-scheme="slate"] .md-typeset .tl9-hero-logo--light,
+html:root [data-md-color-scheme="default"] .md-typeset .tl9-hero-logo--dark { display: none !important; }
+@media screen and (max-width: 768px) { html:root .md-typeset .tl9-hero-logo { height: 5.5rem; } }
+
+/* ---------------------------------------------------------------- home: the text starts under the header, four text styles */
+html:root .tl9-featured { align-items: start; }
+html:root .md-typeset .hero-title { color: var(--md-default-fg-color); }
+html:root .md-typeset .hero-lede { font-size: var(--tl9-fs-lead); color: var(--md-default-fg-color); }
+html:root .md-typeset .hero-links, html:root .md-typeset .hero-sublede, html:root .md-typeset .hero-lang {
+  font-size: var(--tl9-fs-body); color: var(--md-default-fg-color--light); }
+html:root .md-typeset .tl9-featured-copy a, html:root [data-md-color-scheme] .md-typeset .hero-links a { color: var(--md-typeset-a-color); }
+/* the name under the photo: body size, 600, main text color */
+html:root .md-typeset .tl9-caption { font-style: normal; font-size: var(--tl9-fs-body); font-weight: 600; color: var(--md-default-fg-color); }
+
+/* ---------------------------------------------------------------- frames drawn by sketch.js
+   A host gets data-sk. Its CSS border and shadow give way to the drawn frame
+   (the border stays for the layout, only invisible). A host that is already positioned (the "развернуть" button
+   sits in the corner of its scheme) keeps its position; sketch.js marks static hosts with sk-rel.
+   On paper the drawn layer is off and everything keeps its CSS look: a layer drawn for the screen width does
+   not fit a printed page. */
+@media screen {
+html:root [data-sk] { isolation: isolate; }
+html:root [data-sk]:not(.sk-keep) { border-color: transparent !important; box-shadow: none !important; }
+html:root [data-sk].sk-rel { position: relative; }
+html:root [data-sk].sk-fill { background: transparent !important; }
+/* Material sets max-width: 100% on svg in text: the layer is wider than its box (room for the wobble), it must not shrink */
+svg.sk-layer { position: absolute !important; left: 0; top: 0; pointer-events: none; overflow: visible; z-index: -1; display: block; margin: 0 !important; max-width: none !important; max-height: none !important; }
+html:root .md-header { border-bottom-color: transparent; }
+.md-header svg.sk-layer { z-index: 0; }
+/* tables: the paper and the frame are drawn under the table, so the table itself is transparent */
+html:root .md-typeset__table table:not([class]) { background: transparent; border-color: transparent; box-shadow: none; }
+html:root .md-typeset table:not([class]) th { background: transparent; }
+html:root [data-sk].sk-over > img { border-color: transparent !important; box-shadow: none !important; }
+}
+@media print { svg.sk-layer { display: none !important; } }
+
+/* pictures (img) cannot hold the drawn layer: sketch.js wraps them; a picture under a frame drawn over it
+   (sk-over) loses its CSS frame (in the screen block above) */
+.sk-imgwrap { display: block; position: relative; }
+
+/* ---------------------------------------------------------------- cards on paper
+   Cards and the name band under the photo are the page color (--tl9-backdrop at 85%), not white: the drawn
+   frame and the faint hachure sit on paper, the moving digits of the background are dimmed under the text. */
+html:root .post-card, html:root .tl9-mini-cover, html:root .dash-card, html:root .sketch-card, html:root .tl9-caption {
+  background: rgba(239, 232, 220, .85); }
+html:root [data-md-color-scheme="slate"] .post-card, html:root [data-md-color-scheme="slate"] .tl9-mini-cover,
+html:root [data-md-color-scheme="slate"] .dash-card, html:root [data-md-color-scheme="slate"] .sketch-card,
+html:root [data-md-color-scheme="slate"] .tl9-caption { background: rgba(11, 15, 20, .85); }
+
+/* ---------------------------------------------------------------- the left column (wide screens)
+   The home pages have none (hide: navigation in index.md). On other pages Material paints the section name
+   with --md-default-bg-color, lighter than the page: it gets the page color. */
+@media screen and (min-width: 76.25em) {
+  html:root .md-nav--lifted > .md-nav__list > .md-nav__item--active > .md-nav__link {
+    background: var(--tl9-backdrop); box-shadow: 0 0 .4rem .4rem var(--tl9-backdrop); }
+}
+
+/* ---------------------------------------------------------------- hover on drawn buttons
+   The CSS border and background are hidden under the drawing, so the drawing answers the mouse: rough.js draws
+   the hachure as paths with stroke-width = fillWeight (0.5), they get the darker --sk-hatch; header buttons
+   have no hachure, their outline gets thicker. */
+html:root :is(.slider-btn, .exc-scene__full, .rt-sheet__save, .md-button)[data-sk]:hover > svg.sk-layer path[stroke-width="0.5"] { stroke: var(--sk-hatch); }
+html:root :is(.tl9-lang-toggle, .tl9-social-btn)[data-sk]:hover > svg.sk-layer path { stroke-width: 1.8; }
